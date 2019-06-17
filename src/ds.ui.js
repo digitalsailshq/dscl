@@ -826,7 +826,6 @@ ds.ui.View = ds.Object.extend({
 	get visible() { return this._visible; },
 	set visible(value) {
 		this._visible = value;
-		this._visible = value;
 		if (this.element) this.element.style.setProperty('display', this._visible ? '' : 'none');
 		if (this._visible) this.onshow();
 	},
@@ -850,6 +849,7 @@ ds.ui.View = ds.Object.extend({
 	},
 	fadeOut() {
 		const self = this;
+		if (!self._visible) return Promise.resolve(true);
 		self.element.style.opacity = 1;
 		return new Promise((resolve, reject) => {
 			ds.ui.element_animate(self.element, 50, { opacity: 1 }, { opacity: 0 }, () => {
