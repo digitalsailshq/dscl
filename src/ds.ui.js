@@ -886,7 +886,7 @@ ds.ui.View = ds.Object.extend({
 	init() {
 		const self = this;
 		if (!self.this) self.this = self;
-		if (!self._tagName && !self.template) throw 'ds.ui.View: Template of TagName not specified.';
+		if (!self._tagName && !self.template) throw 'ds.ui.View: Template or TagName not specified.';
 		if (self.template) {
 			self._rootDirective = ds.ui.__Directive.new({ scope: [{ self: self.this }], this: self.this });
 			self._compiledTemplate = ds.ui.__template_compile(self.template, [{ self: self.this }], self.this);
