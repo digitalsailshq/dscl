@@ -20,7 +20,9 @@ ds.appshell.__UserView = ds.ui.View.extend({
 						<span>{{ this._name }}</span><br/>
 						<span class="sm gray">{{ this._jobtitle }}</span>
 					</span>
-					<div x-ref="menu_element" class="dhvr hvr hnd rnd row cen mid" style="align-self:flex-start;width:32px;height:32px;" x-on:click="self._userMenu.open()">
+					<div x-ref="menu_element" class="dhvr hvr hnd rnd row cen mid"
+						style="align-self:flex-start;width:32px;height:32px;"
+						x-on:click="self._userMenu.open()">
 						<img src="data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMTdweCIgaGVpZ2h0PSIxNnB4IiB2aWV3Qm94PSIwIDAgMTcgMTYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8ZyBpZD0ibWVudSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGNpcmNsZSBpZD0iT3ZhbC0yIiBmaWxsPSIjMDAwMDAwIiBjeD0iOC41IiBjeT0iMi41IiByPSIxLjUiPjwvY2lyY2xlPgogICAgICAgIDxjaXJjbGUgaWQ9Ik92YWwtMi1Db3B5IiBmaWxsPSIjMDAwMDAwIiBjeD0iOC41IiBjeT0iNy41IiByPSIxLjUiPjwvY2lyY2xlPgogICAgICAgIDxjaXJjbGUgaWQ9Ik92YWwtMi1Db3B5LTIiIGZpbGw9IiMwMDAwMDAiIGN4PSI4LjUiIGN5PSIxMi41IiByPSIxLjUiPjwvY2lyY2xlPgogICAgPC9nPgo8L3N2Zz4=" class="x16 dhvrc"/>
 					</div>
 				</div>`,

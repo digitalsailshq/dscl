@@ -1,3 +1,5 @@
+![Example](https://github.com/digitalsailshq/dscl/blob/master/sublime/example.png "Example")
+
 ### How To Install Syntax Highlight For Sublime Text
 
 1. Install Polymer syntax
