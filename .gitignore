@@ -59,3 +59,15 @@ typings/
 
 # next.js build output
 .next
+
+# Windows
+Thumbs.db
+desktop.ini
+# OS X
+.DS_Store
+.Spotlight-V100
+.Trashes
+._*
+# Node specific
+package-lock.json
+dist/
