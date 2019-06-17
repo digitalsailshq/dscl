@@ -3285,7 +3285,7 @@ ds.ui.DateTimeEdit = ds.ui.DropDownEdit.extend({
 	}
 }, ds.Events('select'));
 ds.ui.ListView = ds.ui.View.extend({
-	styles: `.__xlstvw { overflow-y: auto; }
+	styles: `.__xlstvw { overflow-y: auto; position: relative; display: flex; flex-flow: column; }
 			 .__xlstvw .__xlstvw_item { position: relative; }
 			 .__xlstvw .__xlstvw_item.__hvr:hover:not(.__selected) { background-color: var(--background-color-selected); }
 			 .__xlstvw .__xlstvw_item.__selected { background-color: var(--background-color-highlighted); }
@@ -3298,16 +3298,25 @@ ds.ui.ListView = ds.ui.View.extend({
 			 .__xlstvw .__xlstvw_item .__xlstvw_item_actn:hover { background-color: var(--background-color-selected); }
 			 .__xlstvw .__xlstvw_item .__xlstvw_item_actn > * { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); opacity: 0.25; }
 			 .__xlstvw .__xlstvw_item .__xlstvw_item_actn:hover > * { opacity: 1; }
-			 .__xlstvw .__xlstvw_item .__xlstvw_item_cell { flex: 1; }`,
+			 .__xlstvw .__xlstvw_item .__xlstvw_item_cell { flex: 1; }
+			 .__xlstvw_tshdw { position: absolute; left: 0px; top: 0px; right: 0px; height: 11px; pointer-events: none; box-shadow: inset 0px 10px 8px -10px #cccccc67; }
+			 .__xlstvw_bshdw { position: absolute; left: 0px; bottom: 0px; right: 0px; height: 11px; pointer-events: none; box-shadow: inset 0px -10px 8px -10px #cccccc67; }`,
 	template: `<div class="__xlstvw">
-					<div x-for="item of this.items | preserve_element: element, preserve_item: __item"
-						 	class="__xlstvw_item row mid{{ item.options.hover ? ' __hvr' : '' }}{{ item.options.hand ? ' hnd' : '' }}{{ item.selected ? ' __selected' : '' }} {{ item.options.className || '' }}"
-						 	style="{{ !item.visible ? 'display:none;' : ''; }}">
-						{{ item.checkbox_element }}
-						{{ item.cell }}
-						{{ item.action_elements }}
+					<div x-ref="items_element" class="col flex scroll">
+						<div x-for="item of this.items | preserve_element: element, preserve_item: __item"
+							 	class="__xlstvw_item row mid{{ item.options.hover ? ' __hvr' : '' }}{{ item.options.hand ? ' hnd' : '' }}{{ item.selected ? ' __selected' : '' }} {{ item.options.className || '' }}"
+							 	style="{{ !item.visible ? 'display:none;' : ''; }}">
+							{{ item.checkbox_element }}
+							{{ item.cell }}
+							{{ item.action_elements }}
+						</div>
 					</div>
+					<div x-ref="innerTopShadow_element" style="display:none;" class="__xlstvw_tshdw"></div>
+					<div x-ref="innerBottomShadow_element" style="display:none;" class="__xlstvw_bshdw"></div>
 				</div>`,
+	_topShadowVisible: false,
+	_bottomShadowVisible: false,
+	_scrollShadow: false,
 	_actions: null,
 	_search: null,
 	_dataSet: null,
@@ -3359,6 +3368,30 @@ ds.ui.ListView = ds.ui.View.extend({
 		if (!this._dataSetOnLoad) this._dataSetOnLoad = () => this.needsUpdate();
 		this._dataSet.on('load', this._dataSetOnLoad);
 		if (this._dataSet.isLoaded()) this.needsUpdate();
+	},
+	get scrollShadow() { return this._scrollShadow; },
+	set scrollShadow(value) { this._scrollShadow = value; this.needsUpdate(); },
+	_checkInnerShadows() {
+		const self = this;
+		if (!self._scrollShadow) return;
+		setTimeout(() => {
+			if (self.items_element.scrollTop == 0 && self._topShadowVisible) {
+				self.innerTopShadow_element.style.display = 'none';
+				self._topShadowVisible = false;
+			}
+			if (self.items_element.scrollTop > 0 && !self._topShadowVisible) {
+				self.innerTopShadow_element.style.display = '';
+				self._topShadowVisible = true;
+			}
+			if ((self.items_element.scrollHeight - self.items_element.scrollTop) <= self.items_element.clientHeight && self._bottomShadowVisible) {
+				self.innerBottomShadow_element.style.display = 'none';
+				self._bottomShadowVisible = false;
+			}
+			if ((self.items_element.scrollHeight - self.items_element.scrollTop) > self.items_element.clientHeight && !self._bottomShadowVisible) {
+				self.innerBottomShadow_element.style.display = '';
+				self._bottomShadowVisible = true;
+			}
+		}, 0);
 	},
 	select(index, trigger_event) {
 		const self = this;
@@ -3432,6 +3465,11 @@ ds.ui.ListView = ds.ui.View.extend({
 		const self = this;
 		self._actions.push(options);
 	},
+	scrollIntoView(index) {
+		const self = this;
+		const li = self.items[index];
+		if (li) li.element.scrollIntoView();
+	},
 	update() {
 		const self = this;
 		if (!self.element) return [];
@@ -3482,6 +3520,7 @@ ds.ui.ListView = ds.ui.View.extend({
 		if (self.wrap) self.element.classList.add('col', 'wrap', 'oxa');
 		else self.element.classList.remove('col', 'wrap', 'oxa');
 		ds.ui.View.update.call(self);
+		self._checkInnerShadows();
 	},
 	init() {
 		const self = this;
@@ -3489,6 +3528,11 @@ ds.ui.ListView = ds.ui.View.extend({
 		self.items = [];
 		if (!self.cellArgs) self.cellArgs = {};
 		ds.ui.View.init.call(self);
+		ds.ui.element_on(self.items_element, 'scroll', function(e) {
+			if (self.__freed) return false;
+			self._checkInnerShadows();
+			return true;
+		});
 		ds.ui.element_on(self.element, 'click', '.__xlstvw_item_actn', function(e) {
 			if (self.__freed) return false;
 			e.stopImmediatePropagation();
