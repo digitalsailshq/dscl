@@ -9,43 +9,6 @@ var pathLib = require('path');
 var zlibLib = require('zlib');
 var streamLib = require('stream');
 // classes...
-ds.srvkit.Daemon = ds.Object.extend({
-	_signalHandler(signal) {
-		const self = this;
-		self._uninstallHandlers();
-		self._triggerAsync('stop')
-			.catch(() => {})
-			.then(() => process.kill(process.pid, signal));
-	},
-	_installHandlers() {
-		const self = this;
-		ds.srvkit.Daemon.__active_daemon = true;
-		process.on('SIGINT', self._sigintHandler = self._signalHandler.bind(self, 'SIGINT'));
-		//process.on('SIGHUP', self._sighupHandler = self._signalHandler.bind(self, 'SIGHUP'));
-		process.on('SIGQUIT', self._sigquitHandler = self._signalHandler.bind(self, 'SIGQUIT'));
-		process.on('SIGTERM', self._sigtermHandler = self._signalHandler.bind(self, 'SIGTERM'));
-	},
-	_uninstallHandlers() {
-		const self = this;
-		process.removeListener('SIGINT', self._sigintHandler);
-        //process.removeListener('SIGHUP', self._sighupHandler);
-        process.removeListener('SIGQUIT', self._sigquitHandler);
-        process.removeListener('SIGTERM', self._sigtermHandler);
-        ds.srvkit.Daemon.__active_daemon = false;
-	},
-	start() {
-		const self = this;
-		if (ds.srvkit.Daemon.__active_daemon) throw new Error('ds.srvkit.Daemon: One daemon already activated.');
-		self._installHandlers();
-		self._triggerAsync('start').then(() => process.stdin.resume());
-	},
-	stop() {
-		const self = this;
-		self._triggerAsync('stop')
-			.catch(() => {})
-			.then(() => process.exit());
-	}
-}, ds.Events('start', 'stop'));
 ds.srvkit.RequestHandler = ds.Object.extend({
 	request(req, res, next) { },
 	getFn() { const self = this; return (req, res, next) => self.request(req, res, next); }
