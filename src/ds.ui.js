@@ -2547,7 +2547,11 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 	set image(value) { this._image = value; this.needsUpdate(); },
 	get pattern() { return this._pattern; },
 	set pattern(value) { this._pattern = value; this.needsUpdate(); },
-	_getValue() { return this._getInputElement() && this._getInputElement().value; },
+	_getValue() {
+		if (!this._getInputElement()) return null;
+		if (this._getInputElement().value == '') return null;
+		return this._getInputElement().value;
+	},
 	_setValue(value) {
 		const input_element = this._getInputElement();
 		if (input_element) {
