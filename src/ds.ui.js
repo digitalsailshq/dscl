@@ -2582,7 +2582,8 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 	_applyChanges() {
 		const self = this;
 		if (self.disabled) return;
-		self.value = ds.ifnull(self._getInputElement().value, '');
+		const val = self._getInputElement().value;
+		self.value = (val == '' ? null : val);
 	},
 	_onFocusOut() {
 		const self = this;
