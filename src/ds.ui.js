@@ -2376,7 +2376,7 @@ ds.ui.Edit = ds.ui.View.extend({
 	set value(value) {
 		const self = this;
 		const passed_value = self._passValue(value);
-		if ((self._lastChangedValue !== passed_value) || ds.isnull(passed_value)) {
+		if (self._lastChangedValue !== passed_value) {
 			self._setValue(passed_value);
 			self._setValueToDataObject(passed_value);
 			self._lastChangedValue = passed_value;
