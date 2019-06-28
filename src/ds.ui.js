@@ -4183,7 +4183,7 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 			 .__xgrd_bdy_row_spoiler { border-bottom-color: rgb(228, 228, 228); border-bottom-style: solid; border-bottom-width: 1px; }`,
 	template: `<div class="__xgrd_bdy col flex{{ this._dataGrid.selectArrow == 'left' ? ' __xgrd_bdy_selarr_l' : '' }}{{ this._dataGrid.selectArrow == 'right' ? ' __xgrd_bdy_selarr_r' : '' }}{{ !this._dataGrid.lastRowSeparator ? ' __nolastrowsep' : '' }}">
 					<div x-ref="innerTopShadow_element" style="display:none;" class="__xgrd_bdy_tshdw __sbpad"></div>
-					<div x-ref="rows_element" class="col flex __sbpad" style="overflow-y: overlay;">{{ this._getDataElements() }}</div>
+					<div x-ref="rows_element" class="col flex __sbpad" style="overflow-y: scroll;">{{ this._getDataElements() }}</div>
 					<div x-ref="innerBottomShadow_element" style="display:none;" class="__xgrd_bdy_bshdw __sbpad"></div>
 				</div>`,
 	_data_hash: null,
