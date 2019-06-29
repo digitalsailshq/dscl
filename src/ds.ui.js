@@ -3694,8 +3694,8 @@ ds.ui.TreeView = ds.ui.View.extend({
 	async findNode(value_path, prop_name, scroll = false) {
 		const self = this;
 		if (value_path === null || value_path === undefined) return;
-		ds.assertIsSet(value_path, 'ds.ui.TreeView.locate: ValuePath is required.');
-		ds.assertIsSet(prop_name, 'ds.ui.TreeView.locate: PropName is required.');
+		if (ds.isnull(value_path)) throw new Error('ds.ui.TreeView.locate: ValuePath is required.');
+		if (ds.isnull(prop_name)) throw new Error('ds.ui.TreeView.locate: PropName is required.');
 		const locate_level = (nodes, value) => nodes.find(node => ds.get(node.item, prop_name) == value);
 		let nodes = await self._nodes;
 		let node = null;
