@@ -26,7 +26,7 @@ ds.asString = value => {
 }
 ds.isnull = a => (a === null || a === undefined);
 ds.ifnull = (a, b) => ds.isnull(a) ? b : a;
-ds.isset = a => !ds.isnull();
+ds.isset = a => !ds.isnull(a);
 ds.allKeys = obj => {
 	let keys = [];
 	for (let key in obj) keys.push(key);
