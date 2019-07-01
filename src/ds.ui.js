@@ -3309,7 +3309,7 @@ ds.ui.ListView = ds.ui.View.extend({
 	template: `<div class="__xlstvw">
 					<div x-ref="items_element" class="col flex scroll">
 						<div x-for="item of this.items | preserve_element: element, preserve_item: __item"
-							 	class="__xlstvw_item row mid{{ item.options.hover ? ' __hvr' : '' }}{{ item.options.hand ? ' hnd' : '' }}{{ item.selected ? ' __selected' : '' }} {{ item.options.className || '' }}"
+							 	class="__xlstvw_item row {{ item.options.hover ? ' __hvr' : '' }}{{ item.options.hand ? ' hnd' : '' }}{{ item.selected ? ' __selected' : '' }} {{ item.options.className || '' }}"
 							 	style="{{ !item.visible ? 'display:none;' : ''; }}">
 							{{ item.checkbox_element }}
 							{{ item.cell }}
