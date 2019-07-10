@@ -15,11 +15,15 @@
       escape_captures:
         0: keyword.other.substitution.end.js
 ```
-5. Open Monokai color theme and paste block for double curly braces
+6. Open Monokai color theme and paste block for double curly braces
 ```json
 {
     "name": "double_curly_braces",
     "scope": "punctuation.definition.template.begin.html, punctuation.definition.template.end.html",
     "foreground": "#F92672"
 }
+```
+7. Fladaptive tweak
+```
+"blue_my": "hsl(210, 15%, 14%)"
 ```

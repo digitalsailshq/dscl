@@ -275,7 +275,7 @@ ds.appshell.__SideBarView = ds.ui.View.extend({
 				</div>`,
 });
 ds.appshell.__AppView = ds.ui.View.extend({
-	styles: `@media (max-width: 1180px) {
+	styles: `@media (max-width: 1280px) {
 				.__xas_nvbr { position: fixed; left: 0px; top: 0px; bottom: 0px; transform: translateX(calc(-100% + 16px)); transition: all 0.25s; z-index: 10; }
 				.__xas_nvbr:hover { transform: none; box-shadow: 0px 0px 15px 0 rgba(0, 0, 0, .1) }
 				.__xas_cnt { margin-left: 16px; }
