@@ -841,12 +841,15 @@ ds.Audit = ds.Object.extend({
 	file: true,
 	output: true,
 	module: null,
+	user: null,
+	_format(a) { return (a || '').toString().replace('\t', ' ').replace('\n', ' '); },
 	message(sev, msg) {
 		const self = this;
 		if (msg === null || msg === undefined) throw new Error(`ds.Audit: "msg" is required.`);
 		if (!self.SEVERITY.includes(sev)) throw new Error(`ds.Audit: "sev" must be one of "${self.SEVERITY}".`);
+		if (self.user === null || self.user === undefined) throw new Error(`ds.Audit: "self.user" is required.`);
 		const dt = ds.Date.new().toISODateTime().replace('T', ' ');
-		const log = `${dt}\t${(sev || '').toString().toUpperCase()}\t${msg.replace('\n', ' ').replace('\t', ' ') || ''}\n`;
+		const log = `${self._format(dt)}\t${self._format(sev)}\t${self._format(self.user)}\t${self._format(msg)}\n`;
 		if (self.output) {
 			if (sev == 'INFO') console.log(log);
 			else if (sev == 'WARNING') console.log(ds.yellow(log));
