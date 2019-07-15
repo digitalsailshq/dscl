@@ -1,0 +1,6 @@
+{
+	"name": "dscl",
+	"install": {
+		"path": "src"
+	}
+}
