@@ -295,7 +295,7 @@ ds.ui.__styles = `
 	.x4 { height: 4px; width: 4px; }
 	.rtt180 { transform: rotate(180deg); }
 	.ndt:empty { position: relative; min-height: 28px; }
-	.ndt:empty::after { content: "нет данных"; position: absolute; top: 7px; text-align: center; font-size: 12px; color: gray; left: 50%; transform: translateX(-50%); }
+	.ndt:empty::after { content: "пусто"; position: absolute; top: 7px; text-align: center; font-size: 12px; color: gray; left: 50%; transform: translateX(-50%); }
 	[data-badge] { position: relative; }
 	[data-badge]::after { content: attr(data-badge); position: absolute; display: block; background-color: red; color: white; border-radius: 50%; top: -2px; right: -2px; width: 14px; height: 14px; text-align: center; font-family: "Open Sans", sans-serif; font-size: 9px; padding-top: 2px; box-sizing: border-box; }
 	.__xmdlpnl_bk { position: absolute; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); left: 0px; top: 0px; z-index: 19; }
@@ -866,7 +866,12 @@ ds.ui.View = ds.Object.extend({
 		const self = this;
 		if (!self.element) return;
 		if (self._rootDirective) self._rootDirective.updateChildren();
-		((self._className || '') + ' ' + (self.className || '')).split(' ').filter(c => !!c).forEach(c => self.element.classList.add(c));
+		(self.__last_added_classes || []).forEach(c => self.element.classList.remove(c));
+		((self._className || '') + ' ' + (self.className || '')).split(' ').filter(c => !!c).forEach(c => {
+			self.element.classList.add(c);
+			if (!self.__last_added_classes) self.__last_added_classes = [];
+			self.__last_added_classes.push(c);
+		});
 		self.element.style.setProperty('display', self.visible ? '' : 'none');
 		Object.keys(self.style || {}).forEach(key => self.element.style.setProperty(key, (self.style || {})[key]));
 		return self;
@@ -2649,7 +2654,9 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 		self.value = null;
 		self._getInputElement().value = '';
 	},
-	focus() { this._getInputElement().focus(); },
+	focus() {
+		setTimeout(() => this._getInputElement().focus(), 100);
+	},
 	loadingShow() {
 		const self = this;
 		ds.ui.Edit.loadingShow.call(self);
@@ -3431,9 +3438,11 @@ ds.ui.ListView = ds.ui.View.extend({
 		const self = this;
 		if (self.checkKey === null || self.checkKey === undefined) throw 'ds.ui.ListView: CheckKey is required.';
 		self.items.forEach(li => {
-			li.item[self.checkKey] = checked ? self._trueDataValue : self._falseDataValue;
-			if (li.options.checkbox) li.checkbox_element.classList[checked ? 'add' : 'remove']('__checked');
-			if (trigger_event) self._trigger('check', li.index, checked);
+			if (li.options.checkbox) {
+				li.item[self.checkKey] = checked ? self._trueDataValue : self._falseDataValue;
+				li.checkbox_element.classList[checked ? 'add' : 'remove']('__checked');
+				if (trigger_event) self._trigger('check', li.index, checked);
+			}
 		});
 	},
 	check(values, checked, trigger_event) {
@@ -3555,14 +3564,20 @@ ds.ui.ListView = ds.ui.View.extend({
 			else self.select(cell_element.__xlv_item.index, true);
 			return true;
 		});
-		self.on('count', () => self.dataSet && self.dataSet.isLoaded() ? self.dataSet.data.length : 0);
+		self.on('count', () => {
+			if (!self.dataSet) return 0;
+			if (!self.dataSet.isLoaded()) return 0;
+			return self.dataSet.data.length;
+		});
 		self.on('text', index => {
-			var item = self.dataSet.data[index];
-			return ds.get(item, self.nameKey);
+			if (!self.dataSet) return '';
+			if (!self.dataSet.isLoaded()) return '';
+			return ds.get(self.dataSet.data[index], self.nameKey);
 		});
 		self.on('image', index => {
-			var item = self.dataSet.data[index];
-			var image = ds.get(item, self.imageKey) || self.defaultImage;
+			if (!self.dataSet) return null;
+			if (!self.dataSet.isLoaded()) return null;
+			const image = ds.get(self.dataSet.data[index], self.imageKey) || self.defaultImage;
 			return self.imageKey && image ? (self.imagePrefix + image) : null;
 		});
 		self.on('cell', index => {
@@ -3571,8 +3586,16 @@ ds.ui.ListView = ds.ui.View.extend({
 			cell_args.text = self._trigger('text', index);
 			return self.cellPrototype.new(cell_args);
 		});
-		self.on('text', index => ds.get(self.dataSet.data[index], self.nameKey));
-		self.on('item', index => self.dataSet.data[index]);
+		self.on('text', index => {
+			if (!self.dataSet) return null;
+			if (!self.dataSet.isLoaded()) return null;
+			return ds.get(self.dataSet.data[index], self.nameKey)
+		});
+		self.on('item', index => {
+			if (!self.dataSet) return null;
+			if (!self.dataSet.isLoaded()) return null;
+			return self.dataSet.data[index];
+		});
 		self.on('options', index => ({ hover: false, hand: false, checkbox: false }));
 	},
 	free() {
@@ -4183,7 +4206,7 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 			 .__xgrd_bdy_row_spoiler { border-bottom-color: rgb(228, 228, 228); border-bottom-style: solid; border-bottom-width: 1px; }`,
 	template: `<div class="__xgrd_bdy col flex{{ this._dataGrid.selectArrow == 'left' ? ' __xgrd_bdy_selarr_l' : '' }}{{ this._dataGrid.selectArrow == 'right' ? ' __xgrd_bdy_selarr_r' : '' }}{{ !this._dataGrid.lastRowSeparator ? ' __nolastrowsep' : '' }}">
 					<div x-ref="innerTopShadow_element" style="display:none;" class="__xgrd_bdy_tshdw __sbpad"></div>
-					<div x-ref="rows_element" class="col flex __sbpad" style="overflow-y: auto;">{{ this._getDataElements() }}</div>
+					<div x-ref="rows_element" class="col flex __sbpad" style="overflow-y: overlay;">{{ this._getDataElements() }}</div>
 					<div x-ref="innerBottomShadow_element" style="display:none;" class="__xgrd_bdy_bshdw __sbpad"></div>
 				</div>`,
 	_data_hash: null,

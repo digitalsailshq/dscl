@@ -102,15 +102,30 @@ ds.appshell.__ExplorerNodeView = ds.ui.View.extend({
 	}
 });
 ds.appshell.__ExplorerSectionView = ds.ui.View.extend({
-	styles: `.__xasexp_sc { margin-bottom: 22px; }`,
-	template: `<div class="__xasexp_sc nosel">
-					<div class="fs11 gray bvl strong pl2 mb">{{ (this._options.text || '').toUpperCase() }}</div>
-					<div x-ref="nodes_element">{{ this._getNodes() }}</div>
+	template: `<div class="nosel">
+					<div class="fs11 gray bvl pl2 pr pb075 row vhvr hnd" x-on:click="self._toggleExpand()">
+						<div class="flex strong">{{ (this._options.text || '').toUpperCase() }}</div>
+						<div x-ref="collapse_element" x-if="this._expanded" class="vhvrc">свернуть</div>
+						<div x-ref="expand_element" x-if="!this._expanded" class="vhvrc">развернуть</div>
+					</div>
+					<div x-ref="nodes_element" x-if="this._expanded" style="margin-bottom: 22px;">{{ this._getNodes() }}</div>
+					<div x-if="!this._expanded" style="margin-bottom: 11px;"></div>
 				</div>`,
+	_expanded: true,
 	_options: null,
 	explorerView: null,
 	item: null,
 	index: null,
+	_getSectionLocalStorageID() {
+		const self = this;
+		return `navbar_section_${self.item.id}_expand`;
+	},
+	_toggleExpand() {
+		const self = this;
+		self._expanded = !self._expanded;
+		self.needsUpdate();
+		localStorage.setItem(self._getSectionLocalStorageID(), self._expanded);
+	},
 	async _getNodes() {
 		const self = this;
 		if (self.nodes) self.nodes.forEach(n => n.free());
@@ -130,8 +145,10 @@ ds.appshell.__ExplorerSectionView = ds.ui.View.extend({
 	},
 	init() {
 		const self = this;
-		if (!self.explorerView) throw new Error('ds.appshell.__ExplorerSectionView: explorerView is required.');
+		if (!self.explorerView) throw new Error('ds.appshell.__ExplorerSectionView: "explorerView" is required.');
+		if (!self.item) throw new Error('ds.appshell.__ExplorerSectionView: "item" is required.');
 		self.item.__sectionView = self;
+		self._expanded = ds.ifnull(localStorage.getItem(self._getSectionLocalStorageID()), 'true') == 'true';
 		ds.ui.View.init.call(self);
 	},
 	free() {
@@ -140,6 +157,50 @@ ds.appshell.__ExplorerSectionView = ds.ui.View.extend({
 		ds.ui.View.free.call(self);
 	}
 });
+ds.appshell.__ExplorerTabsView = ds.ui.View.extend({
+	template: `<div class="nosel" style="display: {{ this.tabs.length == 0 ? 'none' : ''; }}">
+					<div class="fs11 gray bvl pl2 pr pb075 row vhvr hnd" x-on:click="self._toggleExpand()">
+						<div class="flex strong">{{ this._getTitle() }}</div>
+						<div x-ref="collapse_element" x-if="this._expanded" class="vhvrc">свернуть</div>
+						<div x-ref="expand_element" x-if="!this._expanded" class="vhvrc">развернуть</div>
+					</div>
+					<div x-ref="nodes_element" x-if="this._expanded" style="margin-bottom: 22px;">{{ this._getNodes() }}</div>
+					<div x-if="!this._expanded" style="margin-bottom: 11px;"></div>
+				</div>`,
+	selectedIndex: -1,
+	tabs: null,
+	_toggleExpand() {
+		const self = this;
+		self._expanded = !self._expanded;
+		self.needsUpdate();
+		localStorage.setItem('navbar_section_opened_documents_expand', self._expanded);
+	},
+	_getTitle() {
+		const self = this;
+		const text = 'ОТКРЫТЫЕ ДОКУМЕНТЫ';
+		if (self._expanded) return text;
+		else return `${text} (...)`;
+	},
+	_getNodes() {
+		const self = this;
+		self.tabs.forEach(t => t.free());
+		self.tabs = [];
+		const count = self._trigger('count');
+		for (let i = 0; i < count; i++) {
+			const options = self._trigger('options', i);
+			const tab_cell = ds.ui.Cell.new({ text: options.text });
+			if (i == self.selectedIndex) tab_cell.element.classList.add('bk');
+			self.tabs.push(tab_cell);
+		}
+		return self.tabs.map(t => t.element);
+	},
+	init() {
+		const self = this;
+		self._expanded = ds.ifnull(localStorage.getItem('navbar_section_opened_documents_expand'), 'true') == 'true';
+		self.tabs = [];
+		ds.ui.View.init.call(self);
+	}
+}, ds.Events('count:single', 'options:single', 'select', 'close:single'));
 ds.appshell.__ExplorerView = ds.ui.View.extend({
 	template: `<div class="ndt">
 					{{ this._getSections() }}
@@ -167,8 +228,8 @@ ds.appshell.__NavBarView = ds.ui.View.extend({
 	styles: `.__xas_nvbr { backg__round: linear-gradient(to bottom right, var(--background-color), var(--background-color), white); }`,
 	template: `<div class="__xas_nvbr col br bk">
 					<!-- {{ this.searchView = this.searchView || ds.appshell.__SearchView.new({ className: 'ml2 mt15 mr mb' }) }} -->
-					{{ this.userView = this.userView || ds.appshell.__UserView.new({ className: 'mt2 ml2 mr mb' }) }}
-					{{ this.explorerView = this.explorerView || ds.appshell.__ExplorerView.new({ className: 'mt2 flex scroll' }) }}
+					{{ this.userView ||= ds.appshell.__UserView.new({ className: 'mt2 ml2 mr mb' }) }}
+					{{ this.explorerView ||= ds.appshell.__ExplorerView.new({ className: 'mt2 flex scroll' }) }}
 				</div>`,
 	searchView: null,
 	userView: null,
@@ -281,10 +342,10 @@ ds.appshell.__AppView = ds.ui.View.extend({
 				.__xas_cnt { margin-left: 16px; }
 			}`,
 	template: `<div class="app row flex">
-					{{ this.navBarView = this.navBarView || ds.appshell.__NavBarView.new({ className: 'w275' }) }}
-					{{ this.navBarSplitter = this.navBarSplitter || ds.ui.Splitter.new({ align: 'left', overflow: 'left' }) }}
+					{{ this.navBarView ||= ds.appshell.__NavBarView.new({ className: 'w275' }) }}
+					{{ this.navBarSplitter ||= ds.ui.Splitter.new({ align: 'left', overflow: 'left' }) }}
 					<div class="__xas_cnt col flex">
-						{{ this.tabsView = this.tabsView || ds.appshell.__TabsView.new({ className: 'bk' })
+						{{ this.tabsView ||= ds.appshell.__TabsView.new({ className: 'bk' })
 							.on('count', () => this.appShell.tabbedControllers.length)
 							.on('options', index => ({ canClose: this.appShell.tabbedControllers[index].tabCanClose, text: this.appShell.tabbedControllers[index].text }))
 							.on('select', index => {
@@ -294,11 +355,11 @@ ds.appshell.__AppView = ds.ui.View.extend({
 								});
 								const controller = this.appShell.tabbedControllers[index];
 								if (controller.__props_controller) {
-									self.appShell.appView.propsSplitter.visible = true;
-									self.appShell.appView.props_content.style.setProperty('display', '');
+									this.appShell.appView.propsSplitter.visible = true;
+									this.appShell.appView.props_content.style.setProperty('display', '');
 								} else {
-									self.appShell.appView.propsSplitter.visible = false;
-									self.appShell.appView.props_content.style.setProperty('display', 'none');
+									this.appShell.appView.propsSplitter.visible = false;
+									this.appShell.appView.props_content.style.setProperty('display', 'none');
 								}
 								if (ds.isFunction(controller.onshow)) controller.onshow();
 								ds.ui.element_trigger(window, 'resize');
@@ -317,12 +378,12 @@ ds.appshell.__AppView = ds.ui.View.extend({
 							.on('sidebar_click', () => self.sideBarSplitter.visible = self.sideBarView.visible = !self.sideBarView.visible) }}
 						<div class="row flex">
 							<div x-ref="tabs_content" class="col flex"></div>
-							{{ this.propsSplitter = this.propsSplitter || ds.ui.Splitter.new({ align: 'right', overflow: 'right', visible: false }) }}
+							{{ this.propsSplitter ||= ds.ui.Splitter.new({ align: 'right', overflow: 'right', visible: false }) }}
 							<div x-ref="props_content" class="col w4 bl" style="display:none;"></div>
 						</div>
 					</div>
-					{{ this.sideBarSplitter = this.sideBarSplitter || ds.ui.Splitter.new({ align: 'right', overflow: 'right', visible: false }) }}
-					{{ this.sideBarView = this.sideBarView || ds.appshell.__SideBarView.new({ className: 'bl w4', visible: false }) }}
+					{{ this.sideBarSplitter ||= ds.ui.Splitter.new({ align: 'right', overflow: 'right', visible: false }) }}
+					{{ this.sideBarView ||= ds.appshell.__SideBarView.new({ className: 'bl w4', visible: false }) }}
 				</div>`,
 	init() {
 		const self = this;
