@@ -10,7 +10,7 @@ ds.ui.__styles = `
 	a { color: var(--text-color-link); text-decoration: none; }
 	:root { --text-color: #333; --text-color-gray: #888888; --text-color-blue: #459fd8; --text-color-link: #3b73af; --text-color-red: #d85b45; --text-color-green: #009834; --text-color-yellow: #ffc700; --text-color-dimmed: #888888ab; --text-color-error: #a94442; --text-color-warning: #9a7639; --text-color-info: #31708f; --text-color-success: #3c763d; --border-color: #d7d7d7; --border-color-light: #efefef; --border-color-blue: #4AA7F0; --border-color-red: #d85b45; --border-color-error: #d04437; --border-color-warning: #ffd580; --border-color-info: #4AA7F0; --border-color-success: #d6e9c6; --background-color-light: #f9f9f9; --background-color: #f5f5f5; --background-color-selected: rgba(0, 0, 0, 0.04); --background-color-highlighted: #ebf2f9; --background-color-error: #f2dede; --background-color-warning: #fff7cb; --background-color-info: #d9edf7; --background-color-success: #dff0d8; --image-dimmed-filter: opacity(0.35); }
 	.app { width: 100%; height: 100%; color: var(--text-color); }
-	.app *:not(input), .app *:not(textarea) { user-select: none; }
+	*:not(input), *:not(textarea) { user-select: none; }
 	body * { flex-shrink: 0; }
 	.row { display: flex; flex-flow: row; }
 	.row-rev { display: flex; flex-flow: row-reverse; }
