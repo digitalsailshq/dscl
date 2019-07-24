@@ -240,6 +240,7 @@ ds.ui.__styles = `
 	.w18 { width: 180px; }
 	.w19 { width: 190px; }
 	.w2 { width: 200px; }
+	.w225 { width: 225px; }
 	.w25 { width: 250px; }
 	.w275 { width: 275px; }
 	.w3 { width: 300px; }
@@ -1961,7 +1962,7 @@ ds.ui.Button = ds.ui.View.extend({
 				font-size: 10px;
 				margin-left: 6px;
 				margin-right: -2px;
-				transform: translateY(-1px); }
+				/*transform: translateY(-1px);*/ }
 			.__xbtn.__small .__xbtn_drpdwncaret { transform: translateY(0px); }
 			.__xbtn.__primary .__xbtn_drpdwncaret { color: white; }
 			.btn-grp .__xbtn { margin-left: -1px; }
@@ -2860,18 +2861,27 @@ ds.ui.NumberEdit = ds.ui.TextEdit.extend({
 });
 ds.ui.CheckboxEdit = ds.ui.Edit.extend({
 	styles: `.__xedt .__xedt_cbox { position: relative; width: 14px; height: 14px; margin-top: 5px; margin-bottom: 5px; border: rgb(204, 204, 204) 1px solid; background-color: white; box-shadow: rgba(0, 0, 0, 0.0588235) 0px 1px 1px 0px inset; cursor: pointer; }
-			.__xedt .__xedt_cbox:hover { border-color: rgb(170, 170, 170); z-index: 2; }
+			.__xedt .__xedt_cbox_lbl { margin-left: 6px; margin-top: 5px; cursor: pointer; }
+			.__xedt .__xedt_prts:hover .__xedt_cbox { border-color: rgb(170, 170, 170); z-index: 2; }
 			.__xedt.__checked .__xedt_cbox::after { content: ""; position: absolute; width: 10px; height: 8px; left: 2px; top: 3px; background-size: 10px 8px; background-position: center; background-repeat: no-repeat; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAQCAYAAAAWGF8bAAAABGdBTUEAALGPC/xhBQAAAPtJREFUOBGtkrERwjAMRe2wRTxCCpqkZ4VUFAxDlqFgBhr6VBQpWCBbcOZ/ne0zhpgkoDvZsi09KVKU+lGapqlixCY+LLUB21trL2VZFuM4Xhm/GuhgJwDJ2BljNKGa1KWSwCRca/2AbosYlvYjfvN2Bnbo+34IwLquO5R/Y4APTvcvsDP9pYcOdsSZCVr0445+DHTwMgdGXw3HipW55kq86wc/QbLOhQmQSy6A70jmp8mjShPKpVvClKeg9MtVH8Noh/+QPWPvcNdC/bC4eztbGfxEApCnCag45j5THNzyAuTdJ+hcGOPfgCkUMAsNE+f7auGgqKsB/wh8AnTbtdDy2XnCAAAAAElFTkSuQmCC'); }
 			.__xedt.__disabled .__xedt_cbox { background-color: var(--background-color); cursor: default; }
 			.__xedt.__required .__xedt_cbox { border-color: #d04437; z-index: 2; }
 			.__xedt.__inline .__xedt_cbox { margin-left: 7px; }`,
-	_cbox_element: null,
+	template: `@extend ds.ui.Edit.template
+					@slot parts
+						<div class="__xedt_cbox"></div>
+						<div class="__xedt_cbox_lbl">{{ this.checkLabel }}</div>
+					@end
+				@end`,
 	_value: null,
+	_checkLabel: null,
 	passive: false,
 	trueValue: 1,
 	falseValue: 0,
 	get checked() { return this.isChecked(); },
 	set checked(value) { this.value = value ? this.trueValue : this.falseValue; },
+	get checkLabel() { return this._checkLabel; },
+	set checkLabel(value) { this._checkLabel = value; this.needsUpdate(); },
 	_getValue() { return this._value; },
 	_setValue(value) { this._value = value; this.needsUpdate(); },
 	isChecked() { return this._value == this.trueValue; },
@@ -2885,9 +2895,7 @@ ds.ui.CheckboxEdit = ds.ui.Edit.extend({
 	init() {
 		const self = this;
 		ds.ui.Edit.init.call(self);
-		self._cbox_element = ds.ui.element('div.__xedt_cbox');
-		self.element.insertBefore(self._cbox_element, self.element.querySelector('.__xedt_prts'));
-		ds.ui.element_on(self.element, 'click', 'div.__xedt_cbox', function(e) {
+		ds.ui.element_on(self.element, 'click', 'div.__xedt_prts', function(e) {
 			if (self.__freed) return false;
 			if (self.passive) return true;
 			if (self._disabled) return true;
