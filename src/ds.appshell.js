@@ -116,7 +116,7 @@ ds.appshell.__ExplorerSectionView = ds.ui.View.extend({
 	explorerView: null,
 	item: null,
 	index: null,
-	_getSectionLocalStorageID() {
+	_getStorageID() {
 		const self = this;
 		return `navbar_section_${self.item.id}_expand`;
 	},
@@ -124,7 +124,7 @@ ds.appshell.__ExplorerSectionView = ds.ui.View.extend({
 		const self = this;
 		self._expanded = !self._expanded;
 		self.needsUpdate();
-		localStorage.setItem(self._getSectionLocalStorageID(), self._expanded);
+		localStorage.setItem(self._getStorageID(), self._expanded);
 	},
 	async _getNodes() {
 		const self = this;
@@ -148,7 +148,7 @@ ds.appshell.__ExplorerSectionView = ds.ui.View.extend({
 		if (!self.explorerView) throw new Error('ds.appshell.__ExplorerSectionView: "explorerView" is required.');
 		if (!self.item) throw new Error('ds.appshell.__ExplorerSectionView: "item" is required.');
 		self.item.__sectionView = self;
-		self._expanded = ds.ifnull(localStorage.getItem(self._getSectionLocalStorageID()), 'true') == 'true';
+		self._expanded = ds.ifnull(localStorage.getItem(self._getStorageID()), 'true') == 'true';
 		ds.ui.View.init.call(self);
 	},
 	free() {
@@ -203,6 +203,7 @@ ds.appshell.__ExplorerTabsView = ds.ui.View.extend({
 }, ds.Events('count:single', 'options:single', 'select', 'close:single'));
 ds.appshell.__ExplorerView = ds.ui.View.extend({
 	template: `<div class="ndt">
+
 					{{ this._getSections() }}
 				</div>`,
 	section: null,
@@ -210,7 +211,7 @@ ds.appshell.__ExplorerView = ds.ui.View.extend({
 		const self = this;
 		if (self.sections) self.sections.forEach(s => s.free());
 		self.sections = [];
-		let count = (await self._triggerAsync('section_count')) || 0;
+		const count = (await self._triggerAsync('section_count')) || 0;
 		for (let i = 0; i < count; i++) {
 			let item = await self._triggerAsync('section_item', i);
 			let view = ds.appshell.__ExplorerSectionView.new({ item: item, index: i, explorerView: self });
@@ -335,6 +336,129 @@ ds.appshell.__SideBarView = ds.ui.View.extend({
 					</div>
 				</div>`,
 });
+ds.appshell.__NavBarNodeView = ds.ui.View.extend({
+	styles: `.__xasexp_nd .__xasexp_nd_cell { padding: 3px 0px 3px 0px; border-left-style: solid; border-left-width: 3px; border-left-color: transparent;  }
+			.__xasexp_nd_cell_exp { position: relative; width: 24px; }
+			.__xasexp_nd.__haschildren .__xasexp_nd_cell_exp::after {
+				position: absolute;
+				content: '';		opacity: 0.25;
+				right: 8px;			top: 50%;
+				width: 5px;			height: 6px;
+				transform: translateY(-50%);
+				background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNXB4IiBoZWlnaHQ9IjZweCIgdmlld0JveD0iMCAwIDUgNiIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4KICAgIDxnIGlkPSJ0cmVlX2NhcmV0IiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8cG9seWdvbiBpZD0iUmVjdGFuZ2xlIiBmaWxsPSIjMDAwMDAwIiBwb2ludHM9IjAgMCA1IDMgMCA2Ij48L3BvbHlnb24+CiAgICA8L2c+Cjwvc3ZnPg=='); }
+			.__xasexp_nd.__haschildren .__xasexp_nd_cell_exp:hover::after { opacity: 1; }
+			.__xasexp_nd.__haschildren.__expanded .__xasexp_nd_cell_exp::after { transform: translateY(-50%) rotate(90deg); }
+			.__xasexp_nd.__selected .__xasexp_nd_cell { background-color: white !important; border-left-color: #4AA7F0;  }`,
+	template: `<div class="__xasexp_nd mt05{{ this._nodes.length > 0 ? ' __haschildren' : '' }}">
+					<div class="__xasexp_nd_cell row hvr hnd vhvr" x-on:click="self._nodeClick(e)">
+						<div class="__xasexp_nd_cell_exp"></div>
+						{{ ds.ui.Cell.new({
+								className: 'flex',
+								text: this.text,
+								image: this.image || ds.ui.Cell.EMPTY_IMG,
+								badge: this.badge,
+								badgeClassName: 'gray' 
+							}) }}
+						<div x-if="this.canClose" class="hnd thvr sm gray tac col mid cen x18 mr05 vhvrc" x-on:click="self._nodeClose(e)">
+							<i class="fa fa-times"></i>
+						</div>
+					</div>
+					<div x-ref="nodes_element">{{ this._nodes }}</div>
+				</div>`,
+	_navBarView: null,
+	_controller: null,
+	text: null,
+	image: null,
+	badge: '0',
+	canClose: false,
+	controller: null,
+	_nodes: null,
+	set selected(value) { this.element.classList[value ? 'add' : 'remove']('__selected'); },
+	get selected() { return this.element.classList.contains('__selected'); },
+	_nodeClick(e) {
+		const self = this;
+		if (!self._controller) self._controller = ds.appshell.AppShell.shared().actions.exec('open_controller', { controller: self.controller, navBarNode: self });
+		else ds.appshell.AppShell.shared().actions.exec('show_controller', { controller: self._controller });
+	},
+	_nodeClose(e) {
+		const self = this;
+		e.stopPropagation();
+		ds.appshell.AppShell.shared().actions.exec('close_controller', { controller: self._controller });
+		self._controller = null;
+	},
+	init() {
+		const self = this;
+		self._nodes = [];
+		ds.ui.View.init.call(self);
+	}
+});
+ds.appshell.__NavBarSectionView = ds.ui.View.extend({
+	template: `<div class="nosel">
+					<div class="fs11 gray bvl pl2 pr pb075 row vhvr hnd" x-on:click="self._toggleExpand()">
+						<div class="flex strong">{{ (this.text || '').toUpperCase() }}</div>
+						<div x-ref="collapse_element" x-if="this._expanded" class="vhvrc">свернуть</div>
+						<div x-ref="expand_element" x-if="!this._expanded" class="vhvrc">развернуть</div>
+					</div>
+					<div x-ref="nodes_element" x-if="this._expanded" style="margin-bottom: 22px;">
+						{{ this._nodes }}
+					</div>
+					<div x-if="!this._expanded" style="margin-bottom: 11px;"></div>
+				</div>`,
+	_nodes: null,
+	_expanded: true,
+	_navBarView: null,
+	_sectionView: null,
+	text: null,
+	id: null,
+	_getStorageID() {
+		const self = this;
+		return `navbar_section_${self.id}_expand`;
+	},
+	_toggleExpand() {
+		const self = this;
+		self._expanded = !self._expanded;
+		self.needsUpdate();
+		localStorage.setItem(self._getStorageID(), self._expanded);
+	},
+	addNode(options) {
+		const self = this;
+		const nodeView = ds.appshell.__NavBarNodeView.new(Object.assign(options, { _navBarView: self._navBarView, _sectionView: self }));
+		self._nodes.push(nodeView);
+		self.needsUpdate();
+		return nodeView;
+	},
+	init() {
+		const self = this;
+		self._nodes = [];
+		self._expanded = ds.ifnull(localStorage.getItem(self._getStorageID()), 'true') == 'true';
+		ds.ui.View.init.call(self);
+	},
+	free() {
+		const self = this;
+		(self._nodes || []).forEach(n => n.free());
+		ds.ui.View.free.call(self);
+	}
+});
+ds.appshell.__NavBarView2 = ds.ui.View.extend({
+	template: `<div class="col bk br">
+					{{ this._sections }}
+				</div>`,
+	_sections: null,
+	openedSection: null,
+	addSection(options) {
+		const self = this;
+		const sectionView = ds.appshell.__NavBarSectionView.new(Object.assign(options, { _navBarView: self }));
+		self._sections.push(sectionView);
+		self.needsUpdate();
+		return sectionView;
+	},
+	init() {
+		const self = this;
+		ds.ui.View.init.call(self);
+		self._sections = [];
+		self.openedSection = self.addSection({ text: 'Открытые' });
+	}
+});
 ds.appshell.__AppView = ds.ui.View.extend({
 	styles: `@media (max-width: 1280px) {
 				.__xas_nvbr { position: fixed; left: 0px; top: 0px; bottom: 0px; transform: translateX(calc(-100% + 16px)); transition: all 0.25s; z-index: 10; }
@@ -342,6 +466,7 @@ ds.appshell.__AppView = ds.ui.View.extend({
 				.__xas_cnt { margin-left: 16px; }
 			}`,
 	template: `<div class="app row flex">
+					{{ this.navBarView2 ||= ds.appshell.__NavBarView2.new({ className: 'w3' }) }}
 					{{ this.navBarView ||= ds.appshell.__NavBarView.new({ className: 'w275' }) }}
 					{{ this.navBarSplitter ||= ds.ui.Splitter.new({ align: 'left', overflow: 'left' }) }}
 					<div class="__xas_cnt col flex">
@@ -467,17 +592,115 @@ ds.appshell.__Actions = ds.Object.extend({
 		if (!self.appShell) throw new Error('ds.appshell.__Actions: appShell is required.');
 		self._actions = [];
 		// standard actions...
+		let active_controller;
 		let props_controller;
 		self.add({
 			name: 'open_controller',
 			fn: args => {
-				if (!args.controller) throw new Error('ds.appshell.addStandardActions: "controller" property not found when performing "open_controller" action.');
+				if (!args.controller) throw new Error('ds.appshell.__Actions: "controller" property not found when performing "open_controller" action.');
 				let controller_prototype = ds.isPrototypeOf(args.controller, ds.ui.Controller)
 											? args.controller
 											: ds.isString(args.controller)
 												? ds.get(ds.global(), args.controller)
 												: null;
-				if (!controller_prototype) throw new Error('ds.appshell.addStandardActions: Controller prototype not found by "' + args.controller + '".');
+				if (!controller_prototype) throw new Error('ds.appshell.__Actions: Controller prototype not found by "' + args.controller + '".');
+				const controller = controller_prototype.new(Object.assign({ __navbar_node: args.navBarNode }, args.controllerArgs || {}));
+				if (!controller.__navbar_node) controller.__navbar_node = self.appShell.appView.navBarView2.openedSection.addNode({ text: '123', _controller: controller });
+				controller.view.visible = false;
+				self.appShell.appView.tabs_content.appendChild(controller.view.element);
+				if (!args.nofocus) self.exec('show_controller', { controller });
+				return controller;
+			}
+		});
+		self.add({
+			name: 'show_controller',
+			fn: args => {
+				if (!args.controller) throw new Error('ds.appshell.__Actions: "controller" property not found when performing "open_controller" action.');
+				if (active_controller) {
+					active_controller.__navbar_node.selected = false;
+					active_controller.view.visible = false;
+					if (active_controller.__props_controller)
+						active_controller.__props_controller.view.visible = false;
+				}
+				active_controller = args.controller;
+				active_controller.__navbar_node.selected = true;
+				active_controller.view.visible = true;
+				if (active_controller.__props_controller) {
+					active_controller.__props_controller.view.visible = true;
+					this.appShell.appView.propsSplitter.visible = true;
+					this.appShell.appView.props_content.style.setProperty('display', '');
+				} else {
+					this.appShell.appView.propsSplitter.visible = false;
+					this.appShell.appView.props_content.style.setProperty('display', 'none');
+				}
+				if (ds.isFunction(active_controller.onshow)) active_controller.onshow();
+				ds.ui.element_trigger(window, 'resize');
+			}
+		});
+		self.add({
+			name: 'close_controller',
+			fn: args => {
+				if (!args.controller) throw new Error('ds.appshell.__Actions: "controller" property not found when performing "open_controller" action.');
+				if (controller.__props_controller) {
+					controller.__props_controller.free();
+					controller.__props_controller = null;
+				}
+				if (controller.__navbar_node) {
+					controller.__navbar_node.free();
+					controller.__navbar_node = null;
+				}
+				controller.free();
+			}
+		});
+		self.add({
+			name: 'open_properties',
+			fn: args => {
+				if (!args.controller) throw new Error('ds.appshell.__Actions: "controller" property not found when performing "open_properties" action.');
+				const controller_prototype = ds.isPrototypeOf(args.controller, ds.ui.Controller)
+											? args.controller
+											: ds.isString(args.controller)
+												? ds.get(ds.global(), args.controller)
+												: null;
+				if (!controller_prototype) throw new Error('ds.appshell.__Actions: Controller prototype not found by "' + args.controller + '".');
+				if (!active_controller) throw new Error('ds.appshell.__Actions: Unable to open properties controller for not active tab.');
+				if (active_controller.__props_controller) {
+					active_controller.__props_controller._trigger('close');
+					active_controller.__props_controller.free();
+				}
+				active_controller.__props_controller = controller_prototype.new(args.controllerArgs || {});
+				self.appShell.appView.propsSplitter.visible = true;
+				self.appShell.appView.props_content.style.setProperty('display', '');
+				self.appShell.appView.props_content.appendChild(active_controller.__props_controller.view.element);
+				ds.ui.element_trigger(window, 'resize');
+				return active_controller.__props_controller;
+			}
+		});
+		self.add({
+			name: 'close_properties',
+			fn: args => {
+				if (!active_controller) throw new Error('ds.appshell.__Actions: Unable to close properties controller for not active tab.');
+				if (active_controller.__props_controller) {
+					active_controller.__props_controller._trigger('close');
+					active_controller.__props_controller.free();
+					active_controller.__props_controller = null;
+					self.appShell.appView.propsSplitter.visible = false;
+					self.appShell.appView.props_content.style.setProperty('display', 'none');
+					ds.ui.element_trigger(window, 'resize');
+				}
+			}
+		});
+
+
+		self.add({
+			name: 'open_controller__',
+			fn: args => {
+				if (!args.controller) throw new Error('ds.appshell.__Actions: "controller" property not found when performing "open_controller" action.');
+				let controller_prototype = ds.isPrototypeOf(args.controller, ds.ui.Controller)
+											? args.controller
+											: ds.isString(args.controller)
+												? ds.get(ds.global(), args.controller)
+												: null;
+				if (!controller_prototype) throw new Error('ds.appshell.__Actions: Controller prototype not found by "' + args.controller + '".');
 				let controller = controller_prototype.new(args.controllerArgs || {});
 				self.appShell.tabbedControllers.push(controller);
 				self.appShell.appView.tabsView.update();
@@ -489,24 +712,24 @@ ds.appshell.__Actions = ds.Object.extend({
 			}
 		});
 		self.add({
-			name: 'close_controller',
+			name: 'close_controller__',
 			fn: args => {
 				const index = self.appShell.tabbedControllers.indexOf(args.controller);
 				if (index > -1) self.appShell.appView.tabsView.close(index);
 			}
 		});
 		self.add({
-			name: 'open_properties',
+			name: 'open_properties__',
 			fn: args => {
-				if (!args.controller) throw new Error('ds.appshell.addStandardActions: "controller" property not found when performing "open_properties" action.');
+				if (!args.controller) throw new Error('ds.appshell.__Actions: "controller" property not found when performing "open_properties" action.');
 				const controller_prototype = ds.isPrototypeOf(args.controller, ds.ui.Controller)
 											? args.controller
 											: ds.isString(args.controller)
 												? ds.get(ds.global(), args.controller)
 												: null;
-				if (!controller_prototype) throw new Error('ds.appshell.addStandardActions: Controller prototype not found by "' + args.controller + '".');
+				if (!controller_prototype) throw new Error('ds.appshell.__Actions: Controller prototype not found by "' + args.controller + '".');
 				const tabbed_controller = self.appShell.tabbedControllers[self.appShell.appView.tabsView.selectedIndex];
-				if (!tabbed_controller) throw new Error('ds.appshell.addStandardActions: Unable to open properties controller for not active tab.');
+				if (!tabbed_controller) throw new Error('ds.appshell.__Actions: Unable to open properties controller for not active tab.');
 				if (tabbed_controller.__props_controller) {
 					tabbed_controller.__props_controller._trigger('close');
 					tabbed_controller.__props_controller.free();
@@ -520,10 +743,10 @@ ds.appshell.__Actions = ds.Object.extend({
 			}
 		});
 		self.add({
-			name: 'close_properties',
+			name: 'close_properties__',
 			fn: args => {
 				const tabbed_controller = self.appShell.tabbedControllers[self.appShell.appView.tabsView.selectedIndex];
-				if (!tabbed_controller) throw new Error('ds.appshell.addStandardActions: Unable to close properties controller for not active tab.');
+				if (!tabbed_controller) throw new Error('ds.appshell.__Actions: Unable to close properties controller for not active tab.');
 				if (tabbed_controller.__props_controller) {
 					tabbed_controller.__props_controller._trigger('close');
 					tabbed_controller.__props_controller.free();

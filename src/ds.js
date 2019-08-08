@@ -718,6 +718,15 @@ ds.Date = ds.Object.extend({
 				self.h.toString().padStart(2, '0') + ':' +
 				self.mi.toString().padStart(2, '0');
 	},
+	DDMMYYYY_HHMMSS() {
+		const self = this;
+		return self.d.toString().padStart(2, '0') + '.' +
+				self.m.toString().padStart(2, '0') + '.' +
+				self.y.toString() + ' ' +
+				self.h.toString().padStart(2, '0') + ':' +
+				self.mi.toString().padStart(2, '0') + ':' +
+				self.s.toString().padStart(2, '0');
+	},
 	DDMMYYYY() {
 		const self = this;
 		return self.d.toString().padStart(2, '0') + '.' +
