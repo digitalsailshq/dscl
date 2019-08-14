@@ -1034,4 +1034,6 @@ if (ds.isNode()) {
 	        });
 	    }
 	}
+	ds.ht_begin = () => process.hrtime();
+	ds.ht_end = ht => (ht = process.hrtime(ht), ht[0] == 0 ? (Math.floor(ht[1] / 1e6).toString() + ' ms') : (ht[0].toString() + ' s, ' + Math.floor(ht[1] / 1e6).toString() + ' ms'));
 }

@@ -2345,7 +2345,7 @@ ds.ui.Edit = ds.ui.View.extend({
 			.__xedt.__lbltop .__xedt_lbl { padding-right: 6px; margin-top: 0px; width: inherit; }`,
 	template: `<div class="__xedt {{ this._getRootClassList().join(' ') }}">
 					<div x-if="this.label" class="__xedt_lbl" style="--xedt-lbl-width: {{ this.labelWidth }}px;"><span class="__xedt_lbl_txt">{{ this.label }}</span></div>
-					<div class="__xedt_prts">
+					<div x-ref="parts_element" class="__xedt_prts">
 						@@parts	
 					</div>
 				</div>`,
@@ -2874,7 +2874,7 @@ ds.ui.CheckboxEdit = ds.ui.Edit.extend({
 	template: `@extend ds.ui.Edit.template
 					@slot parts
 						<div class="__xedt_cbox"></div>
-						<div class="__xedt_cbox_lbl">{{ this.checkLabel }}</div>
+						<div x-if="!!this.checkLabel" class="__xedt_cbox_lbl">{{ this.checkLabel }}</div>
 					@end
 				@end`,
 	_value: null,
@@ -2895,10 +2895,12 @@ ds.ui.CheckboxEdit = ds.ui.Edit.extend({
 		ds.ui.Edit.update.call(self);
 		if (!self.element) return;
 		ds.ui.element_classif(self.element, '__checked', self.isChecked());
+		ds.ui.element_classif(self.parts_element, 'hnd', !self.disabled);
 	},
 	init() {
 		const self = this;
 		ds.ui.Edit.init.call(self);
+		
 		ds.ui.element_on(self.element, 'click', 'div.__xedt_prts', function(e) {
 			if (self.__freed) return false;
 			if (self.passive) return true;
@@ -5800,6 +5802,8 @@ ds.ui.DataObject = ds.Object.extend({
 		if (p1 instanceof Object) Object.keys(p1).forEach(key => self._data_set[key] = p1[key]);
 		else self._data_set[p1] = p2;
 	},
+	hasSetKey(name) { return this._data_set.hasOwnProperty(name); },
+	hasKey(name) { return this._data_get.hasOwnProperty(name); },
 	async load(id) {
 		const self = this;
 		if (id) self.id = id;

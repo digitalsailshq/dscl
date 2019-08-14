@@ -93,7 +93,7 @@ ds.appshell.__NavBarNodeView = ds.ui.View.extend({
 								className: 'flex',
 								text: this._getText(),
 								image: this._getImage() || ds.ui.Cell.EMPTY_IMG,
-								badge: this._getBadge(),
+								badge: this.badge,
 								badgeClassName: 'gray' 
 							}) }}
 						<div x-if="this._getCanClose()" class="hnd thvr sm gray tac col mid cen x18 mr05 vhvrc" x-on:click="self._nodeClose(e)">
@@ -108,7 +108,7 @@ ds.appshell.__NavBarNodeView = ds.ui.View.extend({
 	_selected: false,
 	text: null,
 	image: null,
-	badge: '0',
+	badge: null,
 	controller: null,
 	_nodes: null,
 	set selected(value) { this._selected = value; this.needsUpdate(); },
@@ -124,10 +124,6 @@ ds.appshell.__NavBarNodeView = ds.ui.View.extend({
 		if (self.image) return self.image;
 		else if (self._controller) return self._controller.image;
 		else return null;
-	},
-	_getBadge() {
-		const self = this;
-		return null;
 	},
 	_getCanClose() {
 		const self = this;
@@ -153,6 +149,7 @@ ds.appshell.__NavBarNodeView = ds.ui.View.extend({
 	free() {
 		const self = this;
 		self._sectionView._nodes = self._sectionView._nodes.filter(n => n != self);
+		self._sectionView.needsUpdate();
 		ds.ui.View.free.call(self);
 	}
 });
@@ -190,6 +187,11 @@ ds.appshell.__NavBarSectionView = ds.ui.View.extend({
 		self.needsUpdate();
 		return nodeView;
 	},
+	update() {
+		const self = this;
+		self._visible = self._nodes.length > 0;
+		ds.ui.View.update.call(self);
+	},
 	init() {
 		const self = this;
 		self._nodes = [];
@@ -205,7 +207,9 @@ ds.appshell.__NavBarSectionView = ds.ui.View.extend({
 ds.appshell.__NavBarView = ds.ui.View.extend({
 	template: `<div class="col bk br">
 					{{ this.userView ||= ds.appshell.__UserView.new({ className: 'ml2 mr mb2', style: { 'margin-top': '13px' } }) }}
-					{{ this._sections }}
+					<div class="flex col scroll">
+						{{ this._sections }}	
+					</div>
 				</div>`,
 	_sections: null,
 	openedSection: null,
