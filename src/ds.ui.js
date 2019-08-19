@@ -1083,14 +1083,17 @@ ds.ui.ModalController = ds.ui.Controller.extend({
 					<div x-ref="content_element" class="col flex pl pt2 pr pb2 bkw">
 						@@content
 					</div>
-					<div class="row bt">
-						<div x-ref="footer_left_element" class="pl pb pt flex row">
-							{{ this.cancelBtn = this.cancelBtn || ds.ui.Button.new({ text: 'Отмена' })
-								.on('click', () => this.closeModal('cancel')) }}
-							@@footer_left
-						</div>
-						<div x-ref="footer_right_element" class="pr pb pt row">
-							@@footer_right
+					<div class="col bt">
+						@@footer_top
+						<div class="row">
+							<div x-ref="footer_left_element" class="pl pb pt flex row">
+								{{ this.cancelBtn = this.cancelBtn || ds.ui.Button.new({ text: 'Отмена' })
+									.on('click', () => this.closeModal('cancel')) }}
+								@@footer_left
+							</div>
+							<div x-ref="footer_right_element" class="pr pb pt row">
+								@@footer_right
+							</div>
 						</div>
 					</div>
 				</div>`,

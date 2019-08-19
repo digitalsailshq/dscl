@@ -232,7 +232,7 @@ ds.appshell.__AppView = ds.ui.View.extend({
 				.__xas_nvbr { position: fixed; left: 0px; top: 0px; bottom: 0px; transform: translateX(calc(-100% + 16px)); transition: all 0.25s; z-index: 10; }
 				.__xas_nvbr:hover { transform: none; box-shadow: 0px 0px 15px 0 rgba(0, 0, 0, .1) }
 				.__xas_cnt { margin-left: 16px; } }`,
-	template: `<div class="app row flex">
+	template: `<div class="app row flex bt">
 					{{ this.navBarView ||= ds.appshell.__NavBarView.new({ className: 'w3' }) }}
 					{{ this.navBarSplitter ||= ds.ui.Splitter.new({ align: 'left', overflow: 'left' }) }}
 					<div class="__xas_cnt col flex">
