@@ -431,6 +431,7 @@ ds.evalScope = (expr, scope, this_) => {
 		return eval(code);	
 	} catch(e) {
 		console.log(expr);
+		console.log(e);
 		throw e;
 	}
 }

@@ -301,7 +301,7 @@ ds.ui.__styles = `
 	.x4 { height: 4px; width: 4px; }
 	.rtt180 { transform: rotate(180deg); }
 	.ndt:empty { position: relative; min-height: 28px; }
-	.ndt:empty::after { content: "пусто"; position: absolute; top: 7px; text-align: center; font-size: 12px; color: gray; left: 50%; transform: translateX(-50%); }
+	.ndt:empty::after { content: "нет данных"; position: absolute; top: 7px; text-align: center; font-size: 12px; color: gray; left: 50%; transform: translateX(-50%); }
 	[data-badge] { position: relative; }
 	[data-badge]::after { content: attr(data-badge); position: absolute; display: block; background-color: red; color: white; border-radius: 50%; top: -2px; right: -2px; width: 14px; height: 14px; text-align: center; font-family: "Open Sans", sans-serif; font-size: 9px; padding-top: 2px; box-sizing: border-box; }
 	.__xmdlpnl_bk { position: absolute; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); left: 0px; top: 0px; z-index: 19; }
@@ -3332,6 +3332,10 @@ ds.ui.ListView = ds.ui.View.extend({
 			 .__xlstvw_tshdw { position: absolute; left: 0px; top: 0px; right: 0px; height: 11px; pointer-events: none; box-shadow: inset 0px 10px 8px -10px #cccccc67; }
 			 .__xlstvw_bshdw { position: absolute; left: 0px; bottom: 0px; right: 0px; height: 11px; pointer-events: none; box-shadow: inset 0px -10px 8px -10px #cccccc67; }`,
 	template: `<div class="__xlstvw">
+					<div class="tac mt mb gray fs12" style="display: {{ this._isNoDataElementVisible() ? '' : 'none' }};">нет данных</div>
+					<div class="tac mt mb gray fs13" style="display: {{ this.isNotFoundElementVisible() ? '' : 'none' }};">
+						<i class="fa fa-search"></i><span>&nbsp;&nbsp;</span>по запросу "{{ this._search || '' }}" ничего не найдено
+					</div>
 					<div x-ref="items_element" class="col flex scroll">
 						<div x-for="item of this.items | preserve_element: element, preserve_item: __item"
 							 	class="__xlstvw_item row mid{{ item.options.hover ? ' __hvr' : '' }}{{ item.options.hand ? ' hnd' : '' }}{{ item.selected ? ' __selected' : '' }} {{ item.options.className || '' }}"
@@ -3362,6 +3366,7 @@ ds.ui.ListView = ds.ui.View.extend({
 	_imagePrefix: '/assets/sandbox/',
 	_defaultImage: null,
 	_cellArgs: null,
+	_showIconOnEmpty: true,
 	selectedIndex: -1,
 	keepSelection: false,
 	cellPrototype: ds.ui.Cell.extend({ className: 'ml mr mt mb' }),
@@ -3389,6 +3394,8 @@ ds.ui.ListView = ds.ui.View.extend({
 	set search(value) { this._search = value; this.needsUpdate(); },
 	get cellArgs() { return this._cellArgs },
 	set cellArgs(value) { this._cellArgs = value; this.needsUpdate(); },
+	get showIconOnEmpty() { return this._showIconOnEmpty; },
+	set showIconOnEmpty(value) { this._showIconOnEmpty = value; this.needsUpdate(); },
 	get dataSet() { return this._dataSet; },
 	set dataSet(value) {
 		if (!value) throw 'ds.ui.ListView: DataSet value cannot be null.';
@@ -3401,6 +3408,16 @@ ds.ui.ListView = ds.ui.View.extend({
 	},
 	get scrollShadow() { return this._scrollShadow; },
 	set scrollShadow(value) { this._scrollShadow = value; this.needsUpdate(); },
+	_isNoDataElementVisible() {
+		const self = this;
+		if (!self._showIconOnEmpty) return false;
+		return self.items.length == 0;
+	},
+	isNotFoundElementVisible() {
+		const self = this;
+		if (!self._showIconOnEmpty) return false;
+		return (self.items.length > 0) && (ds.ifnull(self._search, '') != '') && self.items.every(i => i.visible == false);
+	},
 	_checkInnerShadows() {
 		const self = this;
 		if (!self._scrollShadow) return;
@@ -3985,6 +4002,7 @@ ds.ui.DataGrid = ds.ui.View.extend({
 	_groupCheckKey: null,
 	_groupCellPrototype: ds.ui.Cell.extend({ className: 'flex ml mr mt05 mb05' }),
 	_groupCheckboxRect: true,
+	_showIconOnEmpty: true,
 	columns: null,
 	data: null,
 	spoilers: null,
@@ -4058,6 +4076,8 @@ ds.ui.DataGrid = ds.ui.View.extend({
 	set groupCheckboxRect(value) { this._groupCheckboxRect = value; this.needsUpdate(); },
 	get groupCheckKey() { return this._groupCheckKey; },
 	set groupCheckKey(value) { this._groupCheckKey = value; this.needsUpdate(); },
+	get showIconOnEmpty() { return this._showIconOnEmpty; },
+	set showIconOnEmpty(value) { this._showIconOnEmpty = value; this.needsUpdate(); },
 	get idKey() { return this._idKey; },
 	set idKey(value) { this._idKey = value; this.needsUpdate() },
 	get dataSet() { return this._dataSet; },
@@ -4224,8 +4244,12 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 			 .__xgrd_bdy_row_spoiler { border-bottom-color: rgb(228, 228, 228); border-bottom-style: solid; border-bottom-width: 1px; }`,
 	template: `<div class="__xgrd_bdy col flex{{ this._dataGrid.selectArrow == 'left' ? ' __xgrd_bdy_selarr_l' : '' }}{{ this._dataGrid.selectArrow == 'right' ? ' __xgrd_bdy_selarr_r' : '' }}{{ !this._dataGrid.lastRowSeparator ? ' __nolastrowsep' : '' }}">
 					<div x-ref="innerTopShadow_element" style="display:none;" class="__xgrd_bdy_tshdw __sbpad"></div>
+					<div class="tac mt mb gray fs12" style="display: {{ this._isNoDataElementVisible() ? '' : 'none' }};">нет данных</div>
+					<div class="tac mt mb gray fs13" style="display: {{ this.isNotFoundElementVisible() ? '' : 'none' }};">
+						<i class="fa fa-search"></i><span>&nbsp;&nbsp;</span>по запросу "{{ this._dataGrid._search || '' }}" ничего не найдено
+					</div>
 					<div x-ref="rows_element" class="col flex __sbpad" style="overflow-y: overlay;">{{ this._getDataElements() }}</div>
-					<div x-ref="innerBottomShadow_element" style="display:none;" class="__xgrd_bdy_bshdw __sbpad"></div>
+					<div x-ref="innerBottomShadow_element" style="display: none;" class="__xgrd_bdy_bshdw __sbpad"></div>
 				</div>`,
 	_data_hash: null,
 	_state: null,
@@ -4235,6 +4259,16 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 	_topShadowVisible: false,
 	_bottomShadowVisible: false,
 	_selectedId: null,
+	_isNoDataElementVisible() {
+		const self = this;
+		if (!self._dataGrid._showIconOnEmpty) return false;
+		return self._rows.length == 0;
+	},
+	isNotFoundElementVisible() {
+		const self = this;
+		if (!self._dataGrid._showIconOnEmpty) return false;
+		return (self._rows.length > 0) && (ds.ifnull(self._dataGrid._search, '') != '') && self._rows.every(r => r.visible == false);
+	},
 	_sortData(data) {
 		const self = this;
 		if (!data) return data;
