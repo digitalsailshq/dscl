@@ -10,7 +10,7 @@ ds.isPrototypeOf = (obj, proto) => {
 }
 ds.isPromise = obj => toString.call(obj) == '[object Promise]';
 ds.isObject = obj => toString.call(obj) == '[object Object]';
-ds.isArray = obj => toString.call(obj) == '[object Array]';
+ds.isArray = obj => Array.isArray(obj);
 ds.isFunction = obj => toString.call(obj) == '[object Function]' || toString.call(obj) == '[object AsyncFunction]';
 ds.isString = obj => toString.call(obj) == '[object String]';
 ds.isNumber = obj => toString.call(obj) == '[object Number]' && isFinite(obj) && obj != Number.POSITIVE_INFINITY && obj != Number.NEGATIVE_INFINITY;
