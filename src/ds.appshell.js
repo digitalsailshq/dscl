@@ -272,8 +272,6 @@ ds.appshell.__Actions = ds.Object.extend({
 		if (!self.appShell) throw new Error('ds.appshell.__Actions: appShell is required.');
 		self._actions = [];
 		// standard actions...
-		let active_controller;
-		let props_controller;
 		self.add({
 			name: 'open_controller',
 			fn: args => {
@@ -297,24 +295,24 @@ ds.appshell.__Actions = ds.Object.extend({
 			name: 'show_controller',
 			fn: args => {
 				if (!args.controller) throw new Error('ds.appshell.__Actions: "controller" property not found when performing "open_controller" action.');
-				if (active_controller) {
-					active_controller.__navbar_node.selected = false;
-					active_controller.view.visible = false;
-					if (active_controller.__props_controller)
-						active_controller.__props_controller.view.visible = false;
+				if (self.appShell.activeController) {
+					self.appShell.activeController.__navbar_node.selected = false;
+					self.appShell.activeController.view.visible = false;
+					if (self.appShell.activeController.__props_controller)
+						self.appShell.activeController.__props_controller.view.visible = false;
 				}
-				active_controller = args.controller;
-				active_controller.__navbar_node.selected = true;
-				active_controller.view.visible = true;
-				if (active_controller.__props_controller) {
-					active_controller.__props_controller.view.visible = true;
+				self.appShell.activeController = args.controller;
+				self.appShell.activeController.__navbar_node.selected = true;
+				self.appShell.activeController.view.visible = true;
+				if (self.appShell.activeController.__props_controller) {
+					self.appShell.activeController.__props_controller.view.visible = true;
 					this.appShell.appView.propsSplitter.visible = true;
 					this.appShell.appView.props_content.style.setProperty('display', '');
 				} else {
 					this.appShell.appView.propsSplitter.visible = false;
 					this.appShell.appView.props_content.style.setProperty('display', 'none');
 				}
-				if (ds.isFunction(active_controller.onshow)) active_controller.onshow();
+				if (ds.isFunction(self.appShell.activeController.onshow)) self.appShell.activeController.onshow();
 				ds.ui.element_trigger(window, 'resize');
 			}
 		});
@@ -332,7 +330,7 @@ ds.appshell.__Actions = ds.Object.extend({
 				}
 				args.controller.free();
 				self.appShell.openedController = self.appShell.openedController.filter(c => c != args.controller);
-				if (args.controller == active_controller) active_controller = null;
+				if (args.controller == self.appShell.activeController) self.appShell.activeController = null;
 			}
 		});
 		self.add({
@@ -345,27 +343,27 @@ ds.appshell.__Actions = ds.Object.extend({
 												? ds.get(ds.global(), args.controller)
 												: null;
 				if (!controller_prototype) throw new Error('ds.appshell.__Actions: Controller prototype not found by "' + args.controller + '".');
-				if (!active_controller) throw new Error('ds.appshell.__Actions: Unable to open properties controller for not active tab.');
-				if (active_controller.__props_controller) {
-					active_controller.__props_controller._trigger('close');
-					active_controller.__props_controller.free();
+				if (!self.appShell.activeController) throw new Error('ds.appshell.__Actions: Unable to open properties controller for not active tab.');
+				if (self.appShell.activeController.__props_controller) {
+					self.appShell.activeController.__props_controller._trigger('close');
+					self.appShell.activeController.__props_controller.free();
 				}
-				active_controller.__props_controller = controller_prototype.new(args.controllerArgs || {});
+				self.appShell.activeController.__props_controller = controller_prototype.new(args.controllerArgs || {});
 				self.appShell.appView.propsSplitter.visible = true;
 				self.appShell.appView.props_content.style.setProperty('display', '');
-				self.appShell.appView.props_content.appendChild(active_controller.__props_controller.view.element);
+				self.appShell.appView.props_content.appendChild(self.appShell.activeController.__props_controller.view.element);
 				ds.ui.element_trigger(window, 'resize');
-				return active_controller.__props_controller;
+				return self.appShell.activeController.__props_controller;
 			}
 		});
 		self.add({
 			name: 'close_properties',
 			fn: args => {
-				if (!active_controller) throw new Error('ds.appshell.__Actions: Unable to close properties controller for not active tab.');
-				if (active_controller.__props_controller) {
-					active_controller.__props_controller._trigger('close');
-					active_controller.__props_controller.free();
-					active_controller.__props_controller = null;
+				if (!self.appShell.activeController) throw new Error('ds.appshell.__Actions: Unable to close properties controller for not active tab.');
+				if (self.appShell.activeController.__props_controller) {
+					self.appShell.activeController.__props_controller._trigger('close');
+					self.appShell.activeController.__props_controller.free();
+					self.appShell.activeController.__props_controller = null;
 					self.appShell.appView.propsSplitter.visible = false;
 					self.appShell.appView.props_content.style.setProperty('display', 'none');
 					ds.ui.element_trigger(window, 'resize');
@@ -384,6 +382,7 @@ ds.appshell.AppShell = ds.Object.extend({
 		const self = this;
 		if (!self.container) throw 'ds.appshell.AppShell: Container must be specified.';
 		self.openedController = [];
+		self.activeController = null;
 		self.actions = ds.appshell.__Actions.new({ appShell: self });
 		self.appView = ds.appshell.__AppView.new({ appShell: self });
 		self.container.appendChild(self.appView.element);

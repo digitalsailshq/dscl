@@ -305,7 +305,7 @@ ds.ui.__styles = `
 	[data-badge] { position: relative; }
 	[data-badge]::after { content: attr(data-badge); position: absolute; display: block; background-color: red; color: white; border-radius: 50%; top: -2px; right: -2px; width: 14px; height: 14px; text-align: center; font-family: "Open Sans", sans-serif; font-size: 9px; padding-top: 2px; box-sizing: border-box; }
 	.__xmdlpnl_bk { position: absolute; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); left: 0px; top: 0px; z-index: 19; }
-	.__xmdlpnl { position: absolute; border: 1px solid rgb(180, 180, 180); border-radius: 4px; box-shadow: 0px 0px 5px rgba(1, 1, 1, 0.2); left: 50%; top: 35%; transform: translate(-50%, -35%); }
+	.__xmdlpnl { position: absolute; border: 0px; box-shadow: 0px 0px 5px rgba(1, 1, 1, 0.2); left: 50%; top: 35%; transform: translate(-50%, -35%); }
 	.__xfltctrl { position: absolute; z-index: 11; box-shadow: 0px 0px 50px rgba(1, 1, 1, 0.2); --border-color: #c1c1c1; }
 	.__sbpad { padding-right: 16px; }
 	@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(359deg); } }
@@ -1077,8 +1077,9 @@ ds.ui.ModalController = ds.ui.Controller.extend({
 	template: `<div class="col bk {{ this.className }}">
 					<div class="row mid bb pl pt pr pb">
 						<div x-ref="title_element" class="flex strong bvl">{{ this.text }}</div>
-						{{ this.closeBtn = this.closeBtn || ds.ui.Button.new({ text: '<i class="fa fa-close gray bvl"></i>', flat: true, small: true })
-							.on('click', () => this.closeModal('cancel')) }}
+						<div class="col mid cen x24 thvr hnd sm" x-on:click="self.closeModal('cancel')">
+							<i class="fa fa-times"></i>
+						</div>
 					</div>
 					<div x-ref="content_element" class="col flex pl pt2 pr pb2 bkw">
 						@@content
