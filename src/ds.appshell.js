@@ -206,7 +206,7 @@ ds.appshell.__NavBarSectionView = ds.ui.View.extend({
 });
 ds.appshell.__NavBarView = ds.ui.View.extend({
 	template: `<div class="col bk br">
-					{{ this.userView ||= ds.appshell.__UserView.new({ className: 'ml2 mr mb2', style: { 'margin-top': '13px' } }) }}
+					{{ this.userView ||= ds.appshell.__UserView.new({ className: 'ml2 mr15 mb2', style: { 'margin-top': '13px' } }) }}
 					<div class="flex col scroll">
 						{{ this._sections }}	
 					</div>
