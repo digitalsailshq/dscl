@@ -213,7 +213,7 @@ ds.appshell.__NavBarView = ds.ui.View.extend({
 					</div>
 				</div>`,
 	_sections: null,
-	homeSection: null,
+	homeNode: null,
 	openedSection: null,
 	addSection(options) {
 		const self = this;
@@ -226,10 +226,11 @@ ds.appshell.__NavBarView = ds.ui.View.extend({
 		const self = this;
 		ds.ui.View.init.call(self);
 		self._sections = [];
-		self.homeSection = self.addSection({ text: null, noTitle: true });
-		self.homeSection.addNode({
+		self.homeNode = self.addSection({ text: null, noTitle: true })
+							.addNode({
 			text: 'Домашняя страница',
-			controller: 'WidgetListController'
+			controller: 'WidgetListController',
+			image: '/assets/images/home.svg'
 		});
 		self.openedSection = self.addSection({ text: 'Открытые' });
 	}
@@ -319,6 +320,7 @@ ds.appshell.__Actions = ds.Object.extend({
 					this.appShell.appView.propsSplitter.visible = false;
 					this.appShell.appView.props_content.style.setProperty('display', 'none');
 				}
+				if (ds.last(self.appShell.showHistory) != self.appShell.activeController) self.appShell.showHistory.push(self.appShell.activeController);
 				if (ds.isFunction(self.appShell.activeController.onshow)) self.appShell.activeController.onshow();
 				ds.ui.element_trigger(window, 'resize');
 			}
@@ -337,7 +339,11 @@ ds.appshell.__Actions = ds.Object.extend({
 				}
 				args.controller.free();
 				self.appShell.openedController = self.appShell.openedController.filter(c => c != args.controller);
+				self.appShell.showHistory = self.appShell.showHistory.filter(c => c != args.controller);
 				if (args.controller == self.appShell.activeController) self.appShell.activeController = null;
+				self.appShell.showHistory = self.appShell.showHistory.filter(c => !c.__freed);
+				const lastController = ds.last(self.appShell.showHistory);
+				if (lastController) self.exec('show_controller', { controller: lastController });
 			}
 		});
 		self.add({
@@ -382,12 +388,14 @@ ds.appshell.__Actions = ds.Object.extend({
 // appshell...
 ds.appshell.AppShell = ds.Object.extend({
 	openedController: null,
+	showHistory: null,
 	appView: null,
 	container: null,
 	actions: null,
 	init() {
 		const self = this;
 		if (!self.container) throw 'ds.appshell.AppShell: Container must be specified.';
+		self.showHistory = [];
 		self.openedController = [];
 		self.activeController = null;
 		self.actions = ds.appshell.__Actions.new({ appShell: self });
