@@ -155,7 +155,7 @@ ds.appshell.__NavBarNodeView = ds.ui.View.extend({
 });
 ds.appshell.__NavBarSectionView = ds.ui.View.extend({
 	template: `<div class="nosel">
-					<div class="fs11 gray bvl pl2 pr pb075 row vhvr hnd" x-on:click="self._toggleExpand()">
+					<div x-if="!this.noTitle" class="fs11 gray bvl pl2 pr pb075 row vhvr hnd" x-on:click="self._toggleExpand()">
 						<div class="flex strong">{{ (this.text || '').toUpperCase() }}</div>
 						<div x-ref="collapse_element" x-if="this._expanded" class="vhvrc">свернуть</div>
 						<div x-ref="expand_element" x-if="!this._expanded" class="vhvrc">развернуть</div>
@@ -168,6 +168,7 @@ ds.appshell.__NavBarSectionView = ds.ui.View.extend({
 	_nodes: null,
 	_expanded: true,
 	_navBarView: null,
+	noTitle: false,
 	text: null,
 	id: null,
 	_getStorageID() {
@@ -212,6 +213,7 @@ ds.appshell.__NavBarView = ds.ui.View.extend({
 					</div>
 				</div>`,
 	_sections: null,
+	homeSection: null,
 	openedSection: null,
 	addSection(options) {
 		const self = this;
@@ -224,6 +226,11 @@ ds.appshell.__NavBarView = ds.ui.View.extend({
 		const self = this;
 		ds.ui.View.init.call(self);
 		self._sections = [];
+		self.homeSection = self.addSection({ text: null, noTitle: true });
+		self.homeSection.addNode({
+			text: 'Домашняя страница',
+			controller: 'WidgetListController'
+		});
 		self.openedSection = self.addSection({ text: 'Открытые' });
 	}
 });

@@ -2940,6 +2940,7 @@ ds.ui.DropDownEdit = ds.ui.TextEdit.extend({
 		if (!self._onCanOpen()) return;
 		self.dropdown_element.style.setProperty('width', ds.ui.element_rects(self.frame_element).inner.width.toString() + 'px');
 		self._onBeforeOpen();
+		self._trigger('before_open');
 		self._popupHelper.open();
 	},
 	close() {
@@ -2969,7 +2970,7 @@ ds.ui.DropDownEdit = ds.ui.TextEdit.extend({
 			}
 		});
 	}
-});
+}, ds.Events('before_open'));
 ds.ui.LookupEdit = ds.ui.DropDownEdit.extend({
 	styles: `.__xedt_frm_chk_itm { border-style: solid; border-width: 1px; border-radius: 3px; padding: 0px 6px; margin: 2px 0px 2px 2px; background-color: #d2e7fb; border-color: #d2e7fb; color: #333; }`,
 	template: `@extend ds.ui.DropDownEdit.template
@@ -4153,7 +4154,7 @@ ds.ui.DataGrid = ds.ui.View.extend({
 		self._gridAppend = null;
 		ds.ui.View.free.call(self);
 	}
-}, ds.Events('data:single', 'link_click', 'action_options:single', 'action_click', 'header_click', 'row_click', 'row_dblclick', 'row_options:single', 'cell_options:single', 'cell', 'row', 'check', 'check_all', 'group_options:single', 'check_group', 'link_group_click', 'edit', 'update'));
+}, ds.Events('data:single', 'link_click', 'action_options:single', 'action_click', 'header_click', 'row_click', 'row_dblclick', 'row_options:single', 'cell_options:single', 'cell', 'row', 'check', 'check_all', 'group_options:single', 'check_group', 'link_group_click', 'edit', 'update', 'sort'));
 ds.ui.__DataGridHeader = ds.ui.View.extend({
 	styles: `.__xgrd_hdr { }
 			 .__xgrd_hdr_cell_img_asc { transform: translateY(1px) rotate(180deg); opacity: 0.25 }
@@ -4198,6 +4199,7 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 					self._dataGrid._sortColumn = column;
 					self._dataGrid._sortDirection = 'asc';
 				}
+				self._dataGrid._trigger('sort', self._dataGrid._sortColumn, self._dataGrid._sortDirection);
 				self._dataGrid.needsUpdate();	
 			}
 			return true;
@@ -5719,6 +5721,7 @@ ds.ui.DataSet = ds.Object.extend({
 	_loaded: false,
 	_filter: null,
 	_filteredData: null,
+	_storedValues: null,
 	connection: null,
 	url: null,
 	loadOnInit: false,
@@ -5728,6 +5731,7 @@ ds.ui.DataSet = ds.Object.extend({
 	sortKey: null,
 	sortDataType: null,
 	sortDirection: 'asc',
+	keepValues: null,
 	get filter() { return this._filter; },
 	set filter(value) {
 		const self = this;
@@ -5782,6 +5786,40 @@ ds.ui.DataSet = ds.Object.extend({
 			else return 0;
 		});
 	},
+	_keepValuesSave() {
+		const self = this;
+		self._storedValues = [];
+		if (ds.isArray(self.keepValues)) {
+			for (const pair of self.keepValues) {
+				if (!ds.isArray(pair)) throw new Error('ds.ui.DataSet: "keepValues" property must contain array of pairs (arrays), example: [[\'__checked\', \'id\'], [\'user_data\', \'id\'], ... ]');
+				const valueKey = pair[0];
+				const idKey = pair[1];
+				if (ds.isnull(valueKey)) throw new Error('ds.ui.DataSet: value key in "keepValues" array must be set, example: [[\'__checked\', \'id\'], [\'user_data\', \'id\'], ... ]');
+				if (ds.isnull(idKey)) throw new Error('ds.ui.DataSet: value key in "idKey" array must be set, example: [[\'__checked\', \'id\'], [\'user_data\', \'id\'], ... ]');
+				const set = [];
+				self.data.forEach(row => {
+					set.push({
+						idKey: idKey,
+						idValue: ds.get(row, idKey),
+						valueKey: valueKey,
+						valueValue: ds.get(row, valueKey)
+					});
+				});
+				self._storedValues.push(set);
+			}
+		}
+	},
+	_keepValuesRestore() {
+		const self = this;
+		if (ds.isArray(self._storedValues)) {
+			self._storedValues.forEach(set => {
+				set.forEach(pair => {
+					const row = self.data.find(r => ds.get(r, pair.idKey) == pair.idValue);
+					if (row) row[pair.valueKey] = pair.valueValue;
+				});
+			});
+		}
+	},
 	isLoaded() { return this._loaded; },
 	isFiltered() { return !!this._filter; },
 	isItemVisible(index) {
@@ -5799,7 +5837,9 @@ ds.ui.DataSet = ds.Object.extend({
 		if (self.sort) self._sortData(data);
 		data = (await self._trigger('transform', data)) || data;
 		if (JSON.stringify(data) != JSON.stringify(self.data)) self.stamp = self.stamp + 1;
+		self._keepValuesSave();
 		self.data = data;
+		self._keepValuesRestore();
 		self._loaded = true;
 		self._resetFilter();
 		self._trigger('load');
@@ -5818,6 +5858,7 @@ ds.ui.DataSet = ds.Object.extend({
 		const self = this;
 		self._filteredData = [];
 		if (!self.data) self.data = [];
+		if (!self.keepValues) self.keepValues = [];
 		if (self.loadOnInit) self.load();
 	}
 }, ds.Events('load', 'filter', 'beforeload', 'transform:single'));
