@@ -39,6 +39,10 @@ ds.ui.__styles = `
 	.br2 { border-right-width: 2px; border-right-style: solid; border-right-color: var(--border-color); }
 	.bb2 { border-bottom-width: 2px; border-bottom-style: solid; border-bottom-color: var(--border-color); }
 	.bl2 { border-left-width: 2px; border-left-style: solid; border-left-color: var(--border-color); }
+	.btd { border-top-style: dashed; }
+	.brd { border-right-style: dashed; }
+	.bbd { border-bottom-style: dashed; }
+	.bld { border-left-style: dashed; }
 	.so { box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.3); }
 	.so2 { box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.075); }
 	.pso { box-shadow: 0 10px 20px 0 rgba(0, 0, 0, .2); }

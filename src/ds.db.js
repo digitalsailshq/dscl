@@ -36,6 +36,21 @@ ds.db.preprocessor = {
 		else if (conn.__type == 'odbc') return 'datepart(day, getdate() - ' + field + ')';
 		else throw new Error('ds.db.preprocessor.days_past: Connection type "' + conn.__type + '" is not supported.');
 	},
+	year: (conn, expr) => {
+		if (conn.__type == 'libpq') return 'date_part(\'year\', ' + expr + ')';
+		else if (conn.__type == 'odbc') return 'datepart(year, ' + expr + ')';
+		else throw new Error('ds.db.preprocessor.year: Connection type "' + conn.__type + '" is not supported.');	
+	},
+	month: (conn, expr) => {
+		if (conn.__type == 'libpq') return 'date_part(\'month\', ' + expr + ')';
+		else if (conn.__type == 'odbc') return 'datepart(month, ' + expr + ')';
+		else throw new Error('ds.db.preprocessor.month: Connection type "' + conn.__type + '" is not supported.');	
+	},
+	day: (conn, expr) => {
+		if (conn.__type == 'libpq') return 'date_part(\'day\', ' + expr + ')';
+		else if (conn.__type == 'odbc') return 'datepart(day, ' + expr + ')';
+		else throw new Error('ds.db.preprocessor.day: Connection type "' + conn.__type + '" is not supported.');	
+	},
 	string: (conn, size) => {
 		if (conn.__type == 'libpq') return size == 'max' ? 'text' : `varchar(${size || '4000'})`;
 		else if (conn.__type == 'odbc') return `nvarchar(${size || 'max'})`;
