@@ -1222,6 +1222,16 @@ ds.ui.MessageBox = ds.ui.View.extend({
 		msgBox.openModal(callback);
 		return msgBox;
 	},
+	yesNo(options, callback) {
+		if (ds.isString(options)) options = { kind: 'confirmation', text: options, body: null, args: [] };
+		else options = Object.assign({ kind: 'confirmation', text: '', body: null, args: [] }, options);
+		const msgBox = ds.ui.MessageBox.new({ kind: options.kind, text: options.text });
+		msgBox.setFormatBody(options.body, options.args);
+		msgBox.addLeftButton({ text: 'Нет' });
+		msgBox.addRightButton({ text: 'Да', primary: true, modalResult: 'yes' });
+		msgBox.openModal(callback);
+		return msgBox;
+	},
 	alert(options, callback) {
 		if (ds.isString(options)) options = { kind: 'info', text: options, body: null, args: [] };
 		else options = Object.assign({ kind: 'info', text: '', body: null, args: [] }, options);
@@ -2523,7 +2533,8 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 			.__xedt.__inline:not(.__droppeddown):not(.__frmhot):not(.__focused) .__xedt_btn { display: none; }
 			.__xedt .__xedt_clbtn { display: none; }
 			.__xedt.__clearbtn .__xedt_clbtn { display: flex; }
-			.__xedt.__disabled .__xedt_btn { display: none; }`,
+			.__xedt.__disabled .__xedt_btn { display: none; }
+			.__xedt.__readonly .__xedt_btn { display: none; }`,
 	template: `@extend ds.ui.Edit.template
 					@slot parts
 						<div x-ref="frame_element" class="row flex __xedt_frm __xedt_frmhot_trgt" x-on:click="self._getInputElement().focus()">
@@ -2921,7 +2932,7 @@ ds.ui.CheckboxEdit = ds.ui.Edit.extend({
 ds.ui.DropDownEdit = ds.ui.TextEdit.extend({
 	template: `@extend ds.ui.TextEdit.template
 					@slot buttons
-						{{ this._openBtn = this._openBtn || ds.ui.Button.new({ text: '<i class="fa fa-caret-down gray sm"></i>', className: '__xedt_btn __xedt_ddbtn __xedt_frmhot_trgt' })
+						{{ this._openBtn ||= ds.ui.Button.new({ text: '<i class="fa fa-caret-down gray sm"></i>', className: '__xedt_btn __xedt_ddbtn __xedt_frmhot_trgt' })
 							.on('click', () => {
 								this._onOpenClick();
 								this.open();
@@ -3185,6 +3196,7 @@ ds.ui.TreeLookupEdit = ds.ui.DropDownEdit.extend({
 		self._value = value;
 		(async () => {
 			let node = await self.treeView.findNode(value, self.valueKey);
+			if (self.__freed) return;
 			if (!node) {
 				self._value = null;
 				self._image = null;

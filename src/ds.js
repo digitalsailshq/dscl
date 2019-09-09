@@ -28,6 +28,7 @@ ds.asString = value => {
 ds.isnull = a => (a === null || a === undefined);
 ds.ifnull = (a, b) => ds.isnull(a) ? b : a;
 ds.isset = a => !ds.isnull(a);
+ds.intersects = (a, b) => a.some(i => b.includes(i));
 ds.allKeys = obj => {
 	let keys = [];
 	for (let key in obj) keys.push(key);
@@ -702,6 +703,13 @@ ds.Date = ds.Object.extend({
 			return h.toString() + 'ч ' + m.toString() + 'м';
 		} else if (m_diff > 0) return m_diff.toString() + 'м';
 		else return 'сейчас';
+	},
+	YYYYMMDD_HH() {
+		const self = this;
+		return self.y.toString() + '-' +
+				self.m.toString().padStart(2, '0') + '-' +
+				self.d.toString().padStart(2, '0') + '-' +
+				self.h.toString().padStart(2, '0');
 	},
 	YYYYMMDD_HHMM() {
 		const self = this;
