@@ -306,6 +306,8 @@ ds.ui.__styles = `
 	.rtt180 { transform: rotate(180deg); }
 	.ndt:empty { position: relative; min-height: 28px; }
 	.ndt:empty::after { content: "нет данных"; position: absolute; top: 7px; text-align: center; font-size: 12px; color: gray; left: 50%; transform: translateX(-50%); }
+	.loading { position: relative; background-image: url(/assets/images/loading3.gif); background-position: center; background-size: 16px; background-repeat: no-repeat; }
+	.loading::after { content: ""; position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; background-color: rgba(0, 0, 0, 0.05); }
 	[data-badge] { position: relative; }
 	[data-badge]::after { content: attr(data-badge); position: absolute; display: block; background-color: red; color: white; border-radius: 50%; top: -2px; right: -2px; width: 14px; height: 14px; text-align: center; font-family: "Open Sans", sans-serif; font-size: 9px; padding-top: 2px; box-sizing: border-box; }
 	.__xmdlpnl_bk { position: absolute; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); left: 0px; top: 0px; z-index: 19; }
@@ -2548,7 +2550,7 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 						</div>
 						@@buttons
 						<div x-ref="buttons_element" class="row"></div>
-						{{ this._clearBtn = this._clearBtn || ds.ui.Button.new({ hint: 'Очистить', text: '<i class="fa fa-trash-o gray sm"></i>', className: '__xedt_btn __xedt_clbtn __xedt_frmhot_trgt' })
+						{{ this._clearBtn ||= ds.ui.Button.new({ hint: 'Очистить', text: '<i class="fa fa-trash-o gray sm"></i>', className: '__xedt_btn __xedt_clbtn __xedt_frmhot_trgt' })
 							.on('click', () => this.clear()) }}
 						@@parts
 					@end
@@ -2562,7 +2564,6 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 	_applyOnInput: false,
 	_dark: false,
 	_image: null,
-	_pattern: null,
 	get clearButton() { return this._clearButton; },
 	set clearButton(value) { this._clearButton = value; this.needsUpdate(); },
 	get placeholder() { return this._placeholder; },
@@ -2575,8 +2576,6 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 	set dark(value) { this._dark = value; this.needsUpdate(); },
 	get image() { return this._image; },
 	set image(value) { this._image = value; this.needsUpdate(); },
-	get pattern() { return this._pattern; },
-	set pattern(value) { this._pattern = value; this.needsUpdate(); },
 	_getValue() {
 		if (!this._getInputElement()) return null;
 		if (this._getInputElement().value == '') return null;
