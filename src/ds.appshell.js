@@ -132,12 +132,27 @@ ds.appshell.__NavBarNodeView = ds.ui.View.extend({
 	},
 	_nodeClick(e) {
 		const self = this;
-		if (!self._controller) self._controller = ds.appshell.AppShell.shared().actions.exec('open_controller', { controller: self.controller, controllerArgs: self.controllerArgs, navBarNode: self });
-		else ds.appshell.AppShell.shared().actions.exec('show_controller', { controller: self._controller });
+		self.open();
 	},
 	_nodeClose(e) {
 		const self = this;
 		e.stopPropagation();
+		self.close();
+	},
+	open() {
+		const self = this;
+		if (ds.isnull(self._controller))
+			self._controller = ds.appshell.AppShell.shared().actions.exec('open_controller', { controller: self.controller, controllerArgs: self.controllerArgs, navBarNode: self })
+		self.show();
+	},
+	show() {
+		const self = this;
+		if (ds.isnull(self._controller)) return;
+		ds.appshell.AppShell.shared().actions.exec('show_controller', { controller: self._controller });
+	},
+	close() {
+		const self = this;
+		if (ds.isnull(self._controller)) return;
 		ds.appshell.AppShell.shared().actions.exec('close_controller', { controller: self._controller });
 		self._controller = null;
 	},

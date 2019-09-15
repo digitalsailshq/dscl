@@ -2247,6 +2247,7 @@ ds.ui.Calendar = ds.ui.View.extend({
 				</div>`,
 	_noPast: false,
 	_value: null,
+	_page: null,
 	get value() { return this._value; },
 	set value(value) {
 		const self = this;
@@ -2264,43 +2265,41 @@ ds.ui.Calendar = ds.ui.View.extend({
 	now() { this.value = new Date(); },
 	next() {
 		const self = this;
-		let value = self._value;
-		if (!value) value = new Date();
-		let month = value.getMonth();
-		let year = value.getFullYear();
+		let month = self._page.getMonth();
+		let year = self._page.getFullYear();
 		month++;
 		if (month > 11) {
 			month = 0;
 			year++;
 		}
-		self.value = new Date(year, month, 1);
+		self._page = new Date(year, month, 1);
+		self.needsUpdate();
 	},
 	prev() {
 		const self = this;
-		let value = self._value;
-		if (!value) value = new Date();
-		let month = value.getMonth();
-		let year = value.getFullYear();
+		let month = self._page.getMonth();
+		let year = self._page.getFullYear();
 		month--;
 		if (month < 0) {
 			month = 11;
 			year--;
 		}
-		self.value = new Date(year, month, 1);
+		self._page = new Date(year, month, 1);
+		self.needsUpdate();
 	},
 	update() {
 		const self = this;
 		if (!self.element) return;
-		let today = new Date();
+		const today =  new Date();
 		today.setHours(0, 0, 0, 0);
-		let value = self._value;
-		if (!value) value = today;
-		let curr_month = value.getMonth();
-		let curr_year = value.getFullYear();
-		let curr_date = value.getDate();
-		self.month_element.innerHTML = ds.Date.MONTH_NAMES[curr_month].toUpperCase() + '&nbsp;' + curr_year.toString();
+		const page_month = self._page.getMonth();
+		const page_year = self._page.getFullYear();
+		const curr_month = self._value ? self._value.getMonth() : null;
+		const curr_year = self._value ? self._value.getFullYear() : null;
+		const curr_date = self._value ? self._value.getDate() : null;
+		self.month_element.innerHTML = ds.Date.MONTH_NAMES[page_month].toUpperCase() + '&nbsp;' + page_year.toString();
 		self.calendar_element.innerHTML = '';
-		let days = new Date(curr_year, curr_month + 1, 0).getDate();
+		let days = new Date(page_year, page_month + 1, 0).getDate();
 		let matrix = {};
 		for (let i = 0; i < 6; i++) {
 			matrix[i] = { element: ds.ui.element(`<div class="row"></div>`, self.calendar_element), cells: {} };
@@ -2308,20 +2307,20 @@ ds.ui.Calendar = ds.ui.View.extend({
 		}
 		let row_n = 0;
 		for (let day_n = 1; day_n <= days; day_n++) {
-			let date = new Date(curr_year, curr_month, day_n);
+			const date = new Date(page_year, page_month, day_n);
 			date.setHours(0, 0, 0, 0);
 			var cell_n = self.DAY_CONVERT[date.getDay()];
 			matrix[row_n].cells[cell_n].element.classList.add('hvr', 'hnd', '__xcal_cell');
 			matrix[row_n].cells[cell_n].element.setAttribute('date-date', day_n);
-			matrix[row_n].cells[cell_n].element.setAttribute('date-month', curr_month);
-			matrix[row_n].cells[cell_n].element.setAttribute('date-year', curr_year);
+			matrix[row_n].cells[cell_n].element.setAttribute('date-month', page_month);
+			matrix[row_n].cells[cell_n].element.setAttribute('date-year', page_year);
 			matrix[row_n].cells[cell_n].element.innerHTML = day_n;
 			if (cell_n == 5 || cell_n == 6) matrix[row_n].cells[cell_n].element.classList.add('gray');
 			if (date.getTime() == today.getTime()) {
 				matrix[row_n].cells[cell_n].element.classList.add('bl', 'bt', 'br', 'bb');
 				matrix[row_n].cells[cell_n].element.style.setProperty('border-color', 'var(--border-color-blue)');
 			}
-			if (day_n == curr_date) {
+			if (day_n == curr_date && page_month == curr_month && page_year == curr_year) {
 				matrix[row_n].cells[cell_n].element.style.setProperty('background-color', '#ebf2f9');
 				matrix[row_n].cells[cell_n].element.classList.add('strong');
 				matrix[row_n].cells[cell_n].element.classList.remove('gray');
@@ -2335,6 +2334,7 @@ ds.ui.Calendar = ds.ui.View.extend({
 	},
 	init() {
 		var self = this;
+		self._page = new Date();
 		ds.ui.View.init.call(self);
 		ds.ui.element_on(self.element, 'click', '.__xcal_cell', function(e) {
 			if (self.__freed) return false;
@@ -2343,6 +2343,7 @@ ds.ui.Calendar = ds.ui.View.extend({
 			let month = this.getAttribute('date-month');
 			let year = this.getAttribute('date-year');
 			self.value = new Date(year, month, date);
+			self._page = self.value;
 			self._trigger('select', self.value);
 			return true;
 		});
