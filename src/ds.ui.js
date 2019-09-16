@@ -2488,7 +2488,7 @@ ds.ui.Edit = ds.ui.View.extend({
 		self.value = null;
 	},
 	focus() {}
-}, ds.Events('change'));
+}, ds.Events('change', 'user_change'));
 ds.ui.TextEdit = ds.ui.Edit.extend({
 	InlineButton: ds.ui.View.extend({
 		styles: `.__xedt_inline_btn:last-child { margin-right: 4px; }`,
@@ -2552,7 +2552,10 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 						@@buttons
 						<div x-ref="buttons_element" class="row"></div>
 						{{ this._clearBtn ||= ds.ui.Button.new({ hint: 'Очистить', text: '<i class="fa fa-trash-o gray sm"></i>', className: '__xedt_btn __xedt_clbtn __xedt_frmhot_trgt' })
-							.on('click', () => this.clear()) }}
+							.on('click', () => {
+								this.clear();
+								this._trigger('user_change', this.value);
+							}) }}
 						@@parts
 					@end
 				@end`,
@@ -2614,6 +2617,7 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 		if (self.disabled) return;
 		const val = self._getInputElement().value;
 		self.value = (val == '' ? null : val);
+		self._trigger('user_change', self.value);
 	},
 	_onFocusOut() {
 		const self = this;
@@ -2919,12 +2923,12 @@ ds.ui.CheckboxEdit = ds.ui.Edit.extend({
 	init() {
 		const self = this;
 		ds.ui.Edit.init.call(self);
-		
 		ds.ui.element_on(self.element, 'click', 'div.__xedt_prts', function(e) {
 			if (self.__freed) return false;
 			if (self.passive) return true;
 			if (self._disabled) return true;
 			self.value = self.isChecked() ? self.falseValue : self.trueValue;
+			self._trigger('user_change', self.value);
 			return true;
 		});
 	}
@@ -3087,6 +3091,7 @@ ds.ui.LookupEdit = ds.ui.DropDownEdit.extend({
 			if (item && (self.value != item[self.valueKey])) {
 				self._lastChangedValue = undefined; // <-- !!
 				self.value = item[self.valueKey];
+				self._trigger('user_change', self.value);
 				self.close();
 			}
 		}
@@ -3125,6 +3130,7 @@ ds.ui.LookupEdit = ds.ui.DropDownEdit.extend({
 		self._lastChangedValue = undefined; // <-- to force set value...
 		self.value = ds.get(self._dataSet.data[index], self.valueKey);
 		self._trigger('select', self.value);
+		self._trigger('user_change', self.value);
 		self.close();
 	},
 	_onCheckItem(index, checked) {
@@ -3137,6 +3143,7 @@ ds.ui.LookupEdit = ds.ui.DropDownEdit.extend({
 		if (checked) self.value = self.value.concat(value);
 		else self.value = self.value.filter(v => v != value);
 		self._trigger('check', value, checked);
+		self._trigger('user_change', self.value);
 		self._getInputElement().value = '';
 		self.needsUpdate().then(() => self._popupHelper.adjust());
 	},
@@ -3229,6 +3236,7 @@ ds.ui.TreeLookupEdit = ds.ui.DropDownEdit.extend({
 		if (self.disabled) return;
 		self.value = node.getBranch().map(node => node.item[self.valueKey]).join('.');
 		self._trigger('select', self.value);
+		self._trigger('user_change', self.value);
 		self.close();
 	},
 	async _getCount(item) {
@@ -3279,6 +3287,7 @@ ds.ui.DateTimeEdit = ds.ui.DropDownEdit.extend({
 						{{ this.calendar = this.calendar || ds.ui.Calendar.new({ className: 'flex' })
 							.on('change', value => {
 								this.value = ds.Date.newFromDate(value).toISODate();
+								this._trigger('user_change', this.value);
 								this.calendar.needsUpdate().then(() => this._popupHelper.adjust());
 							})
 							.on('select', () => this.close()) }}
