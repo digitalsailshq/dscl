@@ -1011,38 +1011,40 @@ ds.assert = (value, descr = null, errproto = Error) => {
 }
 ds.isNode = () => (typeof process != 'undefined') && (process.cwd !== null) && (process.cwd !== undefined);
 if (ds.isNode()) {
-	const libfs = require('fs');
-	const libpath = require('path');
-	ds.red = a => `\x1b[31m${a}\x1b[0m`;
-	ds.green = a => `\x1b[32m${a}\x1b[0m`;
-	ds.yellow = a => `\x1b[33m${a}\x1b[0m`;
-	ds.rm = p => { if (libfs.existsSync(p)) libfs.unlinkSync(p); };
-	ds.rmrf = p => {
-	    if (libfs.existsSync(p)) {
-	        libfs.readdirSync(p).forEach(f => {
-	            const pp = libpath.join(p, f);
-	            if (libfs.lstatSync(pp).isDirectory()) rmrf(pp);
-	            else libfs.unlinkSync(pp);
-	        });
-	        libfs.rmdirSync(p);
-	    }
-	}
-	ds.cp = (s, d) => {
-		const p = (libfs.existsSync(d) && libfs.lstatSync(d).isDirectory()) ? libpath.join(d, libpath.basename(s)) : d;
-	    libfs.writeFileSync(p, libfs.readFileSync(s));
-	}
-	ds.cprf = (s, d, options) => {
-		options = Object.assign({ contentsOnly: false }, options);
-	    const p = options.contentsOnly ? d : libpath.join(d, libpath.basename(s));
-	    if (!libfs.existsSync(p)) libfs.mkdirSync(p, { recursive: true });
-	    if (libfs.lstatSync(s).isDirectory()) {
-	        libfs.readdirSync(s).forEach(f => {
-	            const pp = libpath.join(s, f);
-	            if (libfs.lstatSync(pp).isDirectory()) cprf(pp, p, null);
-	            else cp(pp, p);
-	        });
-	    }
-	}
-	ds.ht_begin = () => process.hrtime();
-	ds.ht_end = ht => (ht = process.hrtime(ht), ht[0] == 0 ? (Math.floor(ht[1] / 1e6).toString() + ' ms') : (ht[0].toString() + ' s, ' + Math.floor(ht[1] / 1e6).toString() + ' ms'));
+	(() => {
+		const libfs = require('fs');
+		const libpath = require('path');
+		ds.red = a => `\x1b[31m${a}\x1b[0m`;
+		ds.green = a => `\x1b[32m${a}\x1b[0m`;
+		ds.yellow = a => `\x1b[33m${a}\x1b[0m`;
+		ds.rm = p => { if (libfs.existsSync(p)) libfs.unlinkSync(p); };
+		ds.rmrf = p => {
+		    if (libfs.existsSync(p)) {
+		        libfs.readdirSync(p).forEach(f => {
+		            const pp = libpath.join(p, f);
+		            if (libfs.lstatSync(pp).isDirectory()) rmrf(pp);
+		            else libfs.unlinkSync(pp);
+		        });
+		        libfs.rmdirSync(p);
+		    }
+		}
+		ds.cp = (s, d) => {
+			const p = (libfs.existsSync(d) && libfs.lstatSync(d).isDirectory()) ? libpath.join(d, libpath.basename(s)) : d;
+		    libfs.writeFileSync(p, libfs.readFileSync(s));
+		}
+		ds.cprf = (s, d, options) => {
+			options = Object.assign({ contentsOnly: false }, options);
+		    const p = options.contentsOnly ? d : libpath.join(d, libpath.basename(s));
+		    if (!libfs.existsSync(p)) libfs.mkdirSync(p, { recursive: true });
+		    if (libfs.lstatSync(s).isDirectory()) {
+		        libfs.readdirSync(s).forEach(f => {
+		            const pp = libpath.join(s, f);
+		            if (libfs.lstatSync(pp).isDirectory()) cprf(pp, p, null);
+		            else cp(pp, p);
+		        });
+		    }
+		}
+		ds.ht_begin = () => process.hrtime();
+		ds.ht_end = ht => (ht = process.hrtime(ht), ht[0] == 0 ? (Math.floor(ht[1] / 1e6).toString() + ' ms') : (ht[0].toString() + ' s, ' + Math.floor(ht[1] / 1e6).toString() + ' ms'));
+	})();		
 }
