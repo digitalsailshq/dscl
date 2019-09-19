@@ -39,13 +39,13 @@ ds.get = (obj, path) => {
     }
     return obj;
 }
-ds.set = (a, p, v) => {
-	if (!a) throw new Error('ds.set: "a" argument is required.');
-	if (!p) throw new Error('ds.set: "p" argument is required.');
-    for (let i = 0, path_arr = p.split('.'), len = path_arr.length; i < len; i++) {
-    	if (i == path_arr.length - 1) a[path_arr[i]] = v;
-    	else if (a[path_arr[i]] === null || a[path_arr[i]] === undefined) a[path_arr[i]] = {};
-    	a = a[path_arr[i]];
+ds.set = (obj, path, value) => {
+	if (!obj) throw new Error('ds.set: "obj" argument is required.');
+	if (!path) throw new Error('ds.set: "path" argument is required.');
+    for (let i = 0, path_arr = path.split('.'), len = path_arr.length; i < len; i++) {
+    	if (i == path_arr.length - 1) obj[path_arr[i]] = value;
+    	else if (obj[path_arr[i]] === null || obj[path_arr[i]] === undefined) obj[path_arr[i]] = {};
+    	obj = obj[path_arr[i]];
     }
 }
 ds.ensurePath = (obj, path, defaultValue) => {
