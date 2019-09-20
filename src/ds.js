@@ -1006,7 +1006,7 @@ ds.Audit = ds.Object.extend({
 ds.Responder = ds.Object.extend({
 	_pending: null,
 	_worker: null,
-	_children: null,
+	children: null,
 	parent: null,
 	name: null,
 	worker: false,
@@ -1045,7 +1045,7 @@ ds.Responder = ds.Object.extend({
 		ds.assert(message.validated).required().equals(true);
 		if (message.receiver == '*') {
 			if (message.type == 'result') throw new Error(`Message cannot be "result" type and "*" as receiver, sender: "${message.sender}"`);
-			else (self._isRootResponder() ? self.responders : self._getRootResponder().responder).forEach(r => r._receiveMessage(message);
+			else (self._isRootResponder() ? self.responders : self._getRootResponder().responder).forEach(r => r._receiveMessage(message));
 		} else if (message.receiver == self.name) self._receiveMessage(message);
 		else {
 			const responder = self.responders.find(r => r.name == message.receiver);
@@ -1055,6 +1055,12 @@ ds.Responder = ds.Object.extend({
 				else throw new Error(`Responder with name "${message.receiver}" not found on parent "${self.name}"`);
 			}
 		}
+	},
+	respondTo(message, with_) {
+		const self = this;
+		ds.assert(message).required().object();
+		ds.assert(message.validated).required().equals(true);
+		self._sendMessage(Object.assign(with_, { id: message.id, sender: self.name, receiver: message.sender }));
 	},
 	postMessage(message, callback) {
 		const self = this;
@@ -1072,10 +1078,10 @@ ds.Responder = ds.Object.extend({
 		const self = this;
 		ds.assert(self.name).required().string().notEmpty();
 		self._pending = {};
-		self._children = [];
+		self.children = [];
 		if (self.parent) {
-			if (self.parent._children.some(r => r.name == self.name)) throw new Error(`Responder "${self.name}" already registered on parent "${self.parent.name}"`);
-			self.parent._children.push(self);
+			if (self.parent.children.some(r => r.name == self.name)) throw new Error(`Responder "${self.name}" already registered on parent "${self.parent.name}"`);
+			self.parent.children.push(self);
 		}
 		if (self.worker) {
 			if (ds.isNode()) {
@@ -1094,7 +1100,7 @@ ds.Responder = ds.Object.extend({
 	free() {
 		const self = this;
 		if (self.parent) {
-			self.parent._children = self.parent._children.filter(r => r != self);
+			self.parent.children = self.parent.children.filter(r => r != self);
 			self.parent = null;
 		}
 		if (self._worker) {
@@ -1142,3 +1148,6 @@ if (ds.isNode()) {
 		ds.ht_end = ht => (ht = process.hrtime(ht), ht[0] == 0 ? (Math.floor(ht[1] / 1e6).toString() + ' ms') : (ht[0].toString() + ' s, ' + Math.floor(ht[1] / 1e6).toString() + ' ms'));
 	})();		
 }
+
+// Вывести резюме в список документов
+// Если резюме не помещается в ячейку - выводить ее в хинте
