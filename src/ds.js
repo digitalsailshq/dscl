@@ -970,14 +970,26 @@ ds.Tracker = ds.Object.extend({
 }, ds.Events('op_begin', 'op_end'));
 ds.Audit = ds.Object.extend({
 	SEVERITY: ['INFO', 'WARNING', 'ERROR'],
+	_last_module: null,
+	_last_filename: null,
 	_libfs: null,
 	_libpath: null,
-	_filename: null,
+	_isNode: false,
 	file: true,
 	output: true,
 	module: null,
 	user: null,
 	_format(a) { return (a || '').toString().replace('\t', ' ').replace('\n', ' '); },
+	_getFileName() {
+		const self = this;
+		if (!self._isNode) return;
+		if (self.module == self._last_module) return self._last_filename;
+		else {
+			const f1 = self._libpath.join(process.cwd(), 'logs');
+			const f2 = process.cwd();
+			self._last_filename = self._libpath.join((self._libfs.existsSync(f1) ? f1 : f2), `${self.module}.log`);	
+		}
+	},
 	message(sev, msg) {
 		const self = this;
 		if (ds.isnull(msg)) throw new Error(`ds.Audit: "msg" is required.`);
@@ -989,17 +1001,15 @@ ds.Audit = ds.Object.extend({
 			if (sev == 'INFO') console.log(log);
 			else if (sev == 'WARNING') console.log(ds.yellow(log));
 			else if (sev == 'ERROR') console.log(ds.red(log));
-		} if (self.file && ds.isNode()) self._libfs.appendFileSync(self._filename, log + '\n');
+		} if (self.file && ds.isNode()) self._libfs.appendFileSync(self._getFileName(), log + '\n');
 	},
 	init() {
 		const self = this;
 		if (ds.isnull(self.module)) throw new Error('ds.Audit: "module" required.');
 		if (ds.isNode()) {
+			self._isNode = true;
 			self._libfs = require('fs');
 			self._libpath = require('path');
-			const f1 = self._libpath.join(process.cwd(), 'logs');
-			const f2 = process.cwd();
-			self._filename = self._libpath.join((self._libfs.existsSync(f1) ? f1 : f2), `${self.module}.log`);
 		}
 	}
 });
@@ -1072,6 +1082,15 @@ ds.Responder = ds.Object.extend({
 		message.validated = true;
 		if (message.receiver == message.sender) throw new Error(`Restricted to post messages to itself, sender: "${message.sender}", receiver: "${message.receiver}"`);
 		self._pending[id] = callback;
+		self._sendMessage(message);
+	},
+	dispatchMessage(message, receiver) {
+		const self = this;
+		ds.assert(message).required().object();
+		ds.assert(message.validated).required().equals(true);
+		ds.assert(receiver).required().string().notEmpty();
+		message.receiver = receiver;
+		if (message.receiver == self.name) throw new Error(`Restricted to dispatch messages to itself, receiver: "${message.receiver}", dispatcher: "${self.name}"`);
 		self._sendMessage(message);
 	},
 	init() {
