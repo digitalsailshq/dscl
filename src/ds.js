@@ -983,12 +983,13 @@ ds.Audit = ds.Object.extend({
 	_getFileName() {
 		const self = this;
 		if (!self._isNode) return;
-		if (self.module == self._last_module) return self._last_filename;
-		else {
+		if (self.module != self._last_module) {
 			const f1 = self._libpath.join(process.cwd(), 'logs');
 			const f2 = process.cwd();
+			self._last_module = self.module;
 			self._last_filename = self._libpath.join((self._libfs.existsSync(f1) ? f1 : f2), `${self.module}.log`);	
 		}
+		return self._last_filename;
 	},
 	message(sev, msg) {
 		const self = this;
