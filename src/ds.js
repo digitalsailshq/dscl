@@ -1033,33 +1033,32 @@ ds.Responder = ds.Object.extend({
 	},
 	_processMessage(message) {
 		const self = this;
-		ds.assert(message).required().object();
-		ds.assert(message.validated).required().equals(true);
+		ds.assert(message, 'Responder::_processMessage: "message"').required().object();
+		ds.assert(message.validated, 'Responder::_processMessage: "message.validated"').required().equals(true);
 		if (self.worker) self._worker.postMessage(message);
-		else self._sendMessage({ type: 'error', message: 'Message not accepted', id: message.id, sender: self.name, receiver: message.sender });
+		else self.respondTo(message, { type: 'error', message: 'Message not accepted' });
 	},
 	_receiveMessage(message) {
 		const self = this;
-		ds.assert(message).required().object();
-		ds.assert(message.validated).required().equals(true);
+		ds.assert(message, 'Responder::_receiveMessage: "message"').required().object();
+		ds.assert(message.validated, 'Responder::_receiveMessage: "message.validated"').required().equals(true);
 		if (!['*', self.name].includes(message.receiver)) throw new Error(`Message with receiver "${message.receiver}" is not meant for responder with name "${self.name}"`);
-		if (message.type == 'result') {
+		if (ds.isset(self._pending[message.id])) {
 			const fn = self._pending[message.id];
-			if (!fn) throw new Error(`Callback not found for result message with id "${message.id}"`);
 			delete self._pending[message.id];
 			fn.call(null, message);
 		} else self._processMessage(message);
 	},
 	_sendMessage(message) {
 		const self = this;
-		ds.assert(message).required().object();
-		ds.assert(message.validated).required().equals(true);
+		ds.assert(message, 'Responder::_sendMessage: "message"').required().object();
+		ds.assert(message.validated, 'Responder::_sendMessage: "message.validated"').required().equals(true);
 		if (message.receiver == '*') {
 			if (message.type == 'result') throw new Error(`Message cannot be "result" type and "*" as receiver, sender: "${message.sender}"`);
-			else (self._isRootResponder() ? self.responders : self._getRootResponder().responder).forEach(r => r._receiveMessage(message));
+			else (self._isRootResponder() ? self.children : self._getRootResponder().children).forEach(r => r._receiveMessage(message));
 		} else if (message.receiver == self.name) self._receiveMessage(message);
 		else {
-			const responder = self.responders.find(r => r.name == message.receiver);
+			const responder = self.children.find(r => r.name == message.receiver);
 			if (responder) responder._receiveMessage(message);
 			else {
 				if (self.parent) self.parent._sendMessage(message);
@@ -1069,34 +1068,41 @@ ds.Responder = ds.Object.extend({
 	},
 	respondTo(message, with_) {
 		const self = this;
-		ds.assert(message).required().object();
-		ds.assert(message.validated).required().equals(true);
-		self._sendMessage(Object.assign(with_, { id: message.id, sender: self.name, receiver: message.sender }));
+		ds.assert(message, 'Responder::respondTo: "message"').required().object();
+		ds.assert(message.validated, 'respondTo: "message.validated"').required().equals(true);
+		const reply = Object.assign(with_, { id: message.id, sender: self.name, receiver: message.sender });
+		ds.assert(reply, 'Responder::respondTo: "reply"').required().object();
+		ds.assert(reply.id, 'Responder::respondTo: "reply.id"').required().string().notEmpty();
+		ds.assert(reply.type, 'Responder::respondTo: "reply.type"').required().string().notEmpty();
+		ds.assert(reply.sender, 'Responder::respondTo: "reply.sender"').required().string().notEmpty();
+		ds.assert(reply.receiver, 'Responder::respondTo: "reply.receiver"').required().string().notEmpty();
+		reply.validated = true;
+		self._sendMessage(reply);
 	},
 	postMessage(message, callback) {
 		const self = this;
-		ds.assert(message).required().object().hasOwnProprty(['id', 'type', 'receiver', 'sender']);
-		ds.assert(message.type, pyrite.PropInvalidError).required().string().notEmpty();
-		ds.assert(message.receiver, pyrite.PropInvalidError).required().string().notEmpty();
+		ds.assert(message, 'Responder::postMessage: "message"').required().object();
+		ds.assert(message.type, 'Responder::postMessage: "message.type"').required().string().notEmpty();
+		ds.assert(message.receiver, 'Responder::postMessage: "message.receiver"').required().string().notEmpty();
 		message.id = ds.nextId();
 		message.sender = self.name;
 		message.validated = true;
 		if (message.receiver == message.sender) throw new Error(`Restricted to post messages to itself, sender: "${message.sender}", receiver: "${message.receiver}"`);
-		self._pending[id] = callback;
+		self._pending[message.id] = callback;
 		self._sendMessage(message);
 	},
 	dispatchMessage(message, receiver) {
 		const self = this;
-		ds.assert(message).required().object();
-		ds.assert(message.validated).required().equals(true);
-		ds.assert(receiver).required().string().notEmpty();
+		ds.assert(message, 'Responder::dispatchMessage: "message"').required().object();
+		ds.assert(message.validated, 'Responder::dispatchMessage: "message.validated"').required().equals(true);
+		ds.assert(receiver, "receiver").required().string().notEmpty();
 		message.receiver = receiver;
 		if (message.receiver == self.name) throw new Error(`Restricted to dispatch messages to itself, receiver: "${message.receiver}", dispatcher: "${self.name}"`);
 		self._sendMessage(message);
 	},
 	init() {
 		const self = this;
-		ds.assert(self.name).required().string().notEmpty();
+		ds.assert(self.name, 'Responder::init: "responder.name"').required().string().notEmpty();
 		self._pending = {};
 		self.children = [];
 		if (self.parent) {
@@ -1105,11 +1111,11 @@ ds.Responder = ds.Object.extend({
 		}
 		if (self.worker) {
 			if (ds.isNode()) {
-				ds.assert(self.workerPath).required().string().notEmpty();
+				ds.assert(self.workerPath, 'Responder::init: "workerPath"').required().string().notEmpty();
 				self._worker = require('child_process').fork(self.workerPath);
 				self._worker.on('message', message => {
-					ds.assert(message).required().object();
-					ds.assert(message.validated).required().equals(true);
+					ds.assert(message, 'Responder::init: "message"').required().object();
+					ds.assert(message.validated, 'Responder::init: "message.validated"').required().equals(true);
 					self._sendMessage(message);
 				});
 			} else {
