@@ -5280,12 +5280,13 @@ ds.ui.openFile = (callback, options) => {
 			callback(null, e.target.files[0].path);
 			return;
 		}
+		let file = e.target.files[0];
 		let filename = e.target.files[0].name;
 	    let reader = new FileReader();
 	    reader.onload = e => {
 	    	let result = e.target.result;
 	    	input_element.remove();
-	    	callback(result, filename);
+	    	callback(result, filename, file);
 	    };
 	    if (options.readAs.toLowerCase() == 'text') reader.readAsText(e.target.files[0]);
 	    else if (options.readAs.toLowerCase() == 'dataurl') reader.readAsDataURL(e.target.files[0]);
