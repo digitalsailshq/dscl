@@ -100,7 +100,10 @@ ds.db.__odbc_exec = (conn, sql, args) => {
 	}
 	const exec_args = [];
 	const exec_sql = sql.replace(/\:\w+/g, a => (args || {}).hasOwnProperty(a.substr(1)) ? (exec_args.push(args[a.substr(1)]), '?') : a);
-	const res = conn.queryResultSync(exec_sql, exec_args);
+	const res = (() => {
+					try { return conn.queryResultSync(exec_sql, exec_args); }
+					catch(e) { e.__sql = exec_sql; throw e; };
+				})();
 	const data = res.fetchAllSync().map(row => {
 		Object.keys(row).forEach(key => {
 			if (ds.isDate(row[key])) row[key] = ds.Date.newFromDate(row[key]).toISODateTime();
@@ -242,7 +245,7 @@ ds.db.exec = (conn, sql, args) => {
 		const end_t = process.hrtime(start_t);
 		return res;
 	} catch(e) {
-		ds.db.__log('ERROR', (e.message || e.toString()) + ': ' + sql.replace(/\n/g, '') + ' ' + JSON.stringify(args || {}));
+		ds.db.__log('ERROR', (e.message || e.toString()) + ': ' + (e.__sql || sql).replace(/\n/g, '') + ' ' + JSON.stringify(args || {}));
 		throw e;
 	}
 }
