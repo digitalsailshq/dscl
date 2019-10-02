@@ -212,6 +212,10 @@ ds.db.__preprocess_sql = (conn, sql) => {
 		return fn.apply(null, [conn].concat(args.slice(1)));
 	});
 }
+ds.db.__ident = (conn, name) => {
+	if (conn.__type == 'odbc') return `[${name}]`;
+	else return `"${name}"`;
+}
 // db...
 ds.db.connect = options => {
 	if (!options) throw new Error('ds.db.connect: "options" is required.');
@@ -275,9 +279,9 @@ ds.db.insert = (conn, table_name, args, return_id) => {
 	if (!conn) throw new Error('ds.db.insert: "conn" is required.');
 	if (!table_name) throw new Error('ds.db.insert: "table_name" is required.');
 	if (!args) throw new Error('ds.db.insert: "args" is required.');
-	let sql = 'insert into "' + table_name + '" ';
+	let sql = 'insert into ' + ds.db.__ident(conn, table_name) + ' ';
 	if (Object.keys(args).length > 0) {
-		const sql_fields = '(' + Object.keys(args).map(key => '"' + key + '"').join(',') + ') ';
+		const sql_fields = '(' + Object.keys(args).map(key => ds.db.__ident(conn, key)).join(',') + ') ';
 		const sql_values = 'values (' + Object.keys(args).map(key => ':' + key).join(',') + ') ';
 		if (return_id) {
 			if (conn.__type == 'libpq') sql += sql_fields + sql_values + 'returning id';
@@ -286,7 +290,7 @@ ds.db.insert = (conn, table_name, args, return_id) => {
 		} else sql += sql_fields + sql_values;
 	} else {
 		if (return_id) {
-			if (conn.__type == 'libpq') sql += 'default values returning id';
+			if (conn.__type == 'libpq') sql += 'default values returning ' + ds.db.__ident(conn, 'id');
 			else if (conn.__type == 'odbc') sql += 'output inserted.id default values';
 			else throw new Error('ds.db.insert: Connection type "' + conn.__type + '" is not supported.');
 		} else sql += 'default values';
@@ -301,14 +305,14 @@ ds.db.update = (conn, table_name, args, f1, v1, f2, v2, f3, v3) => {
 	if (!f1) throw new Error('ds.db.update: "f1" is required.');
 	if (!v1) throw new Error('ds.db.update: "v1" is required.');
 	const exec_args = Object.assign({}, args);
-	let exec_sql = 'update "' + table_name + '" set ' + Object.keys(exec_args).map(key => '"' + key + '" = :' + key).join(' ,') + ' where "' + f1 + '" = :__v1';
+	let exec_sql = 'update ' + ds.db.__ident(conn, table_name) + ' set ' + Object.keys(exec_args).map(key => ds.db.__ident(conn, key) + ' = :' + key).join(' ,') + ' where ' + ds.db.__ident(conn, f1) + ' = :__v1';
 	exec_args['__v1'] = v1;
 	if (f2) {
-		exec_sql += ' and "' + f2 + '" = :__v2';
+		exec_sql += ' and ' + ds.db.__ident(conn, f2) + ' = :__v2';
 		exec_args['__v2'] = v2;
 	}
 	if (f3) {
-		exec_sql += ' and "' + f3 + '" = :__v3';
+		exec_sql += ' and ' + ds.db.__ident(conn, f3) + ' = :__v3';
 		exec_args['__v3'] = v3;
 	}
 	const res = ds.db.exec(conn, exec_sql, exec_args);
@@ -320,14 +324,14 @@ ds.db.delete = (conn, table_name, f1, v1, f2, v2, f3, v3) => {
 	if (!f1) throw new Error('ds.db.delete: "f1" is required.');
 	if (!v1) throw new Error('ds.db.delete: "v1" is required.');
 	const exec_args = {};
-	let exec_sql = 'delete from "' + table_name + '" where "' + f1 + '" = :__v1';
+	let exec_sql = 'delete from ' + ds.db.__ident(conn, table_name) + ' where ' + ds.db.__ident(conn, f1) + ' = :__v1';
 	exec_args['__v1'] = v1;
 	if (f2) {
-		exec_sql += ' and "' + f2 + '" = :__v2';
+		exec_sql += ' and ' + ds.db.__ident(conn, f2) + ' = :__v2';
 		exec_args['__v2'] = v2;
 	}
 	if (f3) {
-		exec_sql += ' and "' + f3 + '" = :__v3';
+		exec_sql += ' and ' + ds.db.__ident(conn, f3) + ' = :__v3';
 		exec_args['__v3'] = v3;
 	}
 	const res = ds.db.exec(conn, exec_sql, exec_args);
@@ -340,14 +344,14 @@ ds.db.merge = (conn, table_name, args, f1, v1, f2, v2, f3, v3) => {
 	if (!f1) throw new Error('ds.db.merge: "f1" is required.');
 	if (!v1) throw new Error('ds.db.merge: "v1" is required.');
 	const sel_args = {};
-	let sql = 'select count(*) as qty from "' + table_name + '" where "' + f1 + '" = :__v1';
+	let sql = 'select count(*) as qty from ' + ds.db.__ident(conn, table_name) + ' where ' + ds.db.__ident(conn, f1) + ' = :__v1';
 	sel_args['__v1'] = v1;
 	if (f2) {
-		sql += ' and "' + f2 + '" = :__v2';
+		sql += ' and ' + ds.db.__ident(conn, f2) + ' = :__v2';
 		sel_args['__v2'] = v2;
 	}
 	if (f3) {
-		sql += ' and "' + f3 + '" = :__v3';
+		sql += ' and ' + ds.db.__ident(conn, f3) + ' = :__v3';
 		sel_args['__v3'] = v3;
 	}
 	if (ds.db.exec(conn, sql, sel_args).data[0].qty > 0) return ds.db.update(conn, table_name, args, f1, v1, f2, v2, f3, v3).rowCount;
