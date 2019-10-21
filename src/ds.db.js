@@ -75,7 +75,7 @@ ds.db.preprocessor = {
 		if (conn.__type == 'libpq') return 'smallint';
 		else if (conn.__type == 'odbc') return 'tinyint';
 	},
-	text: (conn) => {
+	text: conn => {
 		if (conn.__type == 'libpq') return 'text';
 		else if (conn.__type == 'odbc') return `nvarchar(max)`;
 	}
@@ -119,6 +119,7 @@ ds.db.__odbc_connect = options => {
 	const conn = require('odbc')();
 	conn.__type = 'odbc';
 	conn.catalog = options.catalog;
+	//conn.openSync(`Driver={ODBC Driver 17 for SQL Server};server=${options.host};database=${options.catalog};uid=${options.user};pwd=${options.password};`);
 	conn.openSync(`Driver={ODBC Driver 13 for SQL Server};server=${options.host};database=${options.catalog};uid=${options.user};pwd=${options.password};`);
 	//conn.openSync(`Driver={SQL Server Native Client 11.0};server=${options.host};database=${options.catalog};uid=${options.user};pwd=${options.password};`);
 	return conn;
