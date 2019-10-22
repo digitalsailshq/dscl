@@ -799,7 +799,7 @@ ds.Date = ds.Object.extend({
 		var divide_by = { w: 604800000, d: 86400000, h: 3600000, m: 60000, s: 1000 };
 		return Math.floor(diff / divide_by[datepart]);
 	},
-	diffText(target) {
+	diffText(target, nowText = 'сейчас') {
 		const self = this;
 		var d_diff = self.diff('d', target);
 		var h_diff = self.diff('h', target);
@@ -813,7 +813,7 @@ ds.Date = ds.Object.extend({
 			var m = m_diff - (60 * h_diff);
 			return h.toString() + 'ч ' + m.toString() + 'м';
 		} else if (m_diff > 0) return m_diff.toString() + 'м';
-		else return 'сейчас';
+		else return nowText;
 	},
 	YYYYMMDD_HH() {
 		const self = this;
