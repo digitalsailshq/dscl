@@ -113,9 +113,10 @@ ds.srvkit.OptionsHandler = ds.srvkit.RequestHandler.extend({
 	request(req, res, next) {
 		const self = this;
 		res.setHeader('Access-Control-Max-Age', self.maxAge);
-		if (self.allowOrigins
-			&& req.headers['origin']
-			&& self.allowOrigins.includes(req.headers['origin'])) res.setHeader('Access-Control-Allow-Origin', req.headers['origin']);
+		if (self.allowOrigins == '*') res.setHeader('Access-Control-Allow-Origin', req.headers['origin'] || '*');
+		else if (self.allowOrigins
+				&& req.headers['origin']
+				&& self.allowOrigins.includes(req.headers['origin'])) res.setHeader('Access-Control-Allow-Origin', req.headers['origin']);
 		if (self.allowMethods) res.setHeader('Access-Control-Allow-Methods', self.allowMethods);
 		if (self.allowHeaders) res.setHeader('Access-Control-Allow-Headers', self.allowHeaders);
 		if (self.allowCredentials) res.setHeader('Access-Control-Allow-Credentials', 'true');

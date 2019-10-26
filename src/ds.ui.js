@@ -1616,15 +1616,18 @@ ds.ui.DragHelper = ds.Object.extend({
 		});
 		ds.ui.element_on(document, 'mouseup', e => {
 			if (self.__freed) return false;
-			var offset = {	x: e.pageX - self.beginPosition.x,
-							y: e.pageY - self.beginPosition.y  };
-			if (!self._dragging) return true;
-			if (Math.abs(offset.x) > 3 || Math.abs(offset.y) > 3 || self._draggingPastSmallOffset) {
-				self._trigger('end', offset, self.position, self.beginPosition, e);
-				if (self._onceOptions && ds.isFunction(self._onceOptions.end)) self._onceOptions.end(offset, self.position, self.beginPosition, e);
+			try {
+				var offset = {	x: e.pageX - self.beginPosition.x,
+								y: e.pageY - self.beginPosition.y  };
+				if (!self._dragging) return true;
+				if (Math.abs(offset.x) > 3 || Math.abs(offset.y) > 3 || self._draggingPastSmallOffset) {
+					self._trigger('end', offset, self.position, self.beginPosition, e);
+					if (self._onceOptions && ds.isFunction(self._onceOptions.end)) self._onceOptions.end(offset, self.position, self.beginPosition, e);
+				}
+				document.body.style.cursor = null;
+			} finally {
+				self.end();
 			}
-			document.body.style.cursor = null;
-			self.end();
 			return true;
 		});
 	}
@@ -3799,7 +3802,7 @@ ds.ui.TreeView = ds.ui.View.extend({
 }, ds.Events('count:single', 'cell:single', 'item:single', 'options:single', 'checked:single', 'check', 'select', 'click'));
 ds.ui.DataGridColumn = ds.Object.extend({
 	_dataGrid: null,
-	cellPrototype: ds.ui.Cell.extend({ className: 'flex ml mr mt mb' }),
+	cellPrototype: ds.ui.Cell,
 	visible: true,
 	text: '',
 	dataKey: null,
@@ -3876,6 +3879,10 @@ ds.ui.DataGridColumn = ds.Object.extend({
 		else if (ds.isNumber(self.minWidth)) styles += 'min-width:' + self.minWidth.toString() + 'px;';
 		return styles;
 	},
+	getCellClassName() {
+		const self = this;
+		return self._dataGrid._compact ? 'ml mt05 mr mb05' : 'ml mr mt mb';
+	},
 	createCell(item, cell) {
 		const self = this;
 		let text = self.ontext(item);
@@ -3884,6 +3891,7 @@ ds.ui.DataGridColumn = ds.Object.extend({
 			text = `<span class="__xgrd_cell_link lnk">${text}</span>`;
 		}
 		return self.cellPrototype.new({
+			className: 'flex ' + self.getCellClassName(),
 			_text: text,
 			_image: self.onimage(item),
 			_tag: self.ontag(item),
@@ -3904,7 +3912,7 @@ ds.ui.DataGridColumn = ds.Object.extend({
 			_textAlign: self.textAlign,
 			_nowrap: true,
 			textClassName: 'sm bvl strong ' + (self._dataGrid.headerGrayText ? 'gray' : ''),
-			className: 'flex ml mr mt mb'
+			className: 'flex ' + self.getCellClassName()
 		});
 	},
 	createAppendCell() {
@@ -4002,10 +4010,12 @@ ds.ui.DataGrid = ds.ui.View.extend({
 	_headerCheckboxRect: true,
 	_hoverRows: false,
 	_handRows: false,
+	_alternateRows: false,
 	_selectRows: false,
 	_hoverCells: false,
 	_handCells: false,
 	_appendable: false,
+	_rowSeparator: true,
 	_lastRowSeparator: false,
 	_selectArrow: null,
 	_idKey: null,
@@ -4030,6 +4040,7 @@ ds.ui.DataGrid = ds.ui.View.extend({
 	_groupCellPrototype: ds.ui.Cell.extend({ className: 'flex ml mr mt05 mb05' }),
 	_groupCheckboxRect: true,
 	_showIconOnEmpty: true,
+	_compact: false,
 	columns: null,
 	data: null,
 	spoilers: null,
@@ -4045,6 +4056,8 @@ ds.ui.DataGrid = ds.ui.View.extend({
 	set hoverRows(value) { this._hoverRows = value; this.needsUpdate(); },
 	get handRows() { return this._handRows; },
 	set handRows(value) { this._handRows = value; this.needsUpdate(); },
+	get alternateRows() { return this._alternateRows; },
+	set alternateRows(value) { this._alternateRows = value; this.needsUpdate(); },
 	get selectRows() { return this._selectRows; },
 	set selectRows(value) { this._selectRows = value; this.needsUpdate(); },
 	get hoverCells() { return this._hoverCells; },
@@ -4053,6 +4066,8 @@ ds.ui.DataGrid = ds.ui.View.extend({
 	set handCells(value) { this._handCells = value; this.needsUpdate(); },
 	get appendable() { return this._appendable; },
 	set appendable(value) { this._appendable = value; this.needsUpdate(); },
+	get rowSeparator() { return this._rowSeparator; },
+	set rowSeparator(value) { this._rowSeparator = value; this.needsUpdate(); },
 	get lastRowSeparator() { return this._lastRowSeparator; },
 	set lastRowSeparator(value) { this._lastRowSeparator = value; this.needsUpdate(); },
 	get search() { return this._search; },
@@ -4115,6 +4130,8 @@ ds.ui.DataGrid = ds.ui.View.extend({
 		this._dataSet.on('load', () => this.needsUpdate());
 		if (this._dataSet.isLoaded()) this.needsUpdate();
 	},
+	get compact() { return this._compact; },
+	set compact(value) { this._compact = value; this.needsUpdate(); },
 	groupExpand(index, expand) {
 		const self = this;
 		let group = self._gridBody._groups[index];
@@ -4238,9 +4255,8 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 			 .__xgrd_bdy_grp_hdr { border-bottom-color: rgb(228, 228, 228); border-bottom-style: solid; border-bottom-width: 0px; }
 			 .__xgrd_bdy_grp_hdr_cell { overflow-y: hidden; }
 			 .__xgrd_bdy_grp.__expanded .__xgrd_bdy_grp_hdr { border-bottom-width: 2px; }
-			 .__xgrd_bdy_row { border-bottom-color: rgb(228, 228, 228); border-bottom-style: solid; border-bottom-width: 1px; }
-			 .__xgrd_bdy_row.__selected { position: relative; background-color: var(--background-color-highlighted) !important; }
-			 .__xgrd_bdy_row.__spoilered { border-bottom-width: 0px; }
+			 /*.__xgrd_bdy_row { border-bottom-color: rgb(228, 228, 228); border-bottom-style: solid; border-bottom-width: 1px; }*/
+			 .__xgrd_bdy_row { }
 			 .__xgrd_bdy.__xgrd_bdy_selarr_l .__xgrd_bdy_row.__selected::before, .__xgrd_bdy.__xgrd_bdy_selarr_l .__xgrd_bdy_row.__selected::after { content: ""; position: absolute; border-style: solid; left: 0px; top: 50%; transform: translateY(-50%); }
 			 .__xgrd_bdy.__xgrd_bdy_selarr_l .__xgrd_bdy_row.__selected::before { border-color: transparent transparent transparent var(--border-color); border-width: 8px; }
 			 .__xgrd_bdy.__xgrd_bdy_selarr_l .__xgrd_bdy_row.__selected::after { border-color: transparent transparent transparent white; border-width: 7px; }
@@ -4267,10 +4283,13 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 			 .__xgrd_bdy_row:hover .__xgrd_cell_actn { visibility: visible; }
 			 .__xgrd_bdy_grp_bdy .__xgrd_bdy_row:last-child { border-bottom-width: 0px; }
 			 .__xgrd_bdy.__nolastrowsep .__xgrd_bdy_row:last-child { border-bottom-width: 0px; }
+			 .__xgrd_bdy.__alternate .__xgrd_bdy_row:nth-child(odd) { background-color: rgba(0, 0, 0, 0.05); }
+			 .__xgrd_bdy_row.__selected { position: relative; background-color: var(--background-color-highlighted) !important; }
+			 .__xgrd_bdy_row.__spoilered { border-bottom-width: 0px; }
 			 .__xgrd_bdy.__nolastrowsep .__xgrd_bdy_grp:last-child { border-bottom-width: 0px; }
 			 .__xgrd_bdy_grp_hdr_exp { width: 36px; height: 28px; text-align: center; line-height: 30px; vertical-align: middle; }
 			 .__xgrd_bdy_row_spoiler { border-bottom-color: rgb(228, 228, 228); border-bottom-style: solid; border-bottom-width: 1px; }`,
-	template: `<div class="__xgrd_bdy col flex{{ this._dataGrid.selectArrow == 'left' ? ' __xgrd_bdy_selarr_l' : '' }}{{ this._dataGrid.selectArrow == 'right' ? ' __xgrd_bdy_selarr_r' : '' }}{{ !this._dataGrid.lastRowSeparator ? ' __nolastrowsep' : '' }}">
+	template: `<div class="__xgrd_bdy col flex{{ this._dataGrid.selectArrow == 'left' ? ' __xgrd_bdy_selarr_l' : '' }}{{ this._dataGrid.selectArrow == 'right' ? ' __xgrd_bdy_selarr_r' : '' }}{{ !this._dataGrid.lastRowSeparator ? ' __nolastrowsep' : '' }}{{ this._dataGrid.alternateRows ? ' __alternate' : '' }}">
 					<div x-ref="innerTopShadow_element" style="display:none;" class="__xgrd_bdy_tshdw __sbpad"></div>
 					<div class="tac mt mb gray fs12" style="display: {{ this._isNoDataElementVisible() ? '' : 'none' }};">нет данных</div>
 					<div class="tac mt mb gray fs13" style="display: {{ this.isNotFoundElementVisible() ? '' : 'none' }};">
@@ -4460,7 +4479,7 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 		self._rows.forEach((row, index) => {
 			row.element = document.createElement('div');
 			row.element.setAttribute('data-row-index', row.index);
-			row.element.classList.add('__xgrd_bdy_row', 'row');
+			row.element.classList.add('__xgrd_bdy_row', 'row', (self._dataGrid._rowSeparator ? 'bb' : undefined));
 			ds.ui.element_classif(
 				row.element,
 				'__selected',	self._dataGrid.idKey && (ds.get(row.item, self._dataGrid.idKey) == self._selectedId),
@@ -4556,7 +4575,7 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 			}
 		}
 		data = self._sortData(data);
-		let count = data.length;
+		const count = data.length;
 		for (let row_index = 0; row_index < count; row_index++) {
 			let item = data[row_index];
 			let item_groups = (() => {
@@ -4738,8 +4757,9 @@ ds.ui.Header = ds.ui.View.extend({
 			.__xhdr.__textaligned { padding-left: 0px; }
 			.__xhdr.__textaligned .__xhdr_exp { left: -22px; }`,
 	template: `<div class="row mid __xhdr{{ this._expandable ? ' __expandable' : '' }}{{ this._alignByText ? ' __textaligned' : '' }}">
-					<div class="__xhdr_exp hvr" x-on:click="self.expanded = !self.expanded;">
-						<i class="fa{{ this.expanded ? ' fa-caret-down': ' fa-caret-right' }}"></i>
+					<div class="__xhdr_exp col cen mid hvr" x-on:click="self.expanded = !self.expanded;">
+						<img x-if="this.expanded" class="x12 ty1" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNDA4IDcwNHEwIDI2LTE5IDQ1bC00NDggNDQ4cS0xOSAxOS00NSAxOXQtNDUtMTlsLTQ0OC00NDhxLTE5LTE5LTE5LTQ1dDE5LTQ1IDQ1LTE5aDg5NnEyNiAwIDQ1IDE5dDE5IDQ1eiIvPjwvc3ZnPg==" />
+						<img x-if="!this.expanded" class="x12 ty1" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xMTUyIDg5NnEwIDI2LTE5IDQ1bC00NDggNDQ4cS0xOSAxOS00NSAxOXQtNDUtMTktMTktNDV2LTg5NnEwLTI2IDE5LTQ1dDQ1LTE5IDQ1IDE5bDQ0OCA0NDhxMTkgMTkgMTkgNDV6Ii8+PC9zdmc+" />
 					</div>
 					<div class="__xhdr_ttl strong fs13" x-on:click="self.expanded = !self.expanded;">{{ this.text }}</div>
 					<div class="__xhdr_line flex"></div>
@@ -5271,6 +5291,46 @@ ds.ui.CheckMenuItem = ds.ui.MenuItem.extend({
 ds.ui.RadioMenuItem = ds.ui.CheckMenuItem.extend({
 	checkImage: 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMTZweCIgaGVpZ2h0PSIxNnB4IiB2aWV3Qm94PSIwIDAgMTYgMTYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8ZyBpZD0iZG90X3NtYWxsIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8Y2lyY2xlIGlkPSJPdmFsIiBmaWxsPSIjMDAwMDAwIiBjeD0iOCIgY3k9IjgiIHI9IjMiPjwvY2lyY2xlPgogICAgPC9nPgo8L3N2Zz4=',
 });
+ds.ui.Switcher = ds.ui.View.extend({
+	styles: `.__switch { position: relative; border-radius: 50px; box-shadow: rgba(0, 0, 0, 0.0588235) 0px 1px 1px 0px inset; }
+			.__switch > .__switch_tgl { position: absolute; top: 2px; transition: left ease 0.1s; }
+			.__switch.__left > .__switch_tgl { left: 2px; }
+			.__switch.__right > .__switch_tgl { left: calc(2px + 100% - 20px); }`,
+	template: `<div class="__switch w04 h02 row mid {{ this._disabled ? '' : 'hnd' }} {{ this.value == this.rightValue ? '__right' : '__left' }}"
+					style="background-color:{{ this.disabled ? 'var(--text-color-gray)' : (this.value == this.rightValue ? this.rightColor : this.leftColor) }};" x-on:click="self.toggle();">
+					<div class="__switch_tgl rnd bkw x16" style="box-shadow: 1px 1px 2px 1px #0005;"></div>
+				</div>`,
+	_value: 0,
+	_leftValue: 0,
+	_rightValue: 1,
+	_leftColor: 'rgba(0, 0, 0, 0.05)',
+	_rightColor: '#4AA7F0',
+	_disabled: false,
+	get value() { return this._value; },
+	set value(value) { this._value = value; this.needsUpdate(); },
+	get leftValue() { return this._leftValue; },
+	set leftValue(value) { this._leftValue = value; this.needsUpdate(); },
+	get rightValue() { return this._rightValue; },
+	set rightValue(value) { this._rightValue = value; this.needsUpdate(); },
+	get leftColor() { return this._leftColor; },
+	set leftColor(value) { this._leftColor = value; this.needsUpdate(); },
+	get rightColor() { return this._rightColor; },
+	set rightColor(value) { this._rightColor = value; this.needsUpdate(); },
+	get disabled() { return this._disabled; },
+	set disabled(value) { this._disabled = value; this.needsUpdate(); },
+	toggle() {
+		const self = this;
+		if (self.disabled) return;
+		self.value = (self.value == self.leftValue ? self.rightValue : self.leftValue);
+		self._trigger('change', self.value);
+		self._trigger('user_change', self.value);
+	},
+	init() {
+		const self = this;
+		self._value = self._leftValue;
+		ds.ui.View.init.call(self);
+	}
+}, ds.Events('change', 'user_change'));
 ds.ui.openFile = (callback, options) => {
 	options = Object.assign({ readAs: 'text', nwdirectory: false }, options);
 	let input_element = ds.ui.element('<input type="file" style="display:none;"' + (options.nwdirectory ? ' nwdirectory' : '') + ' />', document.body);
