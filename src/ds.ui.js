@@ -825,6 +825,12 @@ ds.ui.__PropertyDirective = ds.ui.__Directive.extend({
 	}
 });
 ds.ui.__parsestyles(ds.ui.__styles);
+ds.ui.RELOAD_IMG = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNjM5IDEwNTZxMCA1LTEgNy02NCAyNjgtMjY4IDQzNC41dC00NzggMTY2LjVxLTE0NiAwLTI4Mi41LTU1dC0yNDMuNS0xNTdsLTEyOSAxMjlxLTE5IDE5LTQ1IDE5dC00NS0xOS0xOS00NXYtNDQ4cTAtMjYgMTktNDV0NDUtMTloNDQ4cTI2IDAgNDUgMTl0MTkgNDUtMTkgNDVsLTEzNyAxMzdxNzEgNjYgMTYxIDEwMnQxODcgMzZxMTM0IDAgMjUwLTY1dDE4Ni0xNzlxMTEtMTcgNTMtMTE3IDgtMjMgMzAtMjNoMTkycTEzIDAgMjIuNSA5LjV0OS41IDIyLjV6bTI1LTgwMHY0NDhxMCAyNi0xOSA0NXQtNDUgMTloLTQ0OHEtMjYgMC00NS0xOXQtMTktNDUgMTktNDVsMTM4LTEzOHEtMTQ4LTEzNy0zNDktMTM3LTEzNCAwLTI1MCA2NXQtMTg2IDE3OXEtMTEgMTctNTMgMTE3LTggMjMtMzAgMjNoLTE5OXEtMTMgMC0yMi41LTkuNXQtOS41LTIyLjV2LTdxNjUtMjY4IDI3MC00MzQuNXQ0ODAtMTY2LjVxMTQ2IDAgMjg0IDU1LjV0MjQ1IDE1Ni41bDEzMC0xMjlxMTktMTkgNDUtMTl0NDUgMTkgMTkgNDV6Ii8+PC9zdmc+';
+ds.ui.CARET_UP_IMG = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNDA4IDEyMTZxMCAyNi0xOSA0NXQtNDUgMTloLTg5NnEtMjYgMC00NS0xOXQtMTktNDUgMTktNDVsNDQ4LTQ0OHExOS0xOSA0NS0xOXQ0NSAxOWw0NDggNDQ4cTE5IDE5IDE5IDQ1eiIvPjwvc3ZnPg==';
+ds.ui.CARET_DOWN_IMG = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNDA4IDcwNHEwIDI2LTE5IDQ1bC00NDggNDQ4cS0xOSAxOS00NSAxOXQtNDUtMTlsLTQ0OC00NDhxLTE5LTE5LTE5LTQ1dDE5LTQ1IDQ1LTE5aDg5NnEyNiAwIDQ1IDE5dDE5IDQ1eiIvPjwvc3ZnPg==';
+ds.ui.CARET_LEFT_IMG = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xMjE2IDQ0OHY4OTZxMCAyNi0xOSA0NXQtNDUgMTktNDUtMTlsLTQ0OC00NDhxLTE5LTE5LTE5LTQ1dDE5LTQ1bDQ0OC00NDhxMTktMTkgNDUtMTl0NDUgMTkgMTkgNDV6Ii8+PC9zdmc+';
+ds.ui.CARET_RIGHT_IMG = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xMTUyIDg5NnEwIDI2LTE5IDQ1bC00NDggNDQ4cS0xOSAxOS00NSAxOXQtNDUtMTktMTktNDV2LTg5NnEwLTI2IDE5LTQ1dDQ1LTE5IDQ1IDE5bDQ0OCA0NDhxMTkgMTkgMTkgNDV6Ii8+PC9zdmc+';
+ds.ui.CALENDAR_IMG = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xOTIgMTY2NGgyODh2LTI4OGgtMjg4djI4OHptMzUyIDBoMzIwdi0yODhoLTMyMHYyODh6bS0zNTItMzUyaDI4OHYtMzIwaC0yODh2MzIwem0zNTIgMGgzMjB2LTMyMGgtMzIwdjMyMHptLTM1Mi0zODRoMjg4di0yODhoLTI4OHYyODh6bTczNiA3MzZoMzIwdi0yODhoLTMyMHYyODh6bS0zODQtNzM2aDMyMHYtMjg4aC0zMjB2Mjg4em03NjggNzM2aDI4OHYtMjg4aC0yODh2Mjg4em0tMzg0LTM1MmgzMjB2LTMyMGgtMzIwdjMyMHptLTM1Mi04NjR2LTI4OHEwLTEzLTkuNS0yMi41dC0yMi41LTkuNWgtNjRxLTEzIDAtMjIuNSA5LjV0LTkuNSAyMi41djI4OHEwIDEzIDkuNSAyMi41dDIyLjUgOS41aDY0cTEzIDAgMjIuNS05LjV0OS41LTIyLjV6bTczNiA4NjRoMjg4di0zMjBoLTI4OHYzMjB6bS0zODQtMzg0aDMyMHYtMjg4aC0zMjB2Mjg4em0zODQgMGgyODh2LTI4OGgtMjg4djI4OHptMzItNDgwdi0yODhxMC0xMy05LjUtMjIuNXQtMjIuNS05LjVoLTY0cS0xMyAwLTIyLjUgOS41dC05LjUgMjIuNXYyODhxMCAxMyA5LjUgMjIuNXQyMi41IDkuNWg2NHExMyAwIDIyLjUtOS41dDkuNS0yMi41em0zODQtNjR2MTI4MHEwIDUyLTM4IDkwdC05MCAzOGgtMTQwOHEtNTIgMC05MC0zOHQtMzgtOTB2LTEyODBxMC01MiAzOC05MHQ5MC0zOGgxMjh2LTk2cTAtNjYgNDctMTEzdDExMy00N2g2NHE2NiAwIDExMyA0N3Q0NyAxMTN2OTZoMzg0di05NnEwLTY2IDQ3LTExM3QxMTMtNDdoNjRxNjYgMCAxMTMgNDd0NDcgMTEzdjk2aDEyOHE1MiAwIDkwIDM4dDM4IDkweiIvPjwvc3ZnPg==';
 ds.ui.View = ds.Object.extend({
 	_rootDirective: null,
 	_tagName: 'div',
@@ -1922,7 +1928,7 @@ ds.ui.Button = ds.ui.View.extend({
 				text-shadow: rgb(255, 255, 255) 0px 1px 0px;
 				/*box-shadow: inset 0px 1px 0px 0px rgba(255, 255, 255, 0.75),
 							inset 0px -1px 0px 0px rgba(0, 0, 0, 0.035);*/  }
-			.__xbtn img.__xbtn_img { width: 16px; height: 16px; }
+			/*.__xbtn img.__xbtn_img { width: 16px; height: 16px; }*/
 			.__xbtn.__small {
 				font-size: 12px;
 				padding-left: 6px;
@@ -2022,6 +2028,8 @@ ds.ui.Button = ds.ui.View.extend({
 	_text: null,
 	_image: null,
 	_imageDim: false,
+	_imageWidth: 16,
+	_imageHeight: 16,
 	_hint: '',
 	get grayed() { return this._grayed; },
 	set grayed(value) { this._grayed = value; this.needsUpdate(); },
@@ -2055,6 +2063,10 @@ ds.ui.Button = ds.ui.View.extend({
 	set image(value) { this._image = value; this.needsUpdate(); },
 	get imageDim() { return this._imageDim; },
 	set imageDim(value) { this._imageDim = value; this.needsUpdate(); },
+	get imageWidth() { return this._imageWidth; },
+	set imageWidth(value) { this._imageWidth = value; this.needsUpdate(); },
+	get imageHeight() { return this._imageHeight; },
+	set imageHeight(value) { this._imageHeight = value; this.needsUpdate(); },
 	get hint() { return this._hint; },
 	set hint(value) { this._hint = value; this.needsUpdate(); },
 	_render_ddcaret() {
@@ -2089,7 +2101,7 @@ ds.ui.Button = ds.ui.View.extend({
 			'dhvr',				self.imageDim,
 			'dhvra',			self.down || self.droppeddown,
 		);
-		if (self.image) ds.ui.element('<img srcset="' + self.image + ' 1x, ' + self.image.replace('.png', '@2x.png') + ' 2x" class="__xbtn_img dhvrc" />', self.element);
+		if (self.image) ds.ui.element('<img srcset="' + self.image + ' 1x, ' + self.image.replace('.png', '@2x.png') + ' 2x" class="__xbtn_img dhvrc" style="width: ' + (self._imageWidth || 16).toString() + 'px; height: ' + (self._imageHeight || 16).toString() + 'px;" />', self.element);
 		if (self.text) ds.ui.element(`<span${ self.image ? ' class="ml075"' : '' }>${ self.text }</span>`, self.element);
 		self._render_ddcaret();
 	},
@@ -2232,10 +2244,16 @@ ds.ui.Calendar = ds.ui.View.extend({
 	styles: `.__xcal { max-width: 210px; min-width: 210px; }`,
 	template: `<div class="__xcal">
 					<div x-ref="header_element" class="__xcal_hdr row mid bk bb bvl">
-						<div class="__xcal_hdr_prev hnd hvr pl pt pr pb thvr sm" x-on:click="self.prev()"><i class="fa fa-caret-left"></i></div>
+						<div class="__xcal_hdr_prev hnd hvr pl pt pr pb dhvr" x-on:click="self.prev()">
+							<img src="${ ds.ui.CARET_LEFT_IMG }" class="x12 dhvrc" />
+						</div>
 						<div x-ref="month_element" class="__xcal_hdr_mnth flex fs11 strong tac"></div>
-						<div class="__xcal_hdr_now hnd hvr pl pt pr pb thvr sm" x-on:click="self.now(), self._trigger('select', self.value)"><i class="fa fa-calendar sm"></i></div>
-						<div class="__xcal_hdr_next hnd hvr pl pt pr pb thvr sm" x-on:click="self.next()"><i class="fa fa-caret-right"></i></div>
+						<div class="__xcal_hdr_now hnd hvr pl pt pr pb dhvr" x-on:click="self.now(), self._trigger('select', self.value)">
+							<img src="${ ds.ui.CALENDAR_IMG }" class="x12 dhvrc" />
+						</div>
+						<div class="__xcal_hdr_next hnd hvr pl pt pr pb dhvr" x-on:click="self.next()">
+							<img src="${ ds.ui.CARET_RIGHT_IMG }" class="x12 dhvrc" />
+						</div>
 					</div>
 					<div x-ref="days_element" class="row">
 						<div class="strong flex fs11 strong tac pt pb">${ ds.Date.DAY_NAMES[1].toUpperCase() }</div>
@@ -2939,7 +2957,7 @@ ds.ui.CheckboxEdit = ds.ui.Edit.extend({
 ds.ui.DropDownEdit = ds.ui.TextEdit.extend({
 	template: `@extend ds.ui.TextEdit.template
 					@slot buttons
-						{{ this._openBtn ||= ds.ui.Button.new({ text: '<i class="fa fa-caret-down gray sm"></i>', className: '__xedt_btn __xedt_ddbtn __xedt_frmhot_trgt' })
+						{{ this._openBtn ||= ds.ui.Button.new({ image: ds.ui.CARET_DOWN_IMG, imageDim: true, imageWidth: 12, imageHeight: 12, className: '__xedt_btn __xedt_ddbtn __xedt_frmhot_trgt' })
 							.on('click', () => {
 								this._onOpenClick();
 								this.open();
@@ -3338,7 +3356,7 @@ ds.ui.DateTimeEdit = ds.ui.DropDownEdit.extend({
 		ds.ui.DropDownEdit.init.call(self);
 		self.dropdown_element.style.setProperty('min-width', '210px');
 		self.dropdown_element.style.setProperty('max-width', '210px');
-		self._openBtn.text = `<i class="fa fa-calendar sm gray"></i>`;
+		self._openBtn.image = ds.ui.CALENDAR_IMG;
 		self.calendar._disableEvents = true;
 		self.calendar.now();
 		self.calendar._disableEvents = false;
@@ -4196,7 +4214,7 @@ ds.ui.DataGrid = ds.ui.View.extend({
 		self._gridAppend = null;
 		ds.ui.View.free.call(self);
 	}
-}, ds.Events('data:single', 'link_click', 'action_options:single', 'action_click', 'header_click', 'row_click', 'row_dblclick', 'row_options:single', 'cell_options:single', 'cell', 'row', 'check', 'check_all', 'group_options:single', 'check_group', 'link_group_click', 'edit', 'update', 'sort'));
+}, ds.Events('data:single', 'link_click', 'action_options:single', 'action_click', 'header_click', 'row_click', 'row_dblclick', 'row_unselect', 'row_options:single', 'cell_options:single', 'cell', 'row', 'check', 'check_all', 'group_options:single', 'check_group', 'link_group_click', 'edit', 'update', 'sort'));
 ds.ui.__DataGridHeader = ds.ui.View.extend({
 	styles: `.__xgrd_hdr { }
 			 .__xgrd_hdr_cell_img_asc { transform: translateY(1px) rotate(180deg); opacity: 0.25 }
@@ -4521,7 +4539,7 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 			if (options.color) group.head_element.style.setProperty('background-color', options.color);
 			self._updateGroupCheck(group);
 		});
-		return self._rows.filter(row => row.visible).reduce((acc, row) => {
+		const ret = self._rows.filter(row => row.visible).reduce((acc, row) => {
 			if (row.group && self._dataGrid.grouped) {
 				row.group.body_element.appendChild(row.element);
 				if (row.spoiler_element) row.group.body_element.appendChild(row.spoiler_element);
@@ -4535,6 +4553,11 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 			}
 			return acc;
 		}, []);
+		if (ds.isset(self._selectedId)
+		&& ds.isset(self._dataGrid.idKey)
+		&& !self._rows.some(row => ds.get(row.item, self._dataGrid.idKey) == self._selectedId))
+			self._dataGrid._trigger('row_unselect');
+		return ret;
 	},
 	update() {
 		const self = this;
@@ -4758,8 +4781,8 @@ ds.ui.Header = ds.ui.View.extend({
 			.__xhdr.__textaligned .__xhdr_exp { left: -22px; }`,
 	template: `<div class="row mid __xhdr{{ this._expandable ? ' __expandable' : '' }}{{ this._alignByText ? ' __textaligned' : '' }}">
 					<div class="__xhdr_exp col cen mid hvr" x-on:click="self.expanded = !self.expanded;">
-						<img x-if="this.expanded" class="x12 ty1" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNDA4IDcwNHEwIDI2LTE5IDQ1bC00NDggNDQ4cS0xOSAxOS00NSAxOXQtNDUtMTlsLTQ0OC00NDhxLTE5LTE5LTE5LTQ1dDE5LTQ1IDQ1LTE5aDg5NnEyNiAwIDQ1IDE5dDE5IDQ1eiIvPjwvc3ZnPg==" />
-						<img x-if="!this.expanded" class="x12 ty1" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xMTUyIDg5NnEwIDI2LTE5IDQ1bC00NDggNDQ4cS0xOSAxOS00NSAxOXQtNDUtMTktMTktNDV2LTg5NnEwLTI2IDE5LTQ1dDQ1LTE5IDQ1IDE5bDQ0OCA0NDhxMTkgMTkgMTkgNDV6Ii8+PC9zdmc+" />
+						<img x-if="this.expanded" class="x12 ty1" src="${ ds.ui.CARET_DOWN_IMG }" />
+						<img x-if="!this.expanded" class="x12 ty1" src="${ ds.ui.CARET_RIGHT_IMG }" />
 					</div>
 					<div class="__xhdr_ttl strong fs13" x-on:click="self.expanded = !self.expanded;">{{ this.text }}</div>
 					<div class="__xhdr_line flex"></div>

@@ -237,13 +237,16 @@ ds.db.exec = (conn, sql, args) => {
 	if (!conn) throw new Error('ds.db.exec: "conn" is required.');
 	if (!sql) throw new Error('ds.db.exec: "sql" is required.');
 	const exec_sql = ds.db.__preprocess_sql(conn, sql);
-	const start_t = process.hrtime();
+	const start_t = (new Date()).getTime();
 	try {
 		let res;
 		if (conn.__type == 'libpq') res = ds.db.__libpq_exec(conn, exec_sql, args);
 		else if (conn.__type == 'odbc') res = ds.db.__odbc_exec(conn, exec_sql, args);
 		else throw new Error('ds.db.exec: Connection type "' + conn.__type + '" is not supported.');
-		const end_t = process.hrtime(start_t);
+		const end_t = (new Date()).getTime();
+		ds.db.__last_sql = sql;
+		ds.db.__last_args = args;
+		ds.db.__last_duration = (end_t - start_t);
 		return res;
 	} catch(e) {
 		ds.db.__log('ERROR', (e.message || e.toString()) + ': ' + (e.__sql || sql).replace(/\n/g, '') + ' ' + JSON.stringify((e.__args || args) || {}));
