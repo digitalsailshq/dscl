@@ -43,6 +43,14 @@ ds.ui.__styles = `
 	.brd { border-right-style: dashed; }
 	.bbd { border-bottom-style: dashed; }
 	.bld { border-left-style: dashed; }
+	.btl { border-top-width: 1px; border-top-style: solid; border-top-color: var(--border-color-light); }
+	.brl { border-right-width: 1px; border-right-style: solid; border-right-color: var(--border-color-light); }
+	.bbl { border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: var(--border-color-light); }
+	.bll { border-left-width: 1px; border-left-style: solid; border-left-color: var(--border-color-light); }
+	.bt2l { border-top-width: 2px; border-top-style: solid; border-top-color: var(--border-color-light); }
+	.br2l { border-right-width: 2px; border-right-style: solid; border-right-color: var(--border-color-light); }
+	.bb2l { border-bottom-width: 2px; border-bottom-style: solid; border-bottom-color: var(--border-color-light); }
+	.bl2l { border-left-width: 2px; border-left-style: solid; border-left-color: var(--border-color-light); }
 	.so { box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.3); }
 	.so2 { box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.075); }
 	.pso { box-shadow: 0 10px 20px 0 rgba(0, 0, 0, .2); }
@@ -4642,7 +4650,8 @@ ds.ui.DataGridColumn = ds.Object.extend({
 	},
 	ontext(item) {
 		const self = this;
-		let value = self.onvalue(item) || self.emptyText;
+		let value = self.onvalue(item);
+		if (ds.isnull(value)) value = self.emptyText;
 		return ds.isArray(value) ? value.join(', ') : ds.asString(value);
 	},
 	onimage(item) {
