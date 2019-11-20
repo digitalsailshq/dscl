@@ -17,18 +17,20 @@ ds.appshell.__UserView = ds.ui.View.extend({
 			.__xas_uv_addbtn { background-color: #4AA7F0; border-radius: 50%; width: 32px; height: 32px; opacity: 0.9; align-self:flex-start; }
 			.__xas_uv_addbtn:hover { background-color: #5ab0f2; }
 			.__xas_uv_addbtn:active { background-color: #4AA7F0; box-shadow: rgba(0, 0, 0, 0.0980392) 0px 3px 6px 0px inset; }`,
-	template: `<div class="row mid">
-					<img x-bind:src="{{ this._image }}" class="x32 mr" style="border-radius:50%; align-self:flex-start;">
-					<span class="mr05 flex" style="overflow:hidden;">
-						<span>{{ this._name }}</span><br/>
-						<span class="sm gray">{{ this._jobtitle }}</span>
-					</span>
-					<div x-ref="menu_element" class="dhvr hvr hnd rnd row cen mid"
-						style="align-self:flex-start;width:32px;height:32px;"
-						x-on:click="self._userMenu.open()">
-						<img src="data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMTdweCIgaGVpZ2h0PSIxNnB4IiB2aWV3Qm94PSIwIDAgMTcgMTYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8ZyBpZD0ibWVudSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGNpcmNsZSBpZD0iT3ZhbC0yIiBmaWxsPSIjMDAwMDAwIiBjeD0iOC41IiBjeT0iMi41IiByPSIxLjUiPjwvY2lyY2xlPgogICAgICAgIDxjaXJjbGUgaWQ9Ik92YWwtMi1Db3B5IiBmaWxsPSIjMDAwMDAwIiBjeD0iOC41IiBjeT0iNy41IiByPSIxLjUiPjwvY2lyY2xlPgogICAgICAgIDxjaXJjbGUgaWQ9Ik92YWwtMi1Db3B5LTIiIGZpbGw9IiMwMDAwMDAiIGN4PSI4LjUiIGN5PSIxMi41IiByPSIxLjUiPjwvY2lyY2xlPgogICAgPC9nPgo8L3N2Zz4=" class="x16 dhvrc"/>
+	template: `<div class="col">
+					<div class="row mid">
+						<img x-bind:src="{{ this._image }}" class="x32 mr" style="border-radius:50%; align-self:flex-start;">
+						<span class="mr05 flex" style="overflow:hidden;">
+							<span>{{ this._name }}</span><br/>
+							<span class="sm gray">{{ this._jobtitle }}</span>
+						</span>
+						<div x-ref="menu_element" class="dhvr hvr hnd rnd row cen mid"
+							style="align-self:flex-start;width:32px;height:32px;"
+							x-on:click="self._userMenu.open()">
+							<img src="data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMTdweCIgaGVpZ2h0PSIxNnB4IiB2aWV3Qm94PSIwIDAgMTcgMTYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8ZyBpZD0ibWVudSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGNpcmNsZSBpZD0iT3ZhbC0yIiBmaWxsPSIjMDAwMDAwIiBjeD0iOC41IiBjeT0iMi41IiByPSIxLjUiPjwvY2lyY2xlPgogICAgICAgIDxjaXJjbGUgaWQ9Ik92YWwtMi1Db3B5IiBmaWxsPSIjMDAwMDAwIiBjeD0iOC41IiBjeT0iNy41IiByPSIxLjUiPjwvY2lyY2xlPgogICAgICAgIDxjaXJjbGUgaWQ9Ik92YWwtMi1Db3B5LTIiIGZpbGw9IiMwMDAwMDAiIGN4PSI4LjUiIGN5PSIxMi41IiByPSIxLjUiPjwvY2lyY2xlPgogICAgPC9nPgo8L3N2Zz4=" class="x16 dhvrc"/>
+						</div>
+						<div class="__xas_uv_addbtn hnd row mid cen white fs13 ml05" x-on:click="self._trigger('add_click')"><i class="fa fa-plus"></i></div>
 					</div>
-					<div class="__xas_uv_addbtn hnd row mid cen white fs13 ml05" x-on:click="self._trigger('add_click')"><i class="fa fa-plus"></i></div>
 				</div>`,
 	_userMenu: null,
 	_image: null,

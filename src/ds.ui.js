@@ -319,7 +319,7 @@ ds.ui.__styles = `
 	[data-badge] { position: relative; }
 	[data-badge]::after { content: attr(data-badge); position: absolute; display: block; background-color: red; color: white; border-radius: 50%; top: -2px; right: -2px; width: 14px; height: 14px; text-align: center; font-family: "Open Sans", sans-serif; font-size: 9px; padding-top: 2px; box-sizing: border-box; }
 	.__xmdlpnl_bk { position: absolute; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); left: 0px; top: 0px; z-index: 19; }
-	.__xmdlpnl { position: absolute; border: 0px; box-shadow: 0px 0px 5px rgba(1, 1, 1, 0.2); left: 50%; top: 35%; transform: translate(-50%, -35%); }
+	.__xmdlpnl { position: absolute; border: 0px; box-shadow: 0px 0px 5px rgba(1, 1, 1, 0.2); }
 	.__xfltctrl { position: absolute; z-index: 11; box-shadow: 0px 0px 50px rgba(1, 1, 1, 0.2); --border-color: #c1c1c1; }
 	.__sbpad { padding-right: 16px; }
 	@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(359deg); } }
@@ -333,13 +333,6 @@ ds.ui.__styles = `
 	@keyframes rotate-forever { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 	.spinner { animation-duration: 0.75s; animation-iteration-count: infinite; animation-name: rotate-forever; animation-timing-function: linear; width: 10px; height: 10px; border: 3px solid #e4e4e4; border-right-color: transparent; border-radius: 50%; display: inline-block; }`;
 ds.ui.RELOAD_IMG = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNjM5IDEwNTZxMCA1LTEgNy02NCAyNjgtMjY4IDQzNC41dC00NzggMTY2LjVxLTE0NiAwLTI4Mi41LTU1dC0yNDMuNS0xNTdsLTEyOSAxMjlxLTE5IDE5LTQ1IDE5dC00NS0xOS0xOS00NXYtNDQ4cTAtMjYgMTktNDV0NDUtMTloNDQ4cTI2IDAgNDUgMTl0MTkgNDUtMTkgNDVsLTEzNyAxMzdxNzEgNjYgMTYxIDEwMnQxODcgMzZxMTM0IDAgMjUwLTY1dDE4Ni0xNzlxMTEtMTcgNTMtMTE3IDgtMjMgMzAtMjNoMTkycTEzIDAgMjIuNSA5LjV0OS41IDIyLjV6bTI1LTgwMHY0NDhxMCAyNi0xOSA0NXQtNDUgMTloLTQ0OHEtMjYgMC00NS0xOXQtMTktNDUgMTktNDVsMTM4LTEzOHEtMTQ4LTEzNy0zNDktMTM3LTEzNCAwLTI1MCA2NXQtMTg2IDE3OXEtMTEgMTctNTMgMTE3LTggMjMtMzAgMjNoLTE5OXEtMTMgMC0yMi41LTkuNXQtOS41LTIyLjV2LTdxNjUtMjY4IDI3MC00MzQuNXQ0ODAtMTY2LjVxMTQ2IDAgMjg0IDU1LjV0MjQ1IDE1Ni41bDEzMC0xMjlxMTktMTkgNDUtMTl0NDUgMTkgMTkgNDV6Ii8+PC9zdmc+';
-// ds.ui.CARET_UP_IMG = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNDA4IDEyMTZxMCAyNi0xOSA0NXQtNDUgMTloLTg5NnEtMjYgMC00NS0xOXQtMTktNDUgMTktNDVsNDQ4LTQ0OHExOS0xOSA0NS0xOXQ0NSAxOWw0NDggNDQ4cTE5IDE5IDE5IDQ1eiIvPjwvc3ZnPg==';
-// ds.ui.CARET_DOWN_IMG = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNDA4IDcwNHEwIDI2LTE5IDQ1bC00NDggNDQ4cS0xOSAxOS00NSAxOXQtNDUtMTlsLTQ0OC00NDhxLTE5LTE5LTE5LTQ1dDE5LTQ1IDQ1LTE5aDg5NnEyNiAwIDQ1IDE5dDE5IDQ1eiIvPjwvc3ZnPg==';
-// ds.ui.CARET_LEFT_IMG = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xMjE2IDQ0OHY4OTZxMCAyNi0xOSA0NXQtNDUgMTktNDUtMTlsLTQ0OC00NDhxLTE5LTE5LTE5LTQ1dDE5LTQ1bDQ0OC00NDhxMTktMTkgNDUtMTl0NDUgMTkgMTkgNDV6Ii8+PC9zdmc+';
-// ds.ui.CARET_RIGHT_IMG = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xMTUyIDg5NnEwIDI2LTE5IDQ1bC00NDggNDQ4cS0xOSAxOS00NSAxOXQtNDUtMTktMTktNDV2LTg5NnEwLTI2IDE5LTQ1dDQ1LTE5IDQ1IDE5bDQ0OCA0NDhxMTkgMTkgMTkgNDV6Ii8+PC9zdmc+';
-// ds.ui.CALENDAR_IMG = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xOTIgMTY2NGgyODh2LTI4OGgtMjg4djI4OHptMzUyIDBoMzIwdi0yODhoLTMyMHYyODh6bS0zNTItMzUyaDI4OHYtMzIwaC0yODh2MzIwem0zNTIgMGgzMjB2LTMyMGgtMzIwdjMyMHptLTM1Mi0zODRoMjg4di0yODhoLTI4OHYyODh6bTczNiA3MzZoMzIwdi0yODhoLTMyMHYyODh6bS0zODQtNzM2aDMyMHYtMjg4aC0zMjB2Mjg4em03NjggNzM2aDI4OHYtMjg4aC0yODh2Mjg4em0tMzg0LTM1MmgzMjB2LTMyMGgtMzIwdjMyMHptLTM1Mi04NjR2LTI4OHEwLTEzLTkuNS0yMi41dC0yMi41LTkuNWgtNjRxLTEzIDAtMjIuNSA5LjV0LTkuNSAyMi41djI4OHEwIDEzIDkuNSAyMi41dDIyLjUgOS41aDY0cTEzIDAgMjIuNS05LjV0OS41LTIyLjV6bTczNiA4NjRoMjg4di0zMjBoLTI4OHYzMjB6bS0zODQtMzg0aDMyMHYtMjg4aC0zMjB2Mjg4em0zODQgMGgyODh2LTI4OGgtMjg4djI4OHptMzItNDgwdi0yODhxMC0xMy05LjUtMjIuNXQtMjIuNS05LjVoLTY0cS0xMyAwLTIyLjUgOS41dC05LjUgMjIuNXYyODhxMCAxMyA5LjUgMjIuNXQyMi41IDkuNWg2NHExMyAwIDIyLjUtOS41dDkuNS0yMi41em0zODQtNjR2MTI4MHEwIDUyLTM4IDkwdC05MCAzOGgtMTQwOHEtNTIgMC05MC0zOHQtMzgtOTB2LTEyODBxMC01MiAzOC05MHQ5MC0zOGgxMjh2LTk2cTAtNjYgNDctMTEzdDExMy00N2g2NHE2NiAwIDExMyA0N3Q0NyAxMTN2OTZoMzg0di05NnEwLTY2IDQ3LTExM3QxMTMtNDdoNjRxNjYgMCAxMTMgNDd0NDcgMTEzdjk2aDEyOHE1MiAwIDkwIDM4dDM4IDkweiIvPjwvc3ZnPg==';
-// ds.ui.ELLIPSIS_V_IMG = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xMDg4IDEyNDh2MTkycTAgNDAtMjggNjh0LTY4IDI4aC0xOTJxLTQwIDAtNjgtMjh0LTI4LTY4di0xOTJxMC00MCAyOC02OHQ2OC0yOGgxOTJxNDAgMCA2OCAyOHQyOCA2OHptMC01MTJ2MTkycTAgNDAtMjggNjh0LTY4IDI4aC0xOTJxLTQwIDAtNjgtMjh0LTI4LTY4di0xOTJxMC00MCAyOC02OHQ2OC0yOGgxOTJxNDAgMCA2OCAyOHQyOCA2OHptMC01MTJ2MTkycTAgNDAtMjggNjh0LTY4IDI4aC0xOTJxLTQwIDAtNjgtMjh0LTI4LTY4di0xOTJxMC00MCAyOC02OHQ2OC0yOGgxOTJxNDAgMCA2OCAyOHQyOCA2OHoiLz48L3N2Zz4=';
-// ds.ui.ELLIPSIS_H_IMG = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik01NzYgNzM2djE5MnEwIDQwLTI4IDY4dC02OCAyOGgtMTkycS00MCAwLTY4LTI4dC0yOC02OHYtMTkycTAtNDAgMjgtNjh0NjgtMjhoMTkycTQwIDAgNjggMjh0MjggNjh6bTUxMiAwdjE5MnEwIDQwLTI4IDY4dC02OCAyOGgtMTkycS00MCAwLTY4LTI4dC0yOC02OHYtMTkycTAtNDAgMjgtNjh0NjgtMjhoMTkycTQwIDAgNjggMjh0MjggNjh6bTUxMiAwdjE5MnEwIDQwLTI4IDY4dC02OCAyOGgtMTkycS00MCAwLTY4LTI4dC0yOC02OHYtMTkycTAtNDAgMjgtNjh0NjgtMjhoMTkycTQwIDAgNjggMjh0MjggNjh6Ii8+PC9zdmc+';
 ds.ui._500PX_IMG = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNTI5IDE1NDdsLTYgNnEtMTEzIDExMy0yNTkgMTc1LTE1NCA2NC0zMTcgNjQtMTY1IDAtMzE3LTY0LTE0OC02My0yNTktMTc1LTExMy0xMTItMTc1LTI1OC00Mi0xMDMtNTQtMTg5LTQtMjggNDgtMzYgNTEtOCA1NiAyMCAxIDEgMSA0IDE4IDkwIDQ2IDE1OSA1MCAxMjQgMTUyIDIyNiA5OCA5OCAyMjYgMTUyIDEzMiA1NiAyNzYgNTYgMTQzIDAgMjc2LTU2IDEyOC01NSAyMjUtMTUybDYtNnExMC0xMCAyNS02IDEyIDMgMzMgMjIgMzYgMzcgMTcgNTh6bS00NzItNjE1bC02NiA2NiA2MyA2M3EyMSAyMS03IDQ5LTE3IDE3LTMyIDE3LTEwIDAtMTktMTBsLTYyLTYxLTY2IDY2cS01IDUtMTUgNS0xNSAwLTMxLTE2bC0yLTJxLTE4LTE1LTE4LTI5IDAtNyA4LTE3bDY2LTY1LTY2LTY2cS0xNi0xNiAxNC00NSAxOC0xOCAzMS0xOCA2IDAgMTMgNWw2NSA2NiA2NS02NXExOC0xNyA0OCAxMyAyNyAyNyAxMSA0NHptNDcxIDU3cTAgMTE4LTQ2IDIyOC00NSAxMDUtMTI2IDE4Ni04MCA4MC0xODcgMTI2dC0yMjggNDYtMjI4LTQ2LTE4Ny0xMjZxLTgyLTgyLTEyNS0xODYtMTUtMzMtMTUtNDBoLTFxLTktMjcgNDMtNDQgNTAtMTYgNjAgMTIgMzcgOTkgOTcgMTY3aDF2LTM0MXEzLTEzNiAxMDItMjMyIDEwNS0xMDMgMjUzLTEwMyAxNDcgMCAyNTEgMTAzdDEwNCAyNDlxMCAxNDctMTA0LjUgMjUxdC0yNTAuNSAxMDRxLTU4IDAtMTEyLTE2LTI4LTExLTEzLTYxIDE2LTUxIDQ0LTQzbDE0IDNxMTQgMyAzMyA2dDMwIDNxMTA0IDAgMTc2LTcxLjV0NzItMTc0LjVxMC0xMDEtNzItMTcxLTcxLTcxLTE3NS03MS0xMDcgMC0xNzggODAtNjQgNzItNjQgMTYwdjQxM3ExMTAgNjcgMjQyIDY3IDk2IDAgMTg1LTM2LjV0MTU2LTEwMy41IDEwMy41LTE1NSAzNi41LTE4M3EwLTE5OC0xNDEtMzM5LTE0MC0xNDAtMzM5LTE0MC0yMDAgMC0zNDAgMTQwLTUzIDUzLTc3IDg3bC0yIDJxLTggMTEtMTMgMTUuNXQtMjEuNSA5LjUtMzguNS0zcS0yMS01LTM2LjUtMTYuNXQtMTUuNS0yNi41di02ODBxMC0xNSAxMC41LTI2LjV0MjcuNS0xMS41aDg3N3EzMCAwIDMwIDU1dC0zMCA1NWgtODExdjQ4M2gxcTQwLTQyIDEwMi04NHQxMDgtNjFxMTA5LTQ2IDIzMS00NiAxMjEgMCAyMjggNDZ0MTg3IDEyNnE4MSA4MSAxMjYgMTg2IDQ2IDExMiA0NiAyMjl6bS0zMS01ODFxOSA4IDkgMTh0LTUuNSAxOC0xNi41IDIxcS0yNiAyNi0zOSAyNi05IDAtMTYtNy0xMDYtOTEtMjA3LTEzMy0xMjgtNTYtMjc2LTU2LTEzMyAwLTI2MiA0OS0yNyAxMC00NS0zNy05LTI1LTgtMzggMy0xNiAxNi0yMCAxMzAtNTcgMjk5LTU3IDE2NCAwIDMxNiA2NCAxMzcgNTggMjM1IDE1MnoiLz48L3N2Zz4='
 ds.ui.ADDRESS_BOOK_O_IMG = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xMDkyIDY0NHEwIDEwNy03Ni41IDE4M3QtMTgzLjUgNzYtMTgzLjUtNzYtNzYuNS0xODNxMC0xMDggNzYuNS0xODR0MTgzLjUtNzYgMTgzLjUgNzYgNzYuNSAxODR6bS00OCAyMjBxNDYgMCA4Mi41IDE3dDYwIDQ3LjUgMzkuNSA2NyAyNCA4MSAxMS41IDgyLjUgMy41IDc5cTAgNjctMzkuNSAxMTguNXQtMTA1LjUgNTEuNWgtNTc2cS02NiAwLTEwNS41LTUxLjV0LTM5LjUtMTE4LjVxMC00OCA0LjUtOTMuNXQxOC41LTk4LjUgMzYuNS05MS41IDYzLTY0LjUgOTMuNS0yNmg1cTcgNCAzMiAxOS41dDM1LjUgMjEgMzMgMTcgMzcgMTYgMzUgOSAzOS41IDQuNSAzOS41LTQuNSAzNS05IDM3LTE2IDMzLTE3IDM1LjUtMjEgMzItMTkuNXptNjg0LTI1NnEwIDEzLTkuNSAyMi41dC0yMi41IDkuNWgtOTZ2MTI4aDk2cTEzIDAgMjIuNSA5LjV0OS41IDIyLjV2MTkycTAgMTMtOS41IDIyLjV0LTIyLjUgOS41aC05NnYxMjhoOTZxMTMgMCAyMi41IDkuNXQ5LjUgMjIuNXYxOTJxMCAxMy05LjUgMjIuNXQtMjIuNSA5LjVoLTk2djIyNHEwIDY2LTQ3IDExM3QtMTEzIDQ3aC0xMjE2cS02NiAwLTExMy00N3QtNDctMTEzdi0xNDcycTAtNjYgNDctMTEzdDExMy00N2gxMjE2cTY2IDAgMTEzIDQ3dDQ3IDExM3YyMjRoOTZxMTMgMCAyMi41IDkuNXQ5LjUgMjIuNXYxOTJ6bS0yNTYgMTAyNHYtMTQ3MnEwLTEzLTkuNS0yMi41dC0yMi41LTkuNWgtMTIxNnEtMTMgMC0yMi41IDkuNXQtOS41IDIyLjV2MTQ3MnEwIDEzIDkuNSAyMi41dDIyLjUgOS41aDEyMTZxMTMgMCAyMi41LTkuNXQ5LjUtMjIuNXoiLz48L3N2Zz4='
 ds.ui.ADDRESS_BOOK_IMG = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xMjY1IDEyMzhxMC01Ny01LjUtMTA3dC0yMS0xMDAuNS0zOS41LTg2LTY0LTU4LTkxLTIyLjVxLTYgNC0zMy41IDIwLjV0LTQyLjUgMjQuNS00MC41IDIwLTQ5IDE3LTQ2LjUgNS00Ni41LTUtNDktMTctNDAuNS0yMC00Mi41LTI0LjUtMzMuNS0yMC41cS01MSAwLTkxIDIyLjV0LTY0IDU4LTM5LjUgODYtMjEgMTAwLjUtNS41IDEwN3EwIDczIDQyIDEyMS41dDEwMyA0OC41aDU3NnE2MSAwIDEwMy00OC41dDQyLTEyMS41em0tMTczLTU5NHEwLTEwOC03Ni41LTE4NHQtMTgzLjUtNzYtMTgzLjUgNzYtNzYuNSAxODRxMCAxMDcgNzYuNSAxODN0MTgzLjUgNzYgMTgzLjUtNzYgNzYuNS0xODN6bTYzNiA1NDB2MTkycTAgMTQtOSAyM3QtMjMgOWgtOTZ2MjI0cTAgNjYtNDcgMTEzdC0xMTMgNDdoLTEyMTZxLTY2IDAtMTEzLTQ3dC00Ny0xMTN2LTE0NzJxMC02NiA0Ny0xMTN0MTEzLTQ3aDEyMTZxNjYgMCAxMTMgNDd0NDcgMTEzdjIyNGg5NnExNCAwIDIzIDl0OSAyM3YxOTJxMCAxNC05IDIzdC0yMyA5aC05NnYxMjhoOTZxMTQgMCAyMyA5dDkgMjN2MTkycTAgMTQtOSAyM3QtMjMgOWgtOTZ2MTI4aDk2cTE0IDAgMjMgOXQ5IDIzeiIvPjwvc3ZnPg=='
@@ -1783,7 +1776,7 @@ ds.ui.Floating = function(target) {
 	}
 	target.openFloating = function(options) {
 		const self = this;
-		let element = ds.isPrototypeOf(self, ds.ui.Controller) ? self.view.element : self.element;
+		const element = ds.isPrototypeOf(self, ds.ui.Controller) ? self.view.element : self.element;
 		options = Object.assign({ center: false, x: 0, y: 0 }, options);
 		self._initFloating();
 		element.classList.add('__xfltctrl');
@@ -1799,7 +1792,7 @@ ds.ui.Floating = function(target) {
 	}
 	target.closeFloating = function() {
 		const self = this;
-		let element = ds.isPrototypeOf(self, ds.ui.Controller) ? self.view.element : self.element;
+		const element = ds.isPrototypeOf(self, ds.ui.Controller) ? self.view.element : self.element;
 		element.classList.remove('__xfltctrl');
 		element.remove();
 		self._trigger('close');
@@ -1810,9 +1803,31 @@ ds.ui.Modal = function(target) {
 	if (!ds.isPrototypeOf(target, ds.ui.View)
 	&& !ds.isPrototypeOf(target, ds.ui.Controller)) throw 'ds.ui.Modal: Target must be View or Controller subprototype.';
 	ds.Events('open', 'close')(target);
+	target._initModal = function() {
+		const self = this;
+		if (self.__modal_inited) return;
+		const element = ds.isPrototypeOf(self, ds.ui.Controller) ? self.view.element : self.element;
+		self._modalDragInfo = { start: { left: 0, top: 0 } };
+		self._modalDragHelper = ds.ui.DragHelper.new();
+		self._modalDragHelper.on('begin', () => {
+			self._modalDragInfo.start.left = element.offsetLeft;
+			self._modalDragInfo.start.top = element.offsetTop;
+		});
+		self._modalDragHelper.on('drag', offset => {
+			let left = self._modalDragInfo.start.left + offset.x;
+			let top = self._modalDragInfo.start.top + offset.y;
+			if (top < 0) top = 0;
+			if (left < 0) left = 0;
+			if ((top + element.clientHeight) > window.innerHeight) top = window.innerHeight - element.clientHeight;
+			if ((left + element.clientWidth) > window.innerWidth) left = window.innerWidth - element.clientWidth;
+			element.style.setProperty('left', left.toString() + 'px');
+			element.style.setProperty('top', top.toString() + 'px');
+		});
+		self.__modal_inited = true;
+	}
 	target.closeModal = function(modalResult) {
 		const self = this;
-		let element = ds.isPrototypeOf(self, ds.ui.Controller) ? self.view.element : self.element;
+		const element = ds.isPrototypeOf(self, ds.ui.Controller) ? self.view.element : self.element;
 		element.classList.remove('__xmdlpnl');
 		element.remove();
 		self.__background_element.remove();
@@ -1823,12 +1838,14 @@ ds.ui.Modal = function(target) {
 	}
 	target.openModal = function(callback) {
 		const self = this;
-		let element = ds.isPrototypeOf(self, ds.ui.Controller) ? self.view.element : self.element;
-		element.classList.add('__xmdlpnl');
+		const element = ds.isPrototypeOf(self, ds.ui.Controller) ? self.view.element : self.element;
+		self._initModal();
 		self.__modal_callback = callback;
-		self.__background_element = ds.ui.element('div.__xmdlpnl_bk[style="visibility:hidden"]', document.body);
+		self.__background_element = ds.ui.element('div.__xmdlpnl_bk', document.body);
 		self.__background_element.appendChild(element);
-		self.__background_element.style.setProperty('visibility', 'visible');
+		element.classList.add('__xmdlpnl');
+		element.style.setProperty('left', parseInt(((document.body.clientWidth - element.clientWidth) / 2), 10).toString() + 'px');
+		element.style.setProperty('top', parseInt(((document.body.clientHeight - element.clientHeight) / 2) * 0.5, 10).toString() + 'px');
 		self._trigger('open');
 	}
 }
@@ -1883,7 +1900,7 @@ ds.ui.FloatingController = ds.ui.Controller.extend({
 }, ds.ui.Floating);
 ds.ui.ModalController = ds.ui.Controller.extend({
 	template: `<div class="col bk {{ this.className }}">
-					<div class="row mid bb pl pt pr pb">
+					<div class="row mid bb pl pt pr pb" x-on:mousedown="self._modalDragHelper.begin()">
 						<div x-ref="title_element" class="flex strong bvl">{{ this.text }}</div>
 						<div class="col mid cen x24 thvr hnd sm" x-on:click="self.closeModal('cancel')">
 							<i class="fa fa-times"></i>
@@ -3817,7 +3834,12 @@ ds.ui.LookupEdit = ds.ui.DropDownEdit.extend({
 						{{ this.listView = this.listView || ds.ui.ListView.new({ className: 'flex', selectable: true })
 							.on('select', index => this._onSelectItem(index))
 							.on('check', (index, checked) => this._onCheckItem(index, checked))
-							.on('options', index => ({ hover: true, hand: true, checkbox: this.multiple })) }}
+							.on('options', index => ({
+								hover: true,
+								hand: true,
+								checkbox: this.multiple,
+								visible: ds.isset(this.dataSet) ? this.dataSet.isItemVisible(index) : true
+							})) }}
 					@end
 				@end`,
 	_multiple: false,
@@ -3833,9 +3855,15 @@ ds.ui.LookupEdit = ds.ui.DropDownEdit.extend({
 	get dataSet() { return this._dataSet; },
 	set dataSet(value) {
 		const self = this;
+		self._dataSetOnLoad = self._dataSetOnLoad || (self._dataSetOnLoad = () => self.needsUpdate());
+		if (ds.isset(self.dataSet)) {
+			self.dataSet.off('load', self._dataSetOnLoad);
+			self.dataSet.off('filter', self._dataSetOnLoad);
+		}
 		self._dataSet = value;
 		if (self._dataSet) {
-			self._dataSet.on('load', () => self._onDataLoad());
+			self._dataSet.on('load', self._dataSetOnLoad);
+			self._dataSet.on('filter', self._dataSetOnLoad);
 			self._onDataLoad();	
 		}
 		self.needsUpdate();
@@ -4244,10 +4272,14 @@ ds.ui.ListView = ds.ui.View.extend({
 	set dataSet(value) {
 		if (!value) throw 'ds.ui.ListView: DataSet value cannot be null.';
 		if (this._dataSet == value) return;
-		if (this._dataSet) this._dataSet.off('load', this._dataSetOnLoad);
+		if (this._dataSet) {
+			this._dataSet.off('load', this._dataSetOnLoad);
+			this._dataSet.off('filter', this._dataSetOnLoad);
+		}
 		this._dataSet = value;
-		if (!this._dataSetOnLoad) this._dataSetOnLoad = () => this.needsUpdate();
+		this._dataSetOnLoad = this._dataSetOnLoad || (this._dataSetOnLoad = () => this.needsUpdate());
 		this._dataSet.on('load', this._dataSetOnLoad);
+		this._dataSet.on('filter', this._dataSetOnLoad);
 		if (this._dataSet.isLoaded()) this.needsUpdate();
 	},
 	get scrollShadow() { return this._scrollShadow; },
@@ -4377,13 +4409,14 @@ ds.ui.ListView = ds.ui.View.extend({
 		self.items = [];
 		var count = self._trigger('count');
 		for (let i = 0; i < count; i++) {
+			var opts = Object.assign({ hover: false, hand: false, checkbox: false, visible: true }, self._trigger('options', i));
 			var item = {
 				element: null, // <-- will come here from preserve_element options in x-for
 				index: i,
 				item: self._trigger('item', i),
 				selected: false,
-				visible: true,
-				options: Object.assign({ hover: false, hand: false, checkbox: false }, self._trigger('options', i)),
+				visible: opts.visible,
+				options: opts,
 				cell: self._trigger('cell', i) || { element: document.createElement('span') },
 				checkbox_element: null,
 				action_elements: self._actions.map((a, i) => ds.ui.element(`<div class="__xlstvw_item_actn" data-action-index="${i.toString()}" style="--action-index: ${i.toString()};">${a.text || '&nbsp;'}</div>`))
@@ -4399,6 +4432,7 @@ ds.ui.ListView = ds.ui.View.extend({
 		}
 		if (self._search) {
 			self.items.forEach(item => {
+				if (!item.options.visible) return; // skip already invisible items...
 				item.visible = false;
 				var text = self._trigger('text', item.index);
 				if (text && text.toString().toUpperCase().includes(self._search.toUpperCase())) {
@@ -4475,7 +4509,12 @@ ds.ui.ListView = ds.ui.View.extend({
 			if (!self.dataSet.isLoaded()) return null;
 			return self.dataSet.data[index];
 		});
-		self.on('options', index => ({ hover: false, hand: false, checkbox: false }));
+		self.on('options', index => ({
+			hover: false,
+			hand: false,
+			checkbox: false,
+			visible: ds.isset(self.dataSet) ? self.dataSet.isItemVisible(index) : true
+		}));
 	},
 	free() {
 		const self = this;
