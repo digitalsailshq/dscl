@@ -3433,8 +3433,7 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 		if (input_element) {
 			if (input_element.value !== value) input_element.value = value;
 			this._pendingchanges = false;
-		}
-		else setTimeout(() => {
+		} else setTimeout(() => {
 			let input_element = this._getInputElement();
 			if (input_element) {
 				if (input_element.value !== value) input_element.value = value;
@@ -3444,7 +3443,7 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 	},
 	_getRootClassList() {
 		const self = this;
-		let rootClassList = ds.ui.Edit._getRootClassList.call(self);
+		const rootClassList = ds.ui.Edit._getRootClassList.call(self);
 		self.clearButton && rootClassList.push('__clearbtn');
 		self.dark && rootClassList.push('__dark');
 		(self._pendingchanges) && rootClassList.push('__pendingchanges');
@@ -3853,7 +3852,7 @@ ds.ui.LookupEdit = ds.ui.DropDownEdit.extend({
 						{{ this._getCheckedLabels() }}
 					@end
 					@slot dropdown
-						{{ this.listView = this.listView || ds.ui.ListView.new({ className: 'flex', selectable: true })
+						{{ this.listView ||= ds.ui.ListView.new({ className: 'flex', selectable: true })
 							.on('select', index => this._onSelectItem(index))
 							.on('check', (index, checked) => this._onCheckItem(index, checked))
 							.on('options', index => ({
@@ -4151,7 +4150,7 @@ ds.ui.TreeLookupEdit = ds.ui.DropDownEdit.extend({
 ds.ui.DateTimeEdit = ds.ui.DropDownEdit.extend({
 	template: `@extend ds.ui.DropDownEdit.template
 					@slot dropdown
-						{{ this.calendar = this.calendar || ds.ui.Calendar.new({ className: 'flex' })
+						{{ this.calendar ||= ds.ui.Calendar.new({ className: 'flex' })
 							.on('change', value => {
 								this.value = ds.Date.newFromDate(value).toISODate();
 								this._trigger('user_change', this.value);
@@ -4394,7 +4393,7 @@ ds.ui.ListView = ds.ui.View.extend({
 		const self = this;
 		if (!self.checkKey) throw 'ds.ui.ListView: CheckKey not specified, cannot work with checks.';
 		if (!self.dataSet.isLoaded()) return [];
-		var result = [];
+		const result = [];
 		self.dataSet.data.forEach(item => {
 			if (ds.get(item, self.checkKey) == self.trueDataValue) result.push(item);
 		});
@@ -6640,6 +6639,22 @@ ds.ui.DataConnection = ds.Object.extend({
 	_get_cache: null,
 	headers: null,
 	host: null,
+	strategy: 'pyrite',
+	_getStatus(json) {
+		const self = this;
+		if (self.strategy == 'pyrite') return json.status;
+		else return 'success';
+	},
+	_getMessage(json) {
+		const self = this;
+		if (self.strategy == 'pyrite') return json.message;
+		else return null;
+	},
+	_getData(json) {
+		const self = this;
+		if (self.strategy == 'pyrite') return json.data;
+		else return json;
+	},
 	async request(method, url, body, options) {
 		const self = this;
 		if (!self.host) throw new Error('ds.ui.DataConnection: Unable to perform request, "host" property is null.');
@@ -6663,7 +6678,8 @@ ds.ui.DataConnection = ds.Object.extend({
 			let response = await fetch(self.host + url, { mode: 'cors', credentials: 'include', method: method.toUpperCase(), headers: new Headers(self.headers || {}), body: body_str  });
 			if (response.status != 200) throw new Error('ds.ui.DataConnection.request: Request returned error code "' + response.status.toString() + '".');
 			json = await response.json();
-			if (json.status == 'error') throw new Error((json.message || '').toString().split('Error:').join('').trim());
+
+			if (self._getStatus(json) == 'error') throw new Error((self._getMessage(json) || '').toString().split('Error:').join('').trim());
 		} catch(e) {
 			await self._lock.release();
 			self._trigger('error', e);
@@ -6671,11 +6687,11 @@ ds.ui.DataConnection = ds.Object.extend({
 		}
 		if (method.toLowerCase() == 'get' && options.cache) {
 			let descr = method.toUpperCase() + '_' + decodeURIComponent(url);
-			self._get_cache[descr] = { data: json.data, time: (new Date()).getTime(), lifetime: options.cache_lifetime };
+			self._get_cache[descr] = { data: self._getData(json), time: (new Date()).getTime(), lifetime: options.cache_lifetime };
 		}
 		self._trigger('request', json);
 		await self._lock.release();
-		return ds.clone(json.data);
+		return ds.clone(self._getData(json));
 	},
 	init() {
 		const self = this;
