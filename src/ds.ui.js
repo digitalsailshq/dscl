@@ -4836,12 +4836,21 @@ ds.ui.DataGridCheckColumn = ds.ui.DataGridColumn.extend({
 	width: 38,
 	textAlign: 'center',
 	readOnly: false,
+	onchecked(item, cell) {
+		const self = this;
+		return ds.get(item, self.dataKey) == 1;
+	},
+	ondisabled(item, cell) {
+		const self = this;
+		return cell.options.disabled;
+	},
 	createCell(item, cell) {
 		const self = this;
-		var element = ds.ui.element(`<div class="__xgrd_cell_cbox pl pr pt pb"><div></div></div>`);
+		const element = ds.ui.element(`<div class="__xgrd_cell_cbox pl pr pt pb"><div></div></div>`);
 		if (self.textAlign == 'right') element.classList.add('tar');
 		if (self.textAlign == 'center') element.classList.add('tac');
-		if (ds.get(item, cell.column.dataKey) == 1) element.classList.add('__checked');
+		if (self.ondisabled(item, cell)) element.classList.add('__disabled');
+		if (self.onchecked(item, cell)) element.classList.add('__checked');
 		element.__cell = cell;
 		return { element: element };
 	},
@@ -5155,6 +5164,7 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 			 .__xgrd_cell_cbox:hover > div:first-child { border-color: rgb(170, 170, 170); z-index: 2 }
 			 .__xgrd_cell_cbox.__checked > div:first-child::after { content: ""; position: absolute; width: 10px; height: 8px; left: 2px; top: 3px; background-size: 10px 8px; background-image: url(\data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAQCAYAAAAWGF8bAAAABGdBTUEAALGPC/xhBQAAAPtJREFUOBGtkrERwjAMRe2wRTxCCpqkZ4VUFAxDlqFgBhr6VBQpWCBbcOZ/ne0zhpgkoDvZsi09KVKU+lGapqlixCY+LLUB21trL2VZFuM4Xhm/GuhgJwDJ2BljNKGa1KWSwCRca/2AbosYlvYjfvN2Bnbo+34IwLquO5R/Y4APTvcvsDP9pYcOdsSZCVr0445+DHTwMgdGXw3HipW55kq86wc/QbLOhQmQSy6A70jmp8mjShPKpVvClKeg9MtVH8Noh/+QPWPvcNdC/bC4eztbGfxEApCnCag45j5THNzyAuTdJ+hcGOPfgCkUMAsNE+f7auGgqKsB/wh8AnTbtdDy2XnCAAAAAElFTkSuQmCC\) }
 			 .__xgrd_cell_cbox.__mixed > div:first-child::after { content: ""; position: absolute; width: 6px; height: 6px; left: 4px; top: 4px; background-color: black; border-radius: 2px; }
+			 .__xgrd_cell_cbox.__disabled > div:first-child { background-color: var(--background-color); cursor: default; }
 			 .__xgrd_bdy_row:hover .__xgrd_cell_actn { visibility: visible; }
 			 .__xgrd_bdy_grp_bdy .__xgrd_bdy_row:last-child { border-bottom-width: 0px; }
 			 .__xgrd_bdy.__nolastrowsep .__xgrd_bdy_row:last-child { border-bottom-width: 0px; }
@@ -5476,7 +5486,7 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 		rows.forEach(row => {
 			row.options = Object.assign({ color: null }, self._dataGrid._trigger('row_options', row) || {});
 			row.cells.forEach(cell => {
-				cell.options = Object.assign({ link: cell.column.link }, self._dataGrid._trigger('cell_options', cell) || {});
+				cell.options = Object.assign({ link: cell.column.link, disabled: false }, self._dataGrid._trigger('cell_options', cell) || {});
 				cell.cell = cell.column.createCell(row.item, cell);
 				self._dataGrid._trigger('cell', cell);
 			});
@@ -5536,8 +5546,11 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 			if (self.__freed) return false;
 			e.stopImmediatePropagation();
 			if (this.__cell) {
-				self._toggleCheckCell(this.__cell);
-				(self._groups || []).forEach(group => self._updateGroupCheck(group));
+				const disabled = ds.get(this.__cell, 'options.disabled') || false;
+				if (!disabled) {
+					self._toggleCheckCell(this.__cell);
+					(self._groups || []).forEach(group => self._updateGroupCheck(group));	
+				}
 			}
 			return true;
 		});
