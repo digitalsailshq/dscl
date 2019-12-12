@@ -5116,6 +5116,7 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 				const dup = [];
 				column.cells
 					.filter(cell => dup.includes(cell.row.item) ? false : (dup.push(cell.row.item), true))
+					.filter(cell => !cell.options.disabled)
 					.forEach(cell => self._dataGrid._gridBody._toggleCheckCell(cell, false));
 				self._dataGrid._trigger('check_all');
 				(self._dataGrid._gridBody._groups || []).forEach(group => self._dataGrid._gridBody._updateGroupCheck(group));
