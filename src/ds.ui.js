@@ -4552,11 +4552,11 @@ ds.ui.TreeView = ds.ui.View.extend({
 			.__xtree_nd_cbox { display: none; margin-left: 6px; margin-top: 6px; font-size: 0px; cursor: pointer; }
 			.__xtree_nd_cbox > div:first-child { position: relative; display: inline-block; transform: translateY(1px); width: 14px; height: 14px; border: rgb(204, 204, 204) 1px solid; background-color: white; box-shadow: rgba(0, 0, 0, 0.0588235) 0px 1px 1px 0px inset; }
 			.__xtree_nd_cbox:hover > div:first-child { border-color: rgb(170, 170, 170); z-index: 2 }
-			.__xtree_nd.__checked .row > .__xtree_nd_cbox > div:first-child::after { content: ""; position: absolute; width: 10px; height: 8px; left: 2px; top: 3px; background-size: 10px 8px; background-image: url(\data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAQCAYAAAAWGF8bAAAABGdBTUEAALGPC/xhBQAAAPtJREFUOBGtkrERwjAMRe2wRTxCCpqkZ4VUFAxDlqFgBhr6VBQpWCBbcOZ/ne0zhpgkoDvZsi09KVKU+lGapqlixCY+LLUB21trL2VZFuM4Xhm/GuhgJwDJ2BljNKGa1KWSwCRca/2AbosYlvYjfvN2Bnbo+34IwLquO5R/Y4APTvcvsDP9pYcOdsSZCVr0445+DHTwMgdGXw3HipW55kq86wc/QbLOhQmQSy6A70jmp8mjShPKpVvClKeg9MtVH8Noh/+QPWPvcNdC/bC4eztbGfxEApCnCag45j5THNzyAuTdJ+hcGOPfgCkUMAsNE+f7auGgqKsB/wh8AnTbtdDy2XnCAAAAAElFTkSuQmCC\) }
+			.__xtree_nd.__checked > .row > .__xtree_nd_cbox > div:first-child::after { content: ""; position: absolute; width: 10px; height: 8px; left: 2px; top: 3px; background-size: 10px 8px; background-image: url(\data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAQCAYAAAAWGF8bAAAABGdBTUEAALGPC/xhBQAAAPtJREFUOBGtkrERwjAMRe2wRTxCCpqkZ4VUFAxDlqFgBhr6VBQpWCBbcOZ/ne0zhpgkoDvZsi09KVKU+lGapqlixCY+LLUB21trL2VZFuM4Xhm/GuhgJwDJ2BljNKGa1KWSwCRca/2AbosYlvYjfvN2Bnbo+34IwLquO5R/Y4APTvcvsDP9pYcOdsSZCVr0445+DHTwMgdGXw3HipW55kq86wc/QbLOhQmQSy6A70jmp8mjShPKpVvClKeg9MtVH8Noh/+QPWPvcNdC/bC4eztbGfxEApCnCag45j5THNzyAuTdJ+hcGOPfgCkUMAsNE+f7auGgqKsB/wh8AnTbtdDy2XnCAAAAAElFTkSuQmCC\) }
 			.__xtree_nd.__checkbox .row > .__xtree_nd_cbox { display: block; }
 			.__xtree_nd_expbtn {
-				width: 16px; 			height: 16px;
-				margin-left: 6px; 		margin-top: 6px;
+				width: 24px; 			height: 24px;
+				padding-left: 6px; 		padding-top: 6px;
 				cursor: pointer; 		opacity: 0.3;
 				background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNXB4IiBoZWlnaHQ9IjZweCIgdmlld0JveD0iMCAwIDUgNiIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4KICAgIDxnIGlkPSJ0cmVlX2NhcmV0IiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8cG9seWdvbiBpZD0iUmVjdGFuZ2xlIiBmaWxsPSIjMDAwMDAwIiBwb2ludHM9IjAgMCA1IDMgMCA2Ij48L3BvbHlnb24+CiAgICA8L2c+Cjwvc3ZnPg==');
 				background-repeat: no-repeat;
@@ -4570,10 +4570,10 @@ ds.ui.TreeView = ds.ui.View.extend({
 							style="padding-left:{{ this.level * 16 }}px;"
 							x-on:click="self._onClick(e)">
 							<div class="__xtree_nd_expbtn" x-on:click="self._onExpandClick(e)" style="visibility:{{ this.options.has_children ? 'visible' : 'hidden'; }}"></div>
-							<div class="__xtree_nd_cbox"></div>
+							<div class="__xtree_nd_cbox"><div></div></div>
 							{{ this.treeView._trigger('cell', this.item) }}
 						</div>
-						<div class="__xtree_nd_ch col">{{ this._expanded ? (this._nodes = this.treeView._getNodes(this)) : null }}</div>
+						<div x-ref="children_element" class="__xtree_nd_ch col">{{ this._nodes }}</div>
 					</div>`,
 		_expanded: false,
 		_nodes: null,
@@ -4585,7 +4585,18 @@ ds.ui.TreeView = ds.ui.View.extend({
 		options: null,
 		checked: false,
 		get expanded() { return this._expanded; },
-		set expanded(value) { this._expanded = value; this.needsUpdate(); },
+		set expanded(value) {
+			const self = this;
+			self._expanded = value;
+			(self._nodes || []).forEach(node => node.free());
+			self._nodes = [];
+			if (value) {
+				(async () => {
+					self._nodes = await self.treeView._getNodes(self);
+					self.needsUpdate();
+				})();
+			} else self.needsUpdate();
+		},
 		_onExpandClick(e) {
 			const self = this;
 			self.expanded = !self.expanded;
@@ -4616,6 +4627,14 @@ ds.ui.TreeView = ds.ui.View.extend({
 			self.options = Object.assign({ has_children: true, checkbox: false, hover: true, hand: true, clickAction: 'click' }, self.treeView._trigger('options', self.item));
 			self.checked = !!self.treeView._trigger('checked', self.item);
 			ds.ui.View.update.call(self);
+		},
+		updateSubNodes() {
+			const self = this;
+			const proc = node => {
+				node.update();
+				(node._nodes || []).forEach(proc);
+			}
+			proc(self);
 		},
 		init() {
 			const self = this;
