@@ -4588,14 +4588,20 @@ ds.ui.TreeView = ds.ui.View.extend({
 		set expanded(value) {
 			const self = this;
 			self._expanded = value;
+			self._removeChildren();
+			if (value) self._expandAsync();
+			else self.needsUpdate();
+		},
+		_removeChildren() {
+			const self = this;
 			(self._nodes || []).forEach(node => node.free());
 			self._nodes = [];
-			if (value) {
-				(async () => {
-					self._nodes = await self.treeView._getNodes(self);
-					self.needsUpdate();
-				})();
-			} else self.needsUpdate();
+		},
+		_expandAsync() {
+			return (async () => {
+				self._nodes = await self.treeView._getNodes(self);
+				return self.needsUpdate();
+			})();
 		},
 		_onExpandClick(e) {
 			const self = this;
@@ -4691,6 +4697,22 @@ ds.ui.TreeView = ds.ui.View.extend({
 			if (node._nodes.length == 0) return null;
 		}
 		return node;
+	},
+	expand(level) {
+		const self = this;
+		if (!self._nodes) return;
+		const expand = async (node) => {
+			if (node.level > level) return;
+			node._expanded = true;
+			node._removeChildren();
+			await node._expandAsync();
+			if (node._nodes) node._nodes.forEach(expand);
+		}
+		self._nodes.forEach(expand);
+	},
+	expandAll() {
+		const self = this;
+		self.expand(999);
 	}
 }, ds.Events('count:single', 'cell:single', 'item:single', 'options:single', 'checked:single', 'check', 'select', 'click'));
 ds.ui.DataGridColumn = ds.Object.extend({
