@@ -4599,6 +4599,7 @@ ds.ui.TreeView = ds.ui.View.extend({
 			self._nodes = [];
 		},
 		_expandAsync() {
+			const self = this;
 			return (async () => {
 				self._nodes = await self.treeView._getNodes(self);
 				return self.needsUpdate();
