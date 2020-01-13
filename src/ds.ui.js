@@ -4710,14 +4710,17 @@ ds.ui.TreeView = ds.ui.View.extend({
 	},
 	expand(level) {
 		const self = this;
-		const expand = async (node) => {
-			if (node.level > level) return;
-			node._expanded = true;
-			node._removeChildren();
-			await node._expandAsync();
-			if (node._nodes) node._nodes.forEach(expand);
-		}
-		(self._nodes || []).forEach(expand);
+		(async () => {
+			const nodes = await self._nodes;
+			const expand = async (node) => {
+				if (node.level > level) return;
+				node._expanded = true;
+				node._removeChildren();
+				await node._expandAsync();
+				if (node._nodes) node._nodes.forEach(expand);
+			}
+			nodes.forEach(expand);
+		})();
 	},
 	expandAll() {
 		const self = this;
