@@ -4553,6 +4553,7 @@ ds.ui.TreeView = ds.ui.View.extend({
 			.__xtree_nd_cbox > div:first-child { position: relative; display: inline-block; transform: translateY(1px); width: 14px; height: 14px; border: rgb(204, 204, 204) 1px solid; background-color: white; box-shadow: rgba(0, 0, 0, 0.0588235) 0px 1px 1px 0px inset; }
 			.__xtree_nd_cbox:hover > div:first-child { border-color: rgb(170, 170, 170); z-index: 2 }
 			.__xtree_nd.__checked > .row > .__xtree_nd_cbox > div:first-child::after { content: ""; position: absolute; width: 10px; height: 8px; left: 2px; top: 3px; background-size: 10px 8px; background-image: url(\data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAQCAYAAAAWGF8bAAAABGdBTUEAALGPC/xhBQAAAPtJREFUOBGtkrERwjAMRe2wRTxCCpqkZ4VUFAxDlqFgBhr6VBQpWCBbcOZ/ne0zhpgkoDvZsi09KVKU+lGapqlixCY+LLUB21trL2VZFuM4Xhm/GuhgJwDJ2BljNKGa1KWSwCRca/2AbosYlvYjfvN2Bnbo+34IwLquO5R/Y4APTvcvsDP9pYcOdsSZCVr0445+DHTwMgdGXw3HipW55kq86wc/QbLOhQmQSy6A70jmp8mjShPKpVvClKeg9MtVH8Noh/+QPWPvcNdC/bC4eztbGfxEApCnCag45j5THNzyAuTdJ+hcGOPfgCkUMAsNE+f7auGgqKsB/wh8AnTbtdDy2XnCAAAAAElFTkSuQmCC\) }
+			.__xtree_nd.__checked.__checkbox_disabled > .row > .__xtree_nd_cbox > div:first-child::after { background-color: var(--background-color); cursor: default; }
 			.__xtree_nd.__checkbox .row > .__xtree_nd_cbox { display: block; }
 			.__xtree_nd_expbtn {
 				width: 24px; 			height: 24px;
@@ -4565,7 +4566,7 @@ ds.ui.TreeView = ds.ui.View.extend({
 			.__xtree_nd.__expanded > .row > .__xtree_nd_expbtn { transform: rotate(90deg); }`,
 	template: `<div class="__xtree">{{ this._nodes = this._getNodes(null); }}</div>`,
 	NodeView: ds.ui.View.extend({
-		template: `<div class="__xtree_nd col{{ this.options.checkbox ? ' __checkbox' : '' }}{{ this.checked ? ' __checked' : '' }}{{ this._expanded ? ' __expanded' : '' }}{{ this == this.treeView.selectedNode ? ' __selected' : '' }}">
+		template: `<div class="__xtree_nd col{{ this.options.checkbox ? ' __checkbox' : '' }}{{ this.options.checkbox_disabled ? ' __checkbox_disabled' : '' }}{{ this.checked ? ' __checked' : '' }}{{ this._expanded ? ' __expanded' : '' }}{{ this == this.treeView.selectedNode ? ' __selected' : '' }}">
 						<div class="row{{ this.options.hover ? ' hvr' : '' }}{{ this.options.hand ? ' hnd' : '' }}"
 							style="padding-left:{{ this.level * 16 }}px;"
 							x-on:click="self._onClick(e)">
@@ -4613,9 +4614,11 @@ ds.ui.TreeView = ds.ui.View.extend({
 			if (self.options.clickAction == 'select') self.treeView.select(self);
 			else if (self.options.clickAction == 'expand') self.expanded = !self.expanded;
 			else if (self.options.clickAction == 'check') {
-				self.treeView._trigger('check', self);
-				self.checked = !!self.treeView._trigger('checked', self.item);
-				self.update();
+				if (self.options.checkbox_disabled == false) {
+					self.treeView._trigger('check', self);
+					self.checked = !!self.treeView._trigger('checked', self.item);
+					self.update();	
+				}
 			} else if (self.options.clickAction == 'click') self.treeView._trigger('click', self);
 		},
 		getBranch() {
@@ -4630,7 +4633,14 @@ ds.ui.TreeView = ds.ui.View.extend({
 		},
 		update() {
 			const self = this;
-			self.options = Object.assign({ has_children: true, checkbox: false, hover: true, hand: true, clickAction: 'click' }, self.treeView._trigger('options', self.item));
+			self.options = Object.assign({
+				has_children: true,
+				checkbox: false,
+				checkbox_disabled: false,
+				hover: true,
+				hand: true,
+				clickAction: 'click'
+			}, self.treeView._trigger('options', self.item));
 			self.checked = !!self.treeView._trigger('checked', self.item);
 			ds.ui.View.update.call(self);
 		},
