@@ -432,78 +432,78 @@ ds.evalScope = (expr, scope, this_) => {
 // javascript-obfuscator:enable
 ds.md5 = a => {function b(a,b){return a<<b|a>>>32-b}function c(a,b){var c,d,e,f,g;return e=2147483648&a,f=2147483648&b,c=1073741824&a,d=1073741824&b,g=(1073741823&a)+(1073741823&b),c&d?2147483648^g^e^f:c|d?1073741824&g?3221225472^g^e^f:1073741824^g^e^f:g^e^f}function d(a,b,c){return a&b|~a&c}function e(a,b,c){return a&c|b&~c}function f(a,b,c){return a^b^c}function g(a,b,c){return b^(a|~c)}function h(a,e,f,g,h,i,j){return a=c(a,c(c(d(e,f,g),h),j)),c(b(a,i),e)}function i(a,d,f,g,h,i,j){return a=c(a,c(c(e(d,f,g),h),j)),c(b(a,i),d)}function j(a,d,e,g,h,i,j){return a=c(a,c(c(f(d,e,g),h),j)),c(b(a,i),d)}function k(a,d,e,f,h,i,j){return a=c(a,c(c(g(d,e,f),h),j)),c(b(a,i),d)}function l(a){for(var b,c=a.length,d=c+8,e=(d-d%64)/64,f=16*(e+1),g=Array(f-1),h=0,i=0;i<c;)b=(i-i%4)/4,h=i%4*8,g[b]=g[b]|a.charCodeAt(i)<<h,i++;return b=(i-i%4)/4,h=i%4*8,g[b]=g[b]|128<<h,g[f-2]=c<<3,g[f-1]=c>>>29,g}function m(a){var d,e,b="",c="";for(e=0;e<=3;e++)d=a>>>8*e&255,c="0"+d.toString(16),b+=c.substr(c.length-2,2);return b}function n(a){a=a.replace(/\r\n/g,"\n");for(var b="",c=0;c<a.length;c++){var d=a.charCodeAt(c);d<128?b+=String.fromCharCode(d):d>127&&d<2048?(b+=String.fromCharCode(d>>6|192),b+=String.fromCharCode(63&d|128)):(b+=String.fromCharCode(d>>12|224),b+=String.fromCharCode(d>>6&63|128),b+=String.fromCharCode(63&d|128))}return b}var p,q,r,s,t,u,v,w,x,o=Array(),y=7,z=12,A=17,B=22,C=5,D=9,E=14,F=20,G=4,H=11,I=16,J=23,K=6,L=10,M=15,N=21;for(a=n(a),o=l(a),u=1732584193,v=4023233417,w=2562383102,x=271733878,p=0;p<o.length;p+=16)q=u,r=v,s=w,t=x,u=h(u,v,w,x,o[p+0],y,3614090360),x=h(x,u,v,w,o[p+1],z,3905402710),w=h(w,x,u,v,o[p+2],A,606105819),v=h(v,w,x,u,o[p+3],B,3250441966),u=h(u,v,w,x,o[p+4],y,4118548399),x=h(x,u,v,w,o[p+5],z,1200080426),w=h(w,x,u,v,o[p+6],A,2821735955),v=h(v,w,x,u,o[p+7],B,4249261313),u=h(u,v,w,x,o[p+8],y,1770035416),x=h(x,u,v,w,o[p+9],z,2336552879),w=h(w,x,u,v,o[p+10],A,4294925233),v=h(v,w,x,u,o[p+11],B,2304563134),u=h(u,v,w,x,o[p+12],y,1804603682),x=h(x,u,v,w,o[p+13],z,4254626195),w=h(w,x,u,v,o[p+14],A,2792965006),v=h(v,w,x,u,o[p+15],B,1236535329),u=i(u,v,w,x,o[p+1],C,4129170786),x=i(x,u,v,w,o[p+6],D,3225465664),w=i(w,x,u,v,o[p+11],E,643717713),v=i(v,w,x,u,o[p+0],F,3921069994),u=i(u,v,w,x,o[p+5],C,3593408605),x=i(x,u,v,w,o[p+10],D,38016083),w=i(w,x,u,v,o[p+15],E,3634488961),v=i(v,w,x,u,o[p+4],F,3889429448),u=i(u,v,w,x,o[p+9],C,568446438),x=i(x,u,v,w,o[p+14],D,3275163606),w=i(w,x,u,v,o[p+3],E,4107603335),v=i(v,w,x,u,o[p+8],F,1163531501),u=i(u,v,w,x,o[p+13],C,2850285829),x=i(x,u,v,w,o[p+2],D,4243563512),w=i(w,x,u,v,o[p+7],E,1735328473),v=i(v,w,x,u,o[p+12],F,2368359562),u=j(u,v,w,x,o[p+5],G,4294588738),x=j(x,u,v,w,o[p+8],H,2272392833),w=j(w,x,u,v,o[p+11],I,1839030562),v=j(v,w,x,u,o[p+14],J,4259657740),u=j(u,v,w,x,o[p+1],G,2763975236),x=j(x,u,v,w,o[p+4],H,1272893353),w=j(w,x,u,v,o[p+7],I,4139469664),v=j(v,w,x,u,o[p+10],J,3200236656),u=j(u,v,w,x,o[p+13],G,681279174),x=j(x,u,v,w,o[p+0],H,3936430074),w=j(w,x,u,v,o[p+3],I,3572445317),v=j(v,w,x,u,o[p+6],J,76029189),u=j(u,v,w,x,o[p+9],G,3654602809),x=j(x,u,v,w,o[p+12],H,3873151461),w=j(w,x,u,v,o[p+15],I,530742520),v=j(v,w,x,u,o[p+2],J,3299628645),u=k(u,v,w,x,o[p+0],K,4096336452),x=k(x,u,v,w,o[p+7],L,1126891415),w=k(w,x,u,v,o[p+14],M,2878612391),v=k(v,w,x,u,o[p+5],N,4237533241),u=k(u,v,w,x,o[p+12],K,1700485571),x=k(x,u,v,w,o[p+3],L,2399980690),w=k(w,x,u,v,o[p+10],M,4293915773),v=k(v,w,x,u,o[p+1],N,2240044497),u=k(u,v,w,x,o[p+8],K,1873313359),x=k(x,u,v,w,o[p+15],L,4264355552),w=k(w,x,u,v,o[p+6],M,2734768916),v=k(v,w,x,u,o[p+13],N,1309151649),u=k(u,v,w,x,o[p+4],K,4149444226),x=k(x,u,v,w,o[p+11],L,3174756917),w=k(w,x,u,v,o[p+2],M,718787259),v=k(v,w,x,u,o[p+9],N,3951481745),u=c(u,q),v=c(v,r),w=c(w,s),x=c(x,t);var O=m(u)+m(v)+m(w)+m(x);return O.toLowerCase()};
 ds.nextId = (function() { let seq = 1, rnd = parseInt((Math.random() * 100), 10); return () => rnd.toString(16) + (new Date()).getTime().toString(36) + (++seq).toString(36); })();
-ds.assert = (value, descr = null, errproto = Error) => {
+ds.assert = (value, descr = null, errp = Error) => {
 	if (descr && !descr.includes('"')) descr = `"${descr}"`;
 	const valueAssert = {
 		equals(rvalue) {
-			if ((isset || !optional) && value !== rvalue) throw new errproto(`${ descr || 'Assert:' } value "${value}" is not equal to "${rvalue}".`);
+			if ((isset || !optional) && value !== rvalue) throw new errp(`${ descr || 'Assert:' } value "${value}" is not equal to "${rvalue}".`);
 			return this;
 		},
 		oneOf(allowed) {
-			if (!ds.isArray(allowed)) throw new errproto('Assert: "oneOf" accepts only array as first argument.');
-			if ((isset || !optional) && !allowed.includes(value)) throw new errproto(`${ descr || 'Assert:' } value "${value}" is not one of "${allowed.join(', ')}".`);
+			if (!ds.isArray(allowed)) throw new errp('Assert: "oneOf" accepts only array as first argument.');
+			if ((isset || !optional) && !allowed.includes(value)) throw new errp(`${ descr || 'Assert:' } value "${value}" is not one of "${allowed.join(', ')}".`);
 			return this;
 		}
 	}
 	const objectAssert = Object.assign(Object.create(valueAssert), {
 		hasOwnProperty(prop) {
 			const props = ds.isArray(prop) ? prop : [prop];
-			if ((isset || !optional) && !props.every(p => value.hasOwnProperty(p))) throw new errproto(`${ descr || 'Assert:' } object has no own property "${prop}".`);
+			if ((isset || !optional) && !props.every(p => value.hasOwnProperty(p))) throw new errp(`${ descr || 'Assert:' } object has no own property "${prop}".`);
 			return this;
 		},
 		hasProperty(prop) {
 			const props = ds.isArray(prop) ? prop : [prop];
-			if ((isset || !optional) && !props.every(p => p in value)) throw new errproto(`${ descr || 'Assert:' } object has no property "${prop}".`);
+			if ((isset || !optional) && !props.every(p => p in value)) throw new errp(`${ descr || 'Assert:' } object has no property "${prop}".`);
 			return this;
 		},
 		prototypeOf(proto) {
-			if ((isset || !optional) && !ds.isPrototypeOf(value, proto)) throw new errproto(`${ descr || 'Assert:' } object is not prototype of "${prop}".`);
+			if ((isset || !optional) && !ds.isPrototypeOf(value, proto)) throw new errp(`${ descr || 'Assert:' } object is not prototype of "${prop}".`);
 			return this;
 		}
 	});
 	const arrayAssert = Object.assign(Object.create(valueAssert), {
 		lengthOf(len) {
-			if ((isset || !optional) && !(value.length == len)) throw new errproto(`${ descr || 'Assert:' } array is not length of "${len}".`);
+			if ((isset || !optional) && !(value.length == len)) throw new errp(`${ descr || 'Assert:' } array is not length of "${len}".`);
 			return this;
 		},
 		notEmpty() {
-			if ((isset || !optional) && (value.length == 0)) throw new errproto(`${ descr || 'Assert:' } array "${value}" is empty.`);
+			if ((isset || !optional) && (value.length == 0)) throw new errp(`${ descr || 'Assert:' } array "${value}" is empty.`);
 			return this;
 		}
 	});
 	const numberAssert = Object.assign(Object.create(valueAssert), {
 		greaterThan(rvalue) {
-			if ((isset || !optional) && !(value > rvalue)) throw new errproto(`${ descr || 'Assert:' } value "${value}" is not more than "${rvalue}".`);
+			if ((isset || !optional) && !(value > rvalue)) throw new errp(`${ descr || 'Assert:' } value "${value}" is not more than "${rvalue}".`);
 			return this;
 		},
 		greaterThanOrEquals(rvalue) {
-			if ((isset || !optional) && !(value >= rvalue)) throw new errproto(`${ descr || 'Assert:' } value "${value}" is not more than or equal to "${rvalue}".`);
+			if ((isset || !optional) && !(value >= rvalue)) throw new errp(`${ descr || 'Assert:' } value "${value}" is not more than or equal to "${rvalue}".`);
 			return this;
 		},
 		lessThan(rvalue) {
-			if ((isset || !optional) && !(value < rvalue)) throw new errproto(`${ descr || 'Assert:' } value "${value}" is not less than "${rvalue}".`);	
+			if ((isset || !optional) && !(value < rvalue)) throw new errp(`${ descr || 'Assert:' } value "${value}" is not less than "${rvalue}".`);	
 			return this;
 		},
 		lessThanOrEquals(rvalue) {
-			if ((isset || !optional) && !(value <= rvalue)) throw new errproto(`${ descr || 'Assert:' } value "${value}" is not less than or equal to "${rvalue}".`);
+			if ((isset || !optional) && !(value <= rvalue)) throw new errp(`${ descr || 'Assert:' } value "${value}" is not less than or equal to "${rvalue}".`);
 			return this;
 		},
 		odd() {
-			if ((isset || !optional) && (value % 2) == 0) throw new errproto(`${ descr || 'Assert:' } value "${value}" is not odd.`);	
+			if ((isset || !optional) && (value % 2) == 0) throw new errp(`${ descr || 'Assert:' } value "${value}" is not odd.`);	
 			return this;
 		},
 		even() {
-			if ((isset || !optional) && (value % 2) != 0) throw new errproto(`${ descr || 'Assert:' } value "${value}" is not even.`);
+			if ((isset || !optional) && (value % 2) != 0) throw new errp(`${ descr || 'Assert:' } value "${value}" is not even.`);
 			return this;
 		}
 	});
 	const stringAssert = Object.assign(Object.create(valueAssert), {
 		lengthOf(len) {
-			if ((isset || !optional) && !(value.length == len)) throw new errproto(`${ descr || 'Assert:' } string "${value}" is not length of "${len}".`);
+			if ((isset || !optional) && !(value.length == len)) throw new errp(`${ descr || 'Assert:' } string "${value}" is not length of "${len}".`);
 			return this;
 		},
 		notEmpty() {
-			if ((isset || !optional) && (value.length == 0)) throw new errproto(`${ descr || 'Assert:' } string "${value}" is empty.`);
+			if ((isset || !optional) && (value.length == 0)) throw new errp(`${ descr || 'Assert:' } string "${value}" is empty.`);
 			return this;
 		}
 	});
@@ -511,27 +511,27 @@ ds.assert = (value, descr = null, errproto = Error) => {
 	});
 	const finalAssert = Object.assign(Object.create(valueAssert), {
 		object() {
-			if ((isset || !optional) && !ds.isObject(value)) throw new errproto(`${ descr || 'Assert:' } value "${value}" is not an object.`);
+			if ((isset || !optional) && !ds.isObject(value)) throw new errp(`${ descr || 'Assert:' } value "${value}" is not an object.`);
 			return objectAssert;
 		},
 		array() {
-			if ((isset || !optional) && !ds.isArray(value)) throw new errproto(`${ descr || 'Assert:' } value "${value}" is not an array.`);
+			if ((isset || !optional) && !ds.isArray(value)) throw new errp(`${ descr || 'Assert:' } value "${value}" is not an array.`);
 			return arrayAssert;
 		},
 		number() {
-			if ((isset || !optional) && !ds.isNumber(value)) throw new errproto(`${ descr || 'Assert:' } value "${value}" is not a number.`);
+			if ((isset || !optional) && !ds.isNumber(value)) throw new errp(`${ descr || 'Assert:' } value "${value}" is not a number.`);
 			return numberAssert;
 		},
 		string() {
-			if ((isset || !optional) && !ds.isString(value)) throw new errproto(`${ descr || 'Assert:' } value "${value}" is not a string.`);
+			if ((isset || !optional) && !ds.isString(value)) throw new errp(`${ descr || 'Assert:' } value "${value}" is not a string.`);
 			return stringAssert;
 		},
 		bool() {
-			if ((isset || !optional) && !ds.isBool(value)) throw new errproto(`${ descr || 'Assert:' } value "${value}" is not a bool.`);
+			if ((isset || !optional) && !ds.isBool(value)) throw new errp(`${ descr || 'Assert:' } value "${value}" is not a bool.`);
 			return valueAssert;
 		},
 		function() {
-			if ((isset || !optional) && !ds.isFunction(value)) throw new errproto(`${ descr || 'Assert:' } value "${value}" is not a function.`);
+			if ((isset || !optional) && !ds.isFunction(value)) throw new errp(`${ descr || 'Assert:' } value "${value}" is not a function.`);
 			return functionAssert;
 		}
 	});
@@ -544,7 +544,7 @@ ds.assert = (value, descr = null, errproto = Error) => {
 		},
 		required: () => {
 			optional = false;
-			if (value === null || value === undefined) throw new errproto(`${ descr || 'Assert:' } value is required.`);
+			if (value === null || value === undefined) throw new errp(`${ descr || 'Assert:' } value is required.`);
 			return finalAssert;
 		}
 	}
