@@ -8,7 +8,7 @@ ds.ui.__styles = `
 	textarea, input[type="text"] { font-family: "Proxima Nova", "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px; }
 	textarea:focus, input:focus { outline: 0; }
 	a { color: var(--text-color-link); text-decoration: none; }
-	:root { --text-color: #333; --text-color-gray: #888888; --text-color-blue: #459fd8; --text-color-link: #3b73af; --text-color-red: #d85b45; --text-color-green: #009834; --text-color-yellow: #ffc700; --text-color-dimmed: #888888ab; --text-color-error: #a94442; --text-color-warning: #9a7639; --text-color-info: #31708f; --text-color-success: #3c763d; --border-color: #d7d7d7; --border-color-light: #efefef; --border-color-blue: #4AA7F0; --border-color-red: #d85b45; --border-color-error: #d04437; --border-color-warning: #ffd580; --border-color-info: #4AA7F0; --border-color-success: #d6e9c6; --background-color-light: #f9f9f9; --background-color: #f5f5f5; --background-color-selected: rgba(0, 0, 0, 0.04); --background-color-highlighted: #ebf2f9; --background-color-error: #f2dede; --background-color-warning: #fff7cb; --background-color-info: #d9edf7; --background-color-success: #dff0d8; --image-dimmed-filter: opacity(0.35); }
+	:root { --text-color: #333; --text-color-gray: #888888; --text-color-blue: #459fd8; --text-color-link: #3b73af; --text-color-red: #d85b45; --text-color-green: #009834; --text-color-yellow: #ffc700; --text-color-dimmed: #888888ab; --text-color-error: #a94442; --text-color-warning: #9a7639; --text-color-info: #31708f; --text-color-success: #3c763d; --border-color: #d7d7d7; --border-color-light: #efefef; --border-color-blue: #4AA7F0; --border-color-red: #d85b45; --border-color-error: #d04437; --border-color-warning: #ffd580; --border-color-info: #4AA7F0; --border-color-success: #d6e9c6; --background-color-light: #f9f9f9; --background-color: #f5f5f5; --background-color-selected: rgba(0, 0, 0, 0.04); --background-color-highlighted: #ebf2f9; --background-color-error: #f2dede; --background-color-warning: #fff7cb; --background-color-info: #d9edf7; --background-color-success: #dff0d8; --image-dim-filter: opacity(0.4); }
 	.app { width: 100%; height: 100%; color: var(--text-color); }
 	*:not(input), *:not(textarea) { user-select: none; }
 	body * { flex-shrink: 0; }
@@ -213,12 +213,12 @@ ds.ui.__styles = `
 	.vam { vertical-align: middle; }
 	.thvr, .thvr * { color: var(--text-color-dimmed); }
 	.thvr:hover, .thvr:hover *, .thvr.thvra, .thvr.thvra * { color: var(--text-color); }
-	.dhvr.dhvrc, .dhvr .dhvrc { filter: var(--image-dimmed-filter); }
+	.dhvr.dhvrc, .dhvr .dhvrc { filter: var(--image-dim-filter); }
 	.dhvr.dhvrc:hover, .dhvr:hover .dhvrc, .dhvr.dhvra.dhvrc, .dhvr.dhvra .dhvrc { filter: opacity(1); }
 	.vhvr.vhvrc, .vhvr .vhvrc { visibility: hidden; }
 	/*.vhvr:hover .vhvrc, .vhvr.vhvra .vhvrc { visibility: visible; }*/
 	.vhvr.vhvrc:hover, .vhvr:hover .vhvrc, .vhvr.vhvra.vhvrc, .vhvr.vhvra .vhvrc { visibility: visible; }
-	.dhvr2.dhvrc2, .dhvr2 .dhvrc2 { filter: var(--image-dimmed-filter); }
+	.dhvr2.dhvrc2, .dhvr2 .dhvrc2 { filter: var(--image-dim-filter); }
 	.dhvr2.dhvrc2:hover, .dhvr2:hover .dhvrc2, .dhvr2.dhvra2.dhvrc2, .dhvr2.dhvra2 .dhvrc2 { filter: opacity(1); }
 	.vhvr2.vhvrc2, .vhvr2 .vhvrc2 { visibility: hidden; }
 	.vhvr2.vhvrc2:hover, .vhvr2:hover .vhvrc2, .vhvr2.vhvra2.vhvrc2, .vhvr2.vhvra2 .vhvrc2 { visibility: visible; }
@@ -1503,8 +1503,8 @@ ds.ui.__ForDirective = ds.ui.__Directive.extend({
 		var root_directive = ds.ui.__Directive.new({ parent: self, scope: self.extendScope(item_scope) });
 		var element = ds.ui.__template_process(self.template, root_directive)[0];
 		root_directive.updateChildren();
-		if (self._options.preserve_element) item[self._options.preserve_element] = element;
-		if (self._options.preserve_item) element[self._options.preserve_item] = item;
+		if (self._options.store_element) item[self._options.store_element] = element;
+		if (self._options.store_item) element[self._options.store_item] = item;
 		return element;
 	},
 	update() {
@@ -2742,6 +2742,9 @@ ds.ui.Button = ds.ui.View.extend({
 				/*box-shadow: inset 0px 1px 0px 0px rgba(255, 255, 255, 0.75),
 							inset 0px -1px 0px 0px rgba(0, 0, 0, 0.035);*/  }
 			/*.__xbtn img.__xbtn_img { width: 16px; height: 16px; }*/
+			.__xbtn.__dropdown {
+				position: relative;
+				padding-right: 22px;  }
 			.__xbtn.__small {
 				font-size: 12px;
 				padding-left: 6px;
@@ -2750,6 +2753,8 @@ ds.ui.Button = ds.ui.View.extend({
 			.__xbtn.__narrow:not(.__small) {
 				padding-left: 7px;
 				padding-right: 7px; }
+			.__xbtn.__dropdown.__small { padding-right: 12px; }
+			.__xbtn.__dropdown.__narrow { padding-right: 14px; }
 			.__xbtn.__grayed:not(:hover):not(:active):not(.__down):not(.__droppeddown) { color: gray; }
 			.__xbtn.__white { background-color: white; }
 			.__xbtn:hover, .__xbtn.__hover { 
@@ -2804,12 +2809,17 @@ ds.ui.Button = ds.ui.View.extend({
 				cursor: default;
 				pointer-events: none; }
 			.__xbtn .__xbtn_drpdwncaret {
+				position: absolute;
+				right: 10px;
+				top: 50%;
+				transform: translateY(-50%);
 				color: var(--text-color);
 				font-size: 10px;
-				margin-left: 6px;
-				margin-right: -2px;
+				/*margin-left: 6px;
+				margin-right: -2px;*/
 				/*transform: translateY(-1px);*/ }
-			.__xbtn.__small .__xbtn_drpdwncaret { transform: translateY(0px); }
+			.__xbtn.__small .__xbtn_drpdwncaret { right: 6px; }
+			.__xbtn.__narrow .__xbtn_drpdwncaret { right: 6px; }
 			.__xbtn.__primary .__xbtn_drpdwncaret { color: white; }
 			.btn-grp .__xbtn { margin-left: -1px; }
 			.btn-grp .__xbtn:hover, .btn-grp .__xbtn.__hover {
@@ -2886,11 +2896,12 @@ ds.ui.Button = ds.ui.View.extend({
 		const self = this;
 		let caret_element = self.element.querySelector('.__xbtn_drpdwncaret');
 		if (self.dropdown) {
-			if (!caret_element) caret_element = ds.ui.element('<i class="fa fa-caret-down __xbtn_drpdwncaret"></i>', self.element);
+			if (!caret_element) caret_element = ds.ui.element(`<img src="${ds.ui.CARET_DOWN_IMG}" class="x10 __xbtn_drpdwncaret" />`, self.element);
 		} else {
 			if (caret_element) self.element.removeChild(caret_element);
 		}
 	},
+	_onClick(e) {},
 	update() {
 		const self = this;
 		ds.ui.View.update.call(self);
@@ -2902,6 +2913,7 @@ ds.ui.Button = ds.ui.View.extend({
 			'__down', 			self.down,
 			'__grayed', 		self.grayed,
 			'__flat', 			self.flat,
+			'__dropdown', 		self.dropdown,
 			'__droppeddown', 	self.droppeddown,
 			'__white', 			self.white,
 			'__primary', 		self.primary,
@@ -2935,6 +2947,7 @@ ds.ui.Button = ds.ui.View.extend({
 		ds.ui.View.init.call(self);
 		self.element.addEventListener('click', e => {
 			if (self.disabled) return;
+			self._onClick(e);
 			self._trigger('click', e);
 		});
 	}
@@ -4230,7 +4243,7 @@ ds.ui.ListView = ds.ui.View.extend({
 						<i class="fa fa-search"></i><span>&nbsp;&nbsp;</span>по запросу "{{ this._search || '' }}" ничего не найдено
 					</div>
 					<div x-ref="items_element" class="col flex scroll">
-						<div x-for="item of this.items | preserve_element: element, preserve_item: __item"
+						<div x-for="item of this.items | store_element: element, store_item: __item"
 							 	class="__xlstvw_item row mid{{ item.options.hover ? ' __hvr' : '' }}{{ item.options.hand ? ' hnd' : '' }}{{ item.selected ? ' __selected' : '' }} {{ item.options.className || '' }}"
 							 	style="{{ !item.visible ? 'display:none;' : ''; }}">
 							{{ item.checkbox_element }}
@@ -4432,7 +4445,7 @@ ds.ui.ListView = ds.ui.View.extend({
 		for (let i = 0; i < count; i++) {
 			var opts = Object.assign({ hover: false, hand: false, checkbox: false, visible: true }, self._trigger('options', i));
 			var item = {
-				element: null, // <-- will come here from preserve_element options in x-for
+				element: null, // <-- will come here from store_element options in x-for
 				index: i,
 				item: self._trigger('item', i),
 				selected: false,
