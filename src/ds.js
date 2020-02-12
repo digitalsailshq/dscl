@@ -631,13 +631,7 @@ ds.Object = {
 		return obj;
 	},
 	shared(args) {
-		if (!this.__shared_instance) {
-			this.__shared_instance = 
-			this.__shared_instance = Object.create(this);
-			Object.keys(args || {}).forEach(key => this.__shared_instance[key] = args[key]);
-			this.__shared_instance.init();
-		}
-		return this.__shared_instance;
+		return this.__shared_instance || (this.__shared_instance = this.new(args));
 	}
 }
 ds.Emitter = ds.Object.extend({
