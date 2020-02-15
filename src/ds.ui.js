@@ -2216,16 +2216,19 @@ ds.ui.PopupHelper = ds.Object.extend({
 			else if (position.top < 0) correction.top += Math.abs(position.top);
 		}
 		const TRIANGLE_SIZE = 8;
-		let position = { left: 0, top: 0, width: 0, height: 0, bottom() { return this.top + this.height; }, right() { return this.left + this.width; }, triangle_pos: 0 };
-		let correction = { left: 0, top: 0 };
+		const position = {
+			left: 0, top: 0, width: 0, height: 0, triangle_pos: 0,
+			bottom() { return this.top + this.height; },
+			right() { return this.left + this.width; }
+		};
+		const correction = { left: 0, top: 0 };
 		self._target_rect = ds.ui.element_rects(self.target).inner;
 		self._related_rect = self.related ? ds.ui.element_rects(self.related).border : null;
 		position.width = self._target_rect.width;
 		position.height = self._target_rect.height;
-		if (self._x !== null && self._x !== undefined && self._y !== null && self._y !== undefined) {
+		if (ds.isset(self._x) && ds.isset(self._y)) {
 			position.left = self._x;
 			position.top = self._y;
-			// set_limits({ left: position.left, top: position.top, width: 0, height: 0 });
 			fit_horizontal();
 			fit_vertical();
 		} else {
@@ -4229,7 +4232,7 @@ ds.ui.ListView = ds.ui.View.extend({
 			 .__xlstvw .__xlstvw_item .__xlstvw_item_cbox > div:first-child { position: relative; display: inline-block; width: 14px; height: 14px; border: rgb(204, 204, 204) 1px solid; background-color: white; box-shadow: rgba(0, 0, 0, 0.0588235) 0px 1px 1px 0px inset; }
 			 .__xlstvw .__xlstvw_item:hover .__xlstvw_item_cbox > div:first-child { border-color: rgb(170, 170, 170); z-index: 2 }
 			 .__xlstvw .__xlstvw_item .__xlstvw_item_cbox.__checked > div:first-child::after { content: ""; position: absolute; width: 10px; height: 8px; left: 2px; top: 3px; background-size: 10px 8px; background-image: url(\data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAQCAYAAAAWGF8bAAAABGdBTUEAALGPC/xhBQAAAPtJREFUOBGtkrERwjAMRe2wRTxCCpqkZ4VUFAxDlqFgBhr6VBQpWCBbcOZ/ne0zhpgkoDvZsi09KVKU+lGapqlixCY+LLUB21trL2VZFuM4Xhm/GuhgJwDJ2BljNKGa1KWSwCRca/2AbosYlvYjfvN2Bnbo+34IwLquO5R/Y4APTvcvsDP9pYcOdsSZCVr0445+DHTwMgdGXw3HipW55kq86wc/QbLOhQmQSy6A70jmp8mjShPKpVvClKeg9MtVH8Noh/+QPWPvcNdC/bC4eztbGfxEApCnCag45j5THNzyAuTdJ+hcGOPfgCkUMAsNE+f7auGgqKsB/wh8AnTbtdDy2XnCAAAAAElFTkSuQmCC\) }
-			 .__xlstvw .__xlstvw_item .__xlstvw_item_actn { position: absolute; top: 0px; bottom: 0px; width: 28px; right: calc(28px * var(--action-index)); visibility: hidden; }
+			 .__xlstvw .__xlstvw_item .__xlstvw_item_actn { position: absolute; top: 0px; bottom: 0px; width: 28px; right: calc(28px * var(--action-index)); visibility: hidden; cursor: pointer; }
 			 .__xlstvw .__xlstvw_item:hover .__xlstvw_item_actn { visibility: visible; }
 			 .__xlstvw .__xlstvw_item .__xlstvw_item_actn:hover { background-color: var(--background-color-selected); }
 			 .__xlstvw .__xlstvw_item .__xlstvw_item_actn > * { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); opacity: 0.25; }
@@ -4500,7 +4503,7 @@ ds.ui.ListView = ds.ui.View.extend({
 			let item_index = ds.ui.element_parent(this, '.__xlstvw_item').__item.index;
 			let action_index = parseInt(this.getAttribute('data-action-index'), 10);
 			let action = self._actions[action_index];
-			if (action && ds.isFunction(action.fn)) action.fn.call(null, item_index);
+			if (action && ds.isFunction(action.fn)) action.fn.call(null, item_index, e);
 			return true;
 		});
 		ds.ui.element_on(self.element, 'click', '.__xlstvw_item', function(e) {
@@ -6053,6 +6056,7 @@ ds.ui.Progress = ds.ui.View.extend({
 });
 ds.ui.Menu = ds.ui.View.extend({
 	styles: `.__xmnu {
+				position: absolute;
 				display: flex;
 				flex-flow: column;
 				padding-top: 4px;
@@ -6060,6 +6064,7 @@ ds.ui.Menu = ds.ui.View.extend({
 				background-color: white;
 				border: 1px solid var(--border-color);
 				box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.075);
+				overflow: scroll;
 				user-select: none;  }`,
 	template: `<div class="__xmnu" x-on:contextmenu="e.preventDefault()">{{ this.items }}</div>`,
 	_activeItem: null,
