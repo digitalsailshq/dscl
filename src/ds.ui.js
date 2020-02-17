@@ -2818,6 +2818,7 @@ ds.ui.Button = ds.ui.View.extend({
 				transform: translateY(-50%);
 				color: var(--text-color);
 				font-size: 10px;
+				pointer-events: none;
 				/*margin-left: 6px;
 				margin-right: -2px;*/
 				/*transform: translateY(-1px);*/ }
