@@ -2980,25 +2980,7 @@ ds.ui.ButtonDropDownMenu = ds.ui.View.extend({
 	template: `<div class="row btn-grp btn-seg">
 					{{ this.button ||= ds.ui.Button.new() }}
 					{{ this.menuButton ||= ds.ui.Button.new({ dropdown: true, narrow: true }) }}
-				</div>`,
-	menu: null,
-	update() {
-		const self = this;
-		ds.ui.View.update.call(self);
-	},
-	init() {
-		const self = this;
-		ds.ui.View.init.call(self);
-		self.menu = ds.ui.Menu.new();
-		self.menu.on('open', () => {
-			self._menu_opened = true;
-			self.needsUpdate();
-		});
-		self.menu.on('close', () => {
-			self._menu_opened = false;
-			self.needsUpdate();
-		});
-	}
+				</div>`
 });
 ds.ui.__DropdownButton = ds.ui.View.extend({
 	styles: `.__xddbtn:hover .__xbtn:not(:active), .__xddbtn.__hover .__xbtn:not(:active) { border-color: rgb(204, 204, 204) !important }
