@@ -2756,7 +2756,7 @@ ds.ui.Button = ds.ui.View.extend({
 			.__xbtn.__narrow:not(.__small) {
 				padding-left: 7px;
 				padding-right: 7px; }
-			.__xbtn.__dropdown.__small { padding-right: 12px; }
+			.__xbtn.__dropdown.__small { padding-right: 20px; }
 			.__xbtn.__dropdown.__narrow { padding-right: 14px; }
 			.__xbtn.__grayed:not(:hover):not(:active):not(.__down):not(.__droppeddown) { color: gray; }
 			.__xbtn.__white { background-color: white; }
@@ -2818,7 +2818,6 @@ ds.ui.Button = ds.ui.View.extend({
 				transform: translateY(-50%);
 				color: var(--text-color);
 				font-size: 10px;
-				pointer-events: none;
 				/*margin-left: 6px;
 				margin-right: -2px;*/
 				/*transform: translateY(-1px);*/ }
