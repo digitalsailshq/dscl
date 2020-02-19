@@ -2760,12 +2760,15 @@ ds.ui.Button = ds.ui.View.extend({
 			.__xbtn.__dropdown.__narrow { padding-right: 14px; }
 			.__xbtn.__grayed:not(:hover):not(:active):not(.__down):not(.__droppeddown) { color: gray; }
 			.__xbtn.__white { background-color: white; }
+			.__xbtn.__flat {
+				background-color: transparent;
+				border-color: transparent; }
+			.__xbtn.__framed { border-color: rgb(204, 204, 204); }
+			.btn-seg:hover .__xbtn:not(:hover) {
+				border-color: rgb(204, 204, 204); }
 			.__xbtn:hover, .__xbtn.__hover { 
 				background-color: rgb(235, 236, 237);
 				border-color: rgb(153, 153, 153); }
-			.__xbtn.__flat:not(:hover):not(:active):not(.__down):not(.__droppeddown):not(.__hover) {
-				border-color: transparent;
-				background-color: transparent; }
 			.__xbtn:active, .__xbtn.__down {
 				border-color: rgb(204, 204, 204);
 				background-color: rgb(245, 245, 245);
@@ -2851,6 +2854,7 @@ ds.ui.Button = ds.ui.View.extend({
 	_small: false,
 	_disabled: false,
 	_hover: false,
+	_framed: false,
 	_text: null,
 	_image: null,
 	_imageDim: false,
@@ -2883,6 +2887,8 @@ ds.ui.Button = ds.ui.View.extend({
 	set disabled(value) { this._disabled = value; this.needsUpdate(); },
 	get hover() { return this._hover; },
 	set hover(value) { this._hover = value; this.needsUpdate(); },
+	get framed() { return this._framed; },
+	set framed(value) { this._framed = value; this.needsUpdate(); },
 	get text() { return this._text; },
 	set text(value) { this._text = value; this.needsUpdate(); },
 	get image() { return this._image; },
@@ -2926,6 +2932,7 @@ ds.ui.Button = ds.ui.View.extend({
 			'__small', 			self.small,
 			'__disabled', 		self.disabled,
 			'__hover', 			self.hover,
+			'__framed', 		self.framed,
 			'dhvr',				self.imageDim,
 			'dhvra',			self.down || self.droppeddown,
 		);
@@ -2967,6 +2974,30 @@ ds.ui.DropDownButton = ds.ui.Button.extend({
 		self.menu.on('before_open', () => self.droppeddown = true);
 		self.menu.on('close', () => self.droppeddown = false);
 		self.on('click', e => self.menu.open());
+	}
+});
+ds.ui.ButtonDropDownMenu = ds.ui.View.extend({
+	template: `<div class="row btn-grp btn-seg">
+					{{ this.button ||= ds.ui.Button.new() }}
+					{{ this.menuButton ||= ds.ui.Button.new({ dropdown: true, narrow: true }) }}
+				</div>`,
+	menu: null,
+	update() {
+		const self = this;
+		ds.ui.View.update.call(self);
+	},
+	init() {
+		const self = this;
+		ds.ui.View.init.call(self);
+		self.menu = ds.ui.Menu.new();
+		self.menu.on('open', () => {
+			self._menu_opened = true;
+			self.needsUpdate();
+		});
+		self.menu.on('close', () => {
+			self._menu_opened = false;
+			self.needsUpdate();
+		});
 	}
 });
 ds.ui.__DropdownButton = ds.ui.View.extend({
