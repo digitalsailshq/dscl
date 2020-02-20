@@ -6102,6 +6102,10 @@ ds.ui.Menu = ds.ui.View.extend({
 		self.items.push(item);
 		self.needsUpdate();
 	},
+	isOpened() {
+		const self = this;
+		return self.popupHelper.isOpened();
+	},
 	open(x, y) {
 		const self = this;
 		if (self.popupHelper.isOpened()) return;
