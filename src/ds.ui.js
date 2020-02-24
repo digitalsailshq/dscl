@@ -6077,7 +6077,6 @@ ds.ui.Menu = ds.ui.View.extend({
 				background-color: white;
 				border: 1px solid var(--border-color);
 				box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.075);
-				overflow: scroll;
 				user-select: none;  }`,
 	template: `<div class="__xmnu" x-on:contextmenu="e.preventDefault()">{{ this.items }}</div>`,
 	_activeItem: null,
