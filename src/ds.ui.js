@@ -1674,9 +1674,9 @@ ds.ui.View = ds.Object.extend({
 		if (!self.element) return;
 		if (self._rootDirective) self._rootDirective.updateChildren();
 		(self.__last_added_classes || []).forEach(c => self.element.classList.remove(c));
+		self.__last_added_classes = [];
 		((self._className || '') + ' ' + (self.className || '')).split(' ').filter(c => !!c).forEach(c => {
 			self.element.classList.add(c);
-			if (!self.__last_added_classes) self.__last_added_classes = [];
 			self.__last_added_classes.push(c);
 		});
 		self.element.style.setProperty('display', self.visible ? '' : 'none');
@@ -3337,7 +3337,7 @@ ds.ui.Edit = ds.ui.View.extend({
 	},
 	loadingWhile(fn) {
 		const self = this;
-		if (!ds.isFunction(fn)) throw new Error('ds.ui.Edit: "fn" must be function.');
+		if (!ds.isFunction(fn)) throw new Error('ds.ui.Edit: "fn" must be a function.');
 		(async () => {
 			self.loadingShow();
 			try { await fn(); }

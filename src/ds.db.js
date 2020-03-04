@@ -1,7 +1,7 @@
 // dependencies...
 if (typeof ds == 'undefined') throw 'ds module required.';
 // namespace...
-ds.db = {};
+ds.db = { SQL_LOG: true, SQL_LOG_THRESHOLD: 20 };
 // libs...
 const fslib = require('fs');
 const pathlib = require('path');
@@ -119,9 +119,10 @@ ds.db.__odbc_connect = options => {
 	const conn = require('odbc')();
 	conn.__type = 'odbc';
 	conn.catalog = options.catalog;
-	//conn.openSync(`Driver={ODBC Driver 17 for SQL Server};server=${options.host};database=${options.catalog};uid=${options.user};pwd=${options.password};`);
-	conn.openSync(`Driver={ODBC Driver 13 for SQL Server};server=${options.host};database=${options.catalog};uid=${options.user};pwd=${options.password};`);
-	//conn.openSync(`Driver={SQL Server Native Client 11.0};server=${options.host};database=${options.catalog};uid=${options.user};pwd=${options.password};`);
+	conn.openSync((() => {
+		const r = `Driver={${options.odbc_driver || 'ODBC Driver 13 for SQL Server'}};server=${options.host};database=${options.catalog};`;
+		return (options.odbc_trusted) ? `${r}Trusted_Connection=Yes;` : `${r}uid=${options.user};pwd=${options.password};`;
+	})());
 	return conn;
 }
 ds.db.__odbc_disconnect = conn => {
@@ -244,9 +245,12 @@ ds.db.exec = (conn, sql, args) => {
 		else if (conn.__type == 'odbc') res = ds.db.__odbc_exec(conn, exec_sql, args);
 		else throw new Error('ds.db.exec: Connection type "' + conn.__type + '" is not supported.');
 		const end_t = (new Date()).getTime();
+		const duration_t = (end_t - start_t);
+		if ((ds.db.SQL_LOG == true) && (duration_t > ds.db.SQL_LOG_THRESHOLD))
+			ds.db.__log('INFO', `${duration_t} took query "${sql}" with args "${JSON.stringify(args || {})}"`);
 		ds.db.__last_sql = sql;
 		ds.db.__last_args = args;
-		ds.db.__last_duration = (end_t - start_t);
+		ds.db.__last_duration = duration_t;
 		return res;
 	} catch(e) {
 		ds.db.__log('ERROR', (e.message || e.toString()) + ': ' + (e.__sql || sql).replace(/\n/g, '') + ' ' + JSON.stringify((e.__args || args) || {}));
