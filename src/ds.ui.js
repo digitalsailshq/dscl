@@ -288,8 +288,13 @@ ds.ui.__styles = `
 	.x42 { height: 42px; width: 42px; }
 	.x36 { height: 36px; width: 36px; }
 	.x32 { height: 32px; width: 32px; }
+	.x31 { height: 31px; width: 31px; }
+	.x30 { height: 30px; width: 30px; }
+	.x29 { height: 29px; width: 29px; }
 	.x28 { height: 28px; width: 28px; }
+	.x27 { height: 27px; width: 27px; }
 	.x26 { height: 26px; width: 26px; }
+	.x25 { height: 25px; width: 25px; }
 	.x24 { height: 24px; width: 24px; }
 	.x23 { height: 23px; width: 23px; }
 	.x22 { height: 22px; width: 22px; }
@@ -4267,8 +4272,8 @@ ds.ui.ListView = ds.ui.View.extend({
 							{{ item.action_elements }}
 						</div>
 					</div>
-					<div x-ref="innerTopShadow_element" style="display:none;" class="__xlstvw_tshdw"></div>
-					<div x-ref="innerBottomShadow_element" style="display:none;" class="__xlstvw_bshdw"></div>
+					<div x-ref="innerTopShadow_element" style="opacity: 0;" class="__xlstvw_tshdw"></div>
+					<div x-ref="innerBottomShadow_element" style="opacity: 0;" class="__xlstvw_bshdw"></div>
 				</div>`,
 	_topShadowVisible: false,
 	_bottomShadowVisible: false,
@@ -4349,19 +4354,19 @@ ds.ui.ListView = ds.ui.View.extend({
 		if (!self._scrollShadow) return;
 		setTimeout(() => {
 			if (self.items_element.scrollTop == 0 && self._topShadowVisible) {
-				self.innerTopShadow_element.style.display = 'none';
+				self.innerTopShadow_element.style.opacity = 0;
 				self._topShadowVisible = false;
 			}
 			if (self.items_element.scrollTop > 0 && !self._topShadowVisible) {
-				self.innerTopShadow_element.style.display = '';
+				self.innerTopShadow_element.style.opacity = 1;
 				self._topShadowVisible = true;
 			}
 			if ((self.items_element.scrollHeight - self.items_element.scrollTop) <= self.items_element.clientHeight && self._bottomShadowVisible) {
-				self.innerBottomShadow_element.style.display = 'none';
+				self.innerBottomShadow_element.style.opacity = 0;
 				self._bottomShadowVisible = false;
 			}
 			if ((self.items_element.scrollHeight - self.items_element.scrollTop) > self.items_element.clientHeight && !self._bottomShadowVisible) {
-				self.innerBottomShadow_element.style.display = '';
+				self.innerBottomShadow_element.style.opacity = 1;
 				self._bottomShadowVisible = true;
 			}
 		}, 0);
@@ -5259,13 +5264,13 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 			 .__xgrd_bdy_grp_hdr_exp { width: 36px; height: 28px; text-align: center; line-height: 30px; vertical-align: middle; }
 			 .__xgrd_bdy_row_spoiler { border-bottom-color: rgb(228, 228, 228); border-bottom-style: solid; border-bottom-width: 1px; }`,
 	template: `<div class="__xgrd_bdy col flex{{ this._dataGrid.selectArrow == 'left' ? ' __xgrd_bdy_selarr_l' : '' }}{{ this._dataGrid.selectArrow == 'right' ? ' __xgrd_bdy_selarr_r' : '' }}{{ !this._dataGrid.lastRowSeparator ? ' __nolastrowsep' : '' }}{{ this._dataGrid.alternateRows ? ' __alternate' : '' }}">
-					<div x-ref="innerTopShadow_element" style="display:none;" class="__xgrd_bdy_tshdw __sbpad"></div>
+					<div x-ref="innerTopShadow_element" style="opacity: 0;" class="__xgrd_bdy_tshdw __sbpad"></div>
 					<div class="tac mt mb gray fs12" style="display: {{ this._isNoDataElementVisible() ? '' : 'none' }};">нет данных</div>
 					<div class="tac mt mb gray fs13" style="display: {{ this.isNotFoundElementVisible() ? '' : 'none' }};">
 						<i class="fa fa-search"></i><span>&nbsp;&nbsp;</span>по запросу "{{ this._dataGrid._search || '' }}" ничего не найдено
 					</div>
 					<div x-ref="rows_element" class="col flex __sbpad" style="overflow-y: overlay;">{{ this._getDataElements() }}</div>
-					<div x-ref="innerBottomShadow_element" style="display: none;" class="__xgrd_bdy_bshdw __sbpad"></div>
+					<div x-ref="innerBottomShadow_element" style="opacity: 0;" class="__xgrd_bdy_bshdw __sbpad"></div>
 				</div>`,
 	_data_hash: null,
 	_state: null,
@@ -5325,19 +5330,19 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 		const self = this;
 		setTimeout(() => {
 			if (self.rows_element.scrollTop == 0 && self._topShadowVisible) {
-				self.innerTopShadow_element.style.display = 'none';
+				self.innerTopShadow_element.style.opacity = 0;
 				self._topShadowVisible = false;
 			}
 			if (self.rows_element.scrollTop > 0 && !self._topShadowVisible) {
-				self.innerTopShadow_element.style.display = '';
+				self.innerTopShadow_element.style.opacity = 1;
 				self._topShadowVisible = true;
 			}
 			if ((self.rows_element.scrollHeight - self.rows_element.scrollTop) <= self.rows_element.clientHeight && self._bottomShadowVisible) {
-				self.innerBottomShadow_element.style.display = 'none';
+				self.innerBottomShadow_element.style.opacity = 0;
 				self._bottomShadowVisible = false;
 			}
 			if ((self.rows_element.scrollHeight - self.rows_element.scrollTop) > self.rows_element.clientHeight && !self._bottomShadowVisible) {
-				self.innerBottomShadow_element.style.display = '';
+				self.innerBottomShadow_element.style.opacity = 1;
 				self._bottomShadowVisible = true;
 			}
 		}, 0);
