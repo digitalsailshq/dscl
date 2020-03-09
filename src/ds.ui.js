@@ -3330,6 +3330,16 @@ ds.ui.Edit = ds.ui.View.extend({
 		self._lastChangedValue = value;
 		self.needsUpdate();
 	},
+	setValue(value, trigger_event) {
+		const self = this;
+		if (trigger_event) self.value = value;
+		else {
+			const prev = self._disableEvents;
+			self._disableEvents = true;
+			self.value = value;
+			self._disableEvents = prev;	
+		}
+	},
 	loadingShow() {
 		const self = this;
 		self._loadingPrevDisabled = !!self.disabled;
