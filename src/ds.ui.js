@@ -1692,12 +1692,16 @@ ds.ui.View = ds.Object.extend({
 		const self = this;
 		if (self._needsUpdate_promise) return self._needsUpdate_promise;
 		return self._needsUpdate_promise = new Promise(resolve => {
-			window.requestAnimationFrame(() => {
+			setTimeout(() => {
 				self._needsUpdate_promise = null;
-				if (self.__freed) return;
-				try { self.update(); }
-				finally { resolve(); }
-			});
+				try {
+					if (self.__freed)
+						return;
+					self.update();
+				} finally {
+					resolve();
+				}
+			}, 0);
 		});
 	},
 	init() {
@@ -4589,26 +4593,6 @@ ds.ui.ListView = ds.ui.View.extend({
 	}
 }, ds.Events('count:single', 'cell:single', 'text:single', 'item:single', 'options:single', 'text:single', 'image:single', 'check', 'select'));
 ds.ui.TreeView = ds.ui.View.extend({
-	styles: `.__xtree { overflow-x: auto; }
-			.__xtree_nd.__selected > .row { background-color: var(--background-color-highlighted); }
-			.__xtree_nd .__xcell { margin: 6px; }
-			.__xtree_nd_ch:empty { display: none; }
-			.__xtree_nd_cbox { display: none; margin-left: 6px; margin-top: 6px; font-size: 0px; cursor: pointer; }
-			.__xtree_nd_cbox > div:first-child { position: relative; display: inline-block; transform: translateY(1px); width: 14px; height: 14px; border: rgb(204, 204, 204) 1px solid; background-color: white; box-shadow: rgba(0, 0, 0, 0.0588235) 0px 1px 1px 0px inset; }
-			.__xtree_nd_cbox:hover > div:first-child { border-color: rgb(170, 170, 170); z-index: 2 }
-			.__xtree_nd.__checked > .row > .__xtree_nd_cbox > div:first-child::after { content: ""; position: absolute; width: 10px; height: 8px; left: 2px; top: 3px; background-size: 10px 8px; background-image: url(\data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAQCAYAAAAWGF8bAAAABGdBTUEAALGPC/xhBQAAAPtJREFUOBGtkrERwjAMRe2wRTxCCpqkZ4VUFAxDlqFgBhr6VBQpWCBbcOZ/ne0zhpgkoDvZsi09KVKU+lGapqlixCY+LLUB21trL2VZFuM4Xhm/GuhgJwDJ2BljNKGa1KWSwCRca/2AbosYlvYjfvN2Bnbo+34IwLquO5R/Y4APTvcvsDP9pYcOdsSZCVr0445+DHTwMgdGXw3HipW55kq86wc/QbLOhQmQSy6A70jmp8mjShPKpVvClKeg9MtVH8Noh/+QPWPvcNdC/bC4eztbGfxEApCnCag45j5THNzyAuTdJ+hcGOPfgCkUMAsNE+f7auGgqKsB/wh8AnTbtdDy2XnCAAAAAElFTkSuQmCC\) }
-			.__xtree_nd.__checkbox > .row > .__xtree_nd_cbox { display: block; }
-			.__xtree_nd.__checkbox_disabled > .row > .__xtree_nd_cbox > div:first-child { background-color: var(--background-color); cursor: default; }
-			.__xtree_nd_expbtn {
-				width: 24px; 			height: 24px;
-				padding-left: 6px; 		padding-top: 6px;
-				cursor: pointer; 		opacity: 0.3;
-				background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNXB4IiBoZWlnaHQ9IjZweCIgdmlld0JveD0iMCAwIDUgNiIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4KICAgIDxnIGlkPSJ0cmVlX2NhcmV0IiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8cG9seWdvbiBpZD0iUmVjdGFuZ2xlIiBmaWxsPSIjMDAwMDAwIiBwb2ludHM9IjAgMCA1IDMgMCA2Ij48L3BvbHlnb24+CiAgICA8L2c+Cjwvc3ZnPg==');
-				background-repeat: no-repeat;
-				background-position: center; }
-			.__xtree_nd_expbtn:hover { opacity: 1; }
-			.__xtree_nd.__expanded > .row > .__xtree_nd_expbtn { transform: rotate(90deg); }`,
-	template: `<div class="__xtree">{{ this._nodes = this._getNodes(null); }}</div>`,
 	NodeView: ds.ui.View.extend({
 		template: `<div class="__xtree_nd col{{ this.options.checkbox ? ' __checkbox' : '' }}{{ this.options.checkbox_disabled ? ' __checkbox_disabled' : '' }}{{ this.checked ? ' __checked' : '' }}{{ this._expanded ? ' __expanded' : '' }}{{ this == this.treeView.selectedNode ? ' __selected' : '' }}">
 						<div class="row{{ this.options.hover ? ' hvr' : '' }}{{ this.options.hand ? ' hnd' : '' }}"
@@ -4706,6 +4690,26 @@ ds.ui.TreeView = ds.ui.View.extend({
 			ds.ui.View.init.call(self);
 		}
 	}),
+	styles: `.__xtree { overflow-x: auto; }
+			.__xtree_nd.__selected > .row { background-color: var(--background-color-highlighted); }
+			.__xtree_nd .__xcell { margin: 6px; }
+			.__xtree_nd_ch:empty { display: none; }
+			.__xtree_nd_cbox { display: none; margin-left: 6px; margin-top: 6px; font-size: 0px; cursor: pointer; }
+			.__xtree_nd_cbox > div:first-child { position: relative; display: inline-block; transform: translateY(1px); width: 14px; height: 14px; border: rgb(204, 204, 204) 1px solid; background-color: white; box-shadow: rgba(0, 0, 0, 0.0588235) 0px 1px 1px 0px inset; }
+			.__xtree_nd_cbox:hover > div:first-child { border-color: rgb(170, 170, 170); z-index: 2 }
+			.__xtree_nd.__checked > .row > .__xtree_nd_cbox > div:first-child::after { content: ""; position: absolute; width: 10px; height: 8px; left: 2px; top: 3px; background-size: 10px 8px; background-image: url(\data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAQCAYAAAAWGF8bAAAABGdBTUEAALGPC/xhBQAAAPtJREFUOBGtkrERwjAMRe2wRTxCCpqkZ4VUFAxDlqFgBhr6VBQpWCBbcOZ/ne0zhpgkoDvZsi09KVKU+lGapqlixCY+LLUB21trL2VZFuM4Xhm/GuhgJwDJ2BljNKGa1KWSwCRca/2AbosYlvYjfvN2Bnbo+34IwLquO5R/Y4APTvcvsDP9pYcOdsSZCVr0445+DHTwMgdGXw3HipW55kq86wc/QbLOhQmQSy6A70jmp8mjShPKpVvClKeg9MtVH8Noh/+QPWPvcNdC/bC4eztbGfxEApCnCag45j5THNzyAuTdJ+hcGOPfgCkUMAsNE+f7auGgqKsB/wh8AnTbtdDy2XnCAAAAAElFTkSuQmCC\) }
+			.__xtree_nd.__checkbox > .row > .__xtree_nd_cbox { display: block; }
+			.__xtree_nd.__checkbox_disabled > .row > .__xtree_nd_cbox > div:first-child { background-color: var(--background-color); cursor: default; }
+			.__xtree_nd_expbtn {
+				width: 24px; 			height: 24px;
+				padding-left: 6px; 		padding-top: 6px;
+				cursor: pointer; 		opacity: 0.3;
+				background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNXB4IiBoZWlnaHQ9IjZweCIgdmlld0JveD0iMCAwIDUgNiIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4KICAgIDxnIGlkPSJ0cmVlX2NhcmV0IiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8cG9seWdvbiBpZD0iUmVjdGFuZ2xlIiBmaWxsPSIjMDAwMDAwIiBwb2ludHM9IjAgMCA1IDMgMCA2Ij48L3BvbHlnb24+CiAgICA8L2c+Cjwvc3ZnPg==');
+				background-repeat: no-repeat;
+				background-position: center; }
+			.__xtree_nd_expbtn:hover { opacity: 1; }
+			.__xtree_nd.__expanded > .row > .__xtree_nd_expbtn { transform: rotate(90deg); }`,
+	template: `<div class="__xtree">{{ this._nodes = this._getNodes(null); }}</div>`,
 	_nodes: null,
 	async _getNodes(parent_node) {
 		const self = this;
@@ -4746,8 +4750,9 @@ ds.ui.TreeView = ds.ui.View.extend({
 			node = locate_level(nodes, value);
 			if (!node) return null;
 			if (index == value_arr.length - 1) break;
-			node._expanded = true;
-			node.update();
+			await node._expandAsync();
+			// node._expanded = true;
+			// node.update();
 			nodes = await node._nodes;
 			if (node._nodes.length == 0) return null;
 		}
@@ -4963,7 +4968,7 @@ ds.ui.DataGridCheckColumn = ds.ui.DataGridColumn.extend({
 	}
 });
 ds.ui.DataGridEditColumn = ds.ui.DataGridColumn.extend({
-	editPrototype: ds.ui.MultilineTextEdit.extend({ autoHeight: true }),
+	editPrototype: ds.ui.MultilineTextEdit.extend({ autoHeight: true, className: 'flex' }),
 	readOnly: false,
 	createCell(item, cell) {
 		const self = this;
@@ -7022,7 +7027,10 @@ ds.ui.DataObject = ds.Object.extend({
 			Object.keys(self._data_get).forEach(key => {
 				if (self.checkdataIgnoreFields.includes(key)) return;
 				if (!data.hasOwnProperty(key)) return;
-				if (ds.asString(self._data_get[key]) != ds.asString(data[key])) needs_load_trigger = true;
+				if (ds.asString(self._data_get[key]) != ds.asString(data[key])) {
+					console.log(`needs_load_trigger set to True: ${ds.asString(self._data_get[key])} != ${ds.asString(data[key])}`);
+					needs_load_trigger = true;
+				}
 			});
 			if (needs_load_trigger) {
 				Object.assign(self._data_get, data);
