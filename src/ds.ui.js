@@ -4751,8 +4751,6 @@ ds.ui.TreeView = ds.ui.View.extend({
 			if (!node) return null;
 			if (index == value_arr.length - 1) break;
 			await node._expandAsync();
-			// node._expanded = true;
-			// node.update();
 			nodes = await node._nodes;
 			if (node._nodes.length == 0) return null;
 		}
