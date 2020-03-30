@@ -1,6 +1,7 @@
 {
 	"name": "dscl",
 	"install": {
-		"path": "src"
+		"source": "src",
+		"destination": "lib/dscl"
 	}
 }

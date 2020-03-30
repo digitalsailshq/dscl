@@ -4836,6 +4836,10 @@ ds.ui.DataGridColumn = ds.Object.extend({
 		else if (v1 < v2) return -1;
 		else return 0;
 	},
+	ondisabled(item, cell) {
+		const self = this;
+		return cell.options.disabled;
+	},
 	isLast() {
 		const self = this;
 		if (!self._dataGrid) throw 'ds.ui.DataGridColumn: _dataGrid property must be specified.';
@@ -4862,7 +4866,10 @@ ds.ui.DataGridColumn = ds.Object.extend({
 	createCell(item, cell) {
 		const self = this;
 		let text = self.ontext(item);
-		if (cell.options.link) {
+		if (self.ondisabled(item, cell)) {
+			if (ds.isset(text)) 
+				text = `<span class="op05">${text}</span>`;
+		} else if (cell.options.link) {
 			if (!text) text = '(пусто)';
 			text = `<span class="__xgrd_cell_link lnk">${text}</span>`;
 		}
@@ -4941,10 +4948,6 @@ ds.ui.DataGridCheckColumn = ds.ui.DataGridColumn.extend({
 		const self = this;
 		return ds.get(item, self.dataKey) == 1;
 	},
-	ondisabled(item, cell) {
-		const self = this;
-		return cell.options.disabled;
-	},
 	createCell(item, cell) {
 		const self = this;
 		const element = ds.ui.element(`<div class="__xgrd_cell_cbox pl pr pt pb"><div></div></div>`);
@@ -4973,6 +4976,10 @@ ds.ui.DataGridEditColumn = ds.ui.DataGridColumn.extend({
 		cell.edit = self.editPrototype.new({ readOnly: self.readOnly, inline: true, className: 'flex ml05 mt05 mr05 mb05', dataGrid: self._dataGrid, dataGridCell: cell });
 		cell.edit.value = ds.get(item, self.dataKey);
 		cell.edit.on('change', value => self._dataGrid._trigger('edit', cell, value));
+		if (self.ondisabled(item, cell)) {
+			cell.edit._getInputElement().classList.add('op05');
+			cell.edit.disabled = true;
+		}
 		return cell.edit;
 	}
 });
@@ -5585,9 +5592,17 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 			if (item_groups.length > 0) item_groups.forEach(group => make_row(item, group, item_spoilers[0]));
 			else make_row(item, null, item_spoilers[0]);
 		}
-		rows.forEach(row => {
+		rows.forEach((row, index, array) => {
+			row.isFirst = (index == 0);
+			row.isLast = (index == (array.length - 1));
+			row.prev = array[index - 1] || null;
+			row.next = array[index + 1] || null;
 			row.options = Object.assign({ color: null }, self._dataGrid._trigger('row_options', row) || {});
-			row.cells.forEach(cell => {
+			row.cells.forEach((cell, index, array) => {
+				cell.isFirst = (index == 0);
+				cell.isLast = (index == (array.length - 1));
+				cell.prev = array[index - 1] || null;
+				cell.next = array[index + 1] || null;
 				cell.options = Object.assign({ link: cell.column.link, disabled: false }, self._dataGrid._trigger('cell_options', cell) || {});
 				cell.cell = cell.column.createCell(row.item, cell);
 				self._dataGrid._trigger('cell', cell);
