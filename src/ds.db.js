@@ -185,7 +185,7 @@ ds.db.__libpq_connect = options => {
 	const conn = new ds.db.__libpq_lib();
 	conn.__type = 'libpq';
 	conn.catalog = options.catalog;
-	conn.connectSync('postgresql://' + options.user + ':' + options.password + '@' + options.host + '/' + options.catalog);
+	conn.connectSync('postgresql://' + options.user + ':' + options.password + '@' + options.host + ':' + (options.port || '5432') + '/' + options.catalog);
 	conn.exec('SET client_min_messages TO WARNING');
 	return conn;
 }
