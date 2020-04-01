@@ -3616,8 +3616,15 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 		self._getInputElement().addEventListener('cut', e => self._onCut(e));
 		self._getInputElement().addEventListener('copy', e => self._onCopy(e));
 		self._getInputElement().addEventListener('paste', e => self._onPaste(e));
-		self._getInputElement().addEventListener('focusin', e => self.element.classList.add('__focused'));
-		self._getInputElement().addEventListener('focusout', e => { self.element.classList.remove('__focused'); self._onFocusOut(e); });
+		self._getInputElement().addEventListener('focusin', e => {
+			if (self.__freed) return;
+			self.element.classList.add('__focused');
+		});
+		self._getInputElement().addEventListener('focusout', e => {
+			if (self.__freed) return;
+			self.element.classList.remove('__focused');
+			self._onFocusOut(e);
+		});
 		self._getInputElement().addEventListener('input', e => {
 			self._onInput();
 			if (!self.applyOnInput) {
