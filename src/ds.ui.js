@@ -3517,7 +3517,7 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 		if (!self.applyOnInput) self._applyChanges();
 		if (self._keepFocus) {
 			if (!self.__freed)
-				self.focus();
+				self._getInputElement().focus();
 		}
 	},
 	_onKeyPress(e) {
