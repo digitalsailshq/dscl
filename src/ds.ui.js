@@ -3509,9 +3509,10 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 		self.value = (val == '' ? null : val);
 		self._trigger('user_change', self.value);
 	},
-	_onFocusOut() {
+	_onFocusOut(e) {
 		const self = this;
 		if (!self.applyOnInput) self._applyChanges();
+		console.log(e);
 	},
 	_onKeyPress(e) {
 		const self = this;
@@ -3610,7 +3611,7 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 		self._getInputElement().addEventListener('copy', e => self._onCopy(e));
 		self._getInputElement().addEventListener('paste', e => self._onPaste(e));
 		self._getInputElement().addEventListener('focusin', e => self.element.classList.add('__focused'));
-		self._getInputElement().addEventListener('focusout', e => { self.element.classList.remove('__focused'); self._onFocusOut(); });
+		self._getInputElement().addEventListener('focusout', e => { self.element.classList.remove('__focused'); self._onFocusOut(e); });
 		self._getInputElement().addEventListener('input', e => {
 			self._onInput();
 			if (!self.applyOnInput) {
