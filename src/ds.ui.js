@@ -3455,6 +3455,7 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 	_image: null,
 	_allowedKeys: null,
 	_numericAfterLatin: false,
+	_keepFocus: false,
 	get clearButton() { return this._clearButton; },
 	set clearButton(value) { this._clearButton = value; this.needsUpdate(); },
 	get placeholder() { return this._placeholder; },
@@ -3471,6 +3472,8 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 	set allowedKeys(value) { this._allowedKeys = value; this.needsUpdate(); },
 	get numericAfterLatin() { return this._numericAfterLatin; },
 	set numericAfterLatin(value) { this._numericAfterLatin = value; this.needsUpdate(); },
+	get keepFocus() { return this._keepFocus; },
+	set keepFocus(value) { this._keepFocus = value; this.needsUpdate(); },
 	_getValue() {
 		if (!this._getInputElement()) return null;
 		if (this._getInputElement().value == '') return null;
@@ -3512,7 +3515,10 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 	_onFocusOut(e) {
 		const self = this;
 		if (!self.applyOnInput) self._applyChanges();
-		console.log(e);
+		if (self._keepFocus) {
+			if (!self.__freed)
+				e.preventDefault();
+		}
 	},
 	_onKeyPress(e) {
 		const self = this;
