@@ -4220,7 +4220,7 @@ ds.ui.TreeLookupEdit = ds.ui.DropDownEdit.extend({
 ds.ui.DateTimeEdit = ds.ui.DropDownEdit.extend({
 	template: `@extend ds.ui.DropDownEdit.template
 					@slot dropdown
-						{{ this.calendar ||= ds.ui.Calendar.new({ className: 'flex', noPast: this.noPast })
+						{{ this.calendar ||= ds.ui.Calendar.new({ className: 'flex', _noPast: this._noPast })
 							.on('change', value => {
 								this.value = ds.Date.newFromDate(value).toISODate();
 								this._trigger('user_change', this.value);
