@@ -5299,7 +5299,7 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 			 .__xgrd_bdy_row:hover .__xgrd_cell_actn { visibility: visible; }
 			 .__xgrd_bdy_grp_bdy .__xgrd_bdy_row:last-child { border-bottom-width: 0px; }
 			 .__xgrd_bdy.__nolastrowsep .__xgrd_bdy_row:last-child { border-bottom-width: 0px; }
-			 .__xgrd_bdy.__alternate .__xgrd_bdy_row:nth-child(odd):not(:hover) { background-color: rgba(0, 0, 0, 0.05); }
+			 .__xgrd_bdy.__alternate .__xgrd_bdy_row:nth-child(odd):not(:hover) { background-color: rgba(0, 0, 0, 0.04); }
 			 .__xgrd_bdy_row.__selected { position: relative; background-color: var(--background-color-highlighted) !important; }
 			 .__xgrd_bdy_row.__spoilered { border-bottom-width: 0px; }
 			 .__xgrd_bdy.__nolastrowsep .__xgrd_bdy_grp:last-child { border-bottom-width: 0px; }
