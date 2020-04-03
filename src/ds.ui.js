@@ -3430,8 +3430,8 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 							<div class="__xedt_frm_img" style="display:{{ this.image ? '' : 'none'; }}">
 								<img src="{{ this.image || 'data:image/png;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==' }}" />	
 							</div>
-							<input x-ref="input_element" x-if="!this._textareaMode" type="text" size="1" maxlength="{{ this.maxLength.toString() }}" placeholder="{{ this.placeholder }}" />
-							<textarea x-ref="textarea_element" x-if="this._textareaMode" maxlength="{{ this.maxLength.toString() }}" placeholder="{{ this.placeholder }}"></textarea>
+							<input x-ref="input_element" x-if="!this._textareaMode" type="text" size="1" maxlength="{{ this.maxLength.toString() }}" placeholder="{{ this._getPlaceholder() }}" />
+							<textarea x-ref="textarea_element" x-if="this._textareaMode" maxlength="{{ this.maxLength.toString() }}" placeholder="{{ this._getPlaceholder() }}"></textarea>
 							{{ this._inlineElements }}
 						</div>
 						@@buttons
@@ -3504,6 +3504,10 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 	_getInputElement() {
 		const self = this;
 		return self._textareaMode ? self.textarea_element : self.input_element;
+	},
+	_getPlaceholder() {
+		const self = this;
+		return self._placeholder;
 	},
 	_applyChanges() {
 		const self = this;
@@ -4006,6 +4010,10 @@ ds.ui.LookupEdit = ds.ui.DropDownEdit.extend({
 			self._getInputElement().value = ds.get(item, self.nameKey);
 			self._pendingchanges = false;
 		}
+	},
+	_getPlaceholder() {
+		const self = this;
+		return ((self._value || []).length == 0) ? self._placeholder : '';
 	},
 	_applyChanges() {
 		const self = this;
