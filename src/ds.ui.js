@@ -4229,11 +4229,14 @@ ds.ui.DateTimeEdit = ds.ui.DropDownEdit.extend({
 							.on('select', () => this.close()) }}
 					@end
 				@end`,
+	_noPast: false,
 	_dateValue: null,
 	_value: null,
 	_valueKey: 'id',
 	get valueKey() { return this._valueKey; },
 	set valueKey(value) { this._valueKey = value; this.needsUpdate(); },
+	get noPast() { return this._noPast; },
+	set noPast(value) { this._noPast = value; this.needsUpdate(); },
 	_getValue() { return this._value; },
 	_setValue(value) {
 		const self = this;
@@ -4254,8 +4257,8 @@ ds.ui.DateTimeEdit = ds.ui.DropDownEdit.extend({
 			}	
 		}
 	},
-	_applyChanges() { }, // <-- do not remove!...
-	_onInput() { }, // <-- do not remove!...
+	_applyChanges() { }, 	// <-- do not remove!...
+	_onInput() { }, 		// <-- do not remove!...
 	_onCanOpen() {
 		const self = this;
 		if (self.readOnly || self.disabled) return false;
@@ -4264,6 +4267,7 @@ ds.ui.DateTimeEdit = ds.ui.DropDownEdit.extend({
 	update() {
 		const self = this;
 		ds.ui.DropDownEdit.update.call(self);
+		self.calendar._noPast = self._noPast;
 		self.calendar.update();
 	},
 	init() {
