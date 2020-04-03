@@ -6409,6 +6409,29 @@ ds.ui.saveFile = (data, options) => {
 		a_element.remove();
 	}, 60000);
 }
+ds.ui.animate = function(duration, from, to, onframe, onend) {
+	const fps = 24;
+	const frames = Math.ceil((duration / 1000) * fps);
+	let frame_n = 0;
+	const id = setInterval(frame_func, 1000 / fps);
+	function frame_func() {
+		if (frame_n > frames) {
+			clearInterval(id);
+			if (ds.isFunction(onend)) onend();
+		} else {
+			const vals = {};
+			for (prop in from) {
+				if (to[prop] == null) continue;
+				const delta = (to[prop] - from[prop]);
+				const step = (delta / frames);
+				const val = (step * frame_n);
+				vals[prop] = (from[prop] + val);
+			}
+			if (ds.isFunction(onframe)) onframe(vals);
+		}
+		frame_n++;
+	}
+}
 //https://gist.github.com/jonathantneal/7935589
 ds.ui.__element__MATCH = '(-?[_a-zA-Z]+[_a-zA-Z0-9-]*)';
 ds.ui.__element__REGEX = '^(?:' + ds.ui.__element__MATCH + ')|^#' + ds.ui.__element__MATCH + '|^\\.' + ds.ui.__element__MATCH + '|^\\[' + ds.ui.__element__MATCH + '(?:([*$|~^]?=)(["\'])((?:(?=(\\\\?))\\8.)*?)\\6)?\\]';
