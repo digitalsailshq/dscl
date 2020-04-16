@@ -3223,7 +3223,7 @@ ds.ui.Calendar = ds.ui.View.extend({
 }, ds.Events('change', 'select'));
 ds.ui.Edit = ds.ui.View.extend({
 	styles: `.__xedt { display: flex; flex-flow: row; }
-			.__xedt .__xedt_prts { display: flex; flex-flow: row; flex: 1; }
+			.__xedt .__xedt_prts { display: flex; flex-flow: row; flex: 1; overflow-y: hidden; }
 			.__xedt .__xedt_lbl { padding-right: 18px; margin-top: 5px; white-space: nowrap; overflow-x: hidden; text-overflow: ellipsis; box-sizing: border-box; width: var(--xedt-lbl-width, 132); }
 			.__xedt .__xedt_lbl .__xedt_lbl_txt { position: relative; color: var(--text-color-gray); }
 			.__xedt.__xedt_ral .__xedt_lbl { text-align: right; }
@@ -3389,7 +3389,7 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 				border: rgb(204, 204, 204) 1px solid;		box-shadow: rgba(0, 0, 0, 0.0588235) 0px 1px 1px 0px inset;
 				background-color: white;					flex-wrap: wrap;
 				overflow-x: hidden;							cursor: text;
-				position: relative;	}
+				position: relative;							overflow-y: hidden;	}
 			.__xedt .__xedt_frm:hover { border-color: rgb(170, 170, 170); z-index: 2; }
 			.__xedt .__xedt_frm input {
 				flex: 1;					background-color: transparent;
