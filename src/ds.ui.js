@@ -1345,7 +1345,7 @@ ds.ui.__NodeDirective = ds.ui.__Directive.extend({
 		});
 	},
 	_processExprResult(value) {
-		const self = this; 
+		const self = this;
 		var nodes = [];
 		if (ds.isArray(value)) {
 			value.filter(item => item !== undefined && item !== null).forEach(item => {
@@ -1479,7 +1479,7 @@ ds.ui.__ShowDirective = ds.ui.__Directive.extend({
 		if (self._lastResult !== result) {
 			self._lastResult = result;
 			if (result) self.node.style.display = '';
-			else self.node.style.display = 'none';	
+			else self.node.style.display = 'none';
 		}
 	},
 	init() {
@@ -1504,7 +1504,7 @@ ds.ui.__ForDirective = ds.ui.__Directive.extend({
 			[self._itemName]: item,
 			index: index,
 			array: array
-		}; 
+		};
 		var root_directive = ds.ui.__Directive.new({ parent: self, scope: self.extendScope(item_scope) });
 		var element = ds.ui.__template_process(self.template, root_directive)[0];
 		root_directive.updateChildren();
@@ -1523,7 +1523,7 @@ ds.ui.__ForDirective = ds.ui.__Directive.extend({
 				array.forEach((item, index) => new_nodes.push(self._processEachItem(item, index, array)));
 			} else {
 				Object.keys(array).forEach((item, index) => new_nodes.push(self._processEachItem(item, index, array)));
-			}	
+			}
 		}
 		var parent_node = self._nodes[0].parentNode;
 		if (new_nodes.length == 0) new_nodes = [document.createComment('')];
@@ -1656,7 +1656,7 @@ ds.ui.View = ds.Object.extend({
 		return new Promise((resolve, reject) => {
 			ds.ui.element_animate(self.element, 50, { opacity: 0 }, { opacity: 1 }, () => {
 				resolve();
-			});	
+			});
 		});
 	},
 	fadeOut() {
@@ -1667,7 +1667,7 @@ ds.ui.View = ds.Object.extend({
 			ds.ui.element_animate(self.element, 50, { opacity: 1 }, { opacity: 0 }, () => {
 				self.visible = false;
 				resolve();
-			});	
+			});
 		});
 	},
 	appendTo(element) {
@@ -1842,7 +1842,7 @@ ds.ui.Modal = function(target) {
 		self.__background_element.remove();
 		self.__background_element = null;
 		if (ds.isFunction(self.__modal_callback)) self.__modal_callback.call(null, modalResult);
-		self._trigger('close');
+		self._trigger('close', modalResult);
 		if (self.freeOnClose) self.free();
 	}
 	target.openModal = function(callback) {
@@ -1979,7 +1979,7 @@ ds.ui.MessageBox = ds.ui.View.extend({
 			let nodes = [];
 			let wrapper = ds.ui.element('<div>' + self.body.toString() + '</div>');
 			for (let i = 0; i < wrapper.childNodes.length; i++) nodes.push(wrapper.childNodes.item(i));
-			return nodes;	
+			return nodes;
 		}
 	},
 	_formatText(template, args) {
@@ -2576,7 +2576,7 @@ ds.ui.Cell = ds.ui.View.extend({
 			if (pos == -1) return self._text;
 			else {
 				const len = htext_uc.length;
-				return self._text.substr(0, pos) + `<span class="strong bkwr">${self._text.substr(pos, len)}</span>${self._text.substr(pos + len)}`;	
+				return self._text.substr(0, pos) + `<span class="strong bkwr">${self._text.substr(pos, len)}</span>${self._text.substr(pos + len)}`;
 			}
 		} else return self._text;
 	},
@@ -2673,7 +2673,7 @@ ds.ui.Splitter = ds.ui.View.extend({
 			if (self.overflow == 'left') self.element.style.marginLeft = '-7px';
 			if (self.overflow == 'top') self.element.style.marginTop = '-7px';
 			if (self.overflow == 'right') self.element.style.marginRight = '-7px';
-			if (self.overflow == 'bottom') self.element.style.marginBottom = '-7px';	
+			if (self.overflow == 'bottom') self.element.style.marginBottom = '-7px';
 		}
 		if (self.align == 'left' || self.align == 'top') self.target = self.element.previousElementSibling;
 		if (self.align == 'right' || self.align == 'bottom') self.target = self.element.nextElementSibling;
@@ -2700,7 +2700,7 @@ ds.ui.Splitter = ds.ui.View.extend({
 				self._windowResize_defer = setTimeout(function() {
 					ds.ui.element_trigger(window, 'resize');
 					self._windowResize_defer = null;
-				}, 5);	
+				}, 5);
 			}
 		});
 		self.needsUpdate();
@@ -2775,7 +2775,7 @@ ds.ui.Button = ds.ui.View.extend({
 			.__xbtn.__framed { border-color: rgb(204, 204, 204); }
 			.btn-seg:hover .__xbtn:not(:hover) {
 				border-color: rgb(204, 204, 204); }
-			.__xbtn:hover, .__xbtn.__hover { 
+			.__xbtn:hover, .__xbtn.__hover {
 				background-color: rgb(235, 236, 237);
 				border-color: rgb(153, 153, 153); }
 			.__xbtn:active, .__xbtn.__down {
@@ -3239,7 +3239,7 @@ ds.ui.Edit = ds.ui.View.extend({
 	template: `<div class="__xedt {{ this._getRootClassList().join(' ') }}">
 					<div x-if="this.label" class="__xedt_lbl" style="--xedt-lbl-width: {{ this.labelWidth }}px;"><span class="__xedt_lbl_txt">{{ this.label }}</span></div>
 					<div x-ref="parts_element" class="__xedt_prts">
-						@@parts	
+						@@parts
 					</div>
 				</div>`,
 	_loadingPrevDisabled: null,
@@ -3341,7 +3341,7 @@ ds.ui.Edit = ds.ui.View.extend({
 			const prev = self._disableEvents;
 			self._disableEvents = true;
 			self.value = value;
-			self._disableEvents = prev;	
+			self._disableEvents = prev;
 		}
 	},
 	loadingShow() {
@@ -3414,7 +3414,7 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 			.__xedt.__dark:not(.__focused) .__xedt_frm { background-color: rgba(0, 0, 0, 0.05) !important }
 			.__xedt .__xedt_btn {
 				border-radius: 0px; 		margin-left: -1px;
-				padding-right: 0px;			height: 26px; 
+				padding-right: 0px;			height: 26px;
 				padding-left: 0px; 			min-height: 26px;
 				min-width: 24px;			justify-content: center;  }
 			.__xedt .__xedt_btn:hover { z-index: 2; }
@@ -3428,7 +3428,7 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 						<div x-ref="frame_element" class="row flex __xedt_frm __xedt_frmhot_trgt" x-on:click="self._getInputElement().focus()">
 							@@frame
 							<div class="__xedt_frm_img" style="display:{{ this.image ? '' : 'none'; }}">
-								<img src="{{ this.image || 'data:image/png;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==' }}" />	
+								<img src="{{ this.image || 'data:image/png;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==' }}" />
 							</div>
 							<input x-ref="input_element" x-if="!this._textareaMode" type="text" size="1" maxlength="{{ this.maxLength.toString() }}" placeholder="{{ this._getPlaceholder() }}" />
 							<textarea x-ref="textarea_element" x-if="this._textareaMode" maxlength="{{ this.maxLength.toString() }}" placeholder="{{ this._getPlaceholder() }}"></textarea>
@@ -3675,8 +3675,8 @@ ds.ui.MultilineTextEdit = ds.ui.TextEdit.extend({
 		self.frame_element.style.maxHeight = self.maxHeight ? (self.maxHeight.toString() + 'px') : null;
 		if (self.autoHeight) {
 			self.frame_element.style.height = '24px';
-			self.frame_element.style.height = (self._getInputElement().scrollHeight).toString() + 'px';	
-		} else self.frame_element.style.height = (self._ROW_HEIGHT * self.rows).toString() + 'px';	
+			self.frame_element.style.height = (self._getInputElement().scrollHeight).toString() + 'px';
+		} else self.frame_element.style.height = (self._ROW_HEIGHT * self.rows).toString() + 'px';
 	},
 	update() {
 		const self = this;
@@ -3712,7 +3712,7 @@ ds.ui.NumberEdit = ds.ui.TextEdit.extend({
 			const num_src = value.toString().replace(',', '.');
 			if (!isFinite(num_src)) throw new Error('ds.ui.NumberEdit: Invalid number "' + num_src + '".');
 			const num_dst = (new Number((new Number(num_src)).toFixed(self._precision))).valueOf();
-			return num_dst;	
+			return num_dst;
 		}
 	},
 	_getValue() {
@@ -3951,7 +3951,7 @@ ds.ui.LookupEdit = ds.ui.DropDownEdit.extend({
 		if (self._dataSet) {
 			self._dataSet.on('load', self._dataSetOnLoad);
 			self._dataSet.on('filter', self._dataSetOnLoad);
-			self._onDataLoad();	
+			self._onDataLoad();
 		}
 		self.needsUpdate();
 	},
@@ -4057,7 +4057,7 @@ ds.ui.LookupEdit = ds.ui.DropDownEdit.extend({
 			self.listView.check(self.value, true, false);
 		} else {
 			let item = self._dataSet.data.find(i => ds.get(i, self.valueKey) == self.value);
-			self.listView.select(self._dataSet.data.indexOf(item), false);	
+			self.listView.select(self._dataSet.data.indexOf(item), false);
 		}
 	},
 	_onSelectItem(index) {
@@ -4254,7 +4254,7 @@ ds.ui.DateTimeEdit = ds.ui.DropDownEdit.extend({
 				self.calendar._disableEvents = true;
 				self.calendar.value = self._dateValue;
 				self.calendar._disableEvents = false;
-			}	
+			}
 		}
 	},
 	_applyChanges() { }, 	// <-- do not remove!...
@@ -4534,10 +4534,10 @@ ds.ui.ListView = ds.ui.View.extend({
 					item.visible = true;
 					if (ds.isPrototypeOf(item.cell, ds.ui.Cell)) {
 						item.cell._highlightedText = self._search;
-						item.cell.update();	
+						item.cell.update();
 					}
 				}
-			});	
+			});
 		}
 		if (self.wrap) self.element.classList.add('col', 'wrap', 'oxa');
 		else self.element.classList.remove('col', 'wrap', 'oxa');
@@ -4672,7 +4672,7 @@ ds.ui.TreeView = ds.ui.View.extend({
 				if (self.options.checkbox_disabled == false) {
 					self.treeView._trigger('check', self);
 					self.checked = !!self.treeView._trigger('checked', self.item);
-					self.update();	
+					self.update();
 				}
 			} else if (self.options.clickAction == 'click') self.treeView._trigger('click', self);
 		},
@@ -4855,7 +4855,7 @@ ds.ui.DataGridColumn = ds.Object.extend({
 		return self.tagColorKey ? (ds.get(item, self.tagColorKey) || 'navy') : 'navy';
 	},
 	onsort(a, b) {
-		const self = this;		
+		const self = this;
 		const v1 = new self.sortDataType(ds.get(a, self.dataKey));
 		const v2 = new self.sortDataType(ds.get(b, self.dataKey));
 		if (v1 > v2) return 1;
@@ -4893,7 +4893,7 @@ ds.ui.DataGridColumn = ds.Object.extend({
 		const self = this;
 		let text = self.ontext(item);
 		if (self.ondisabled(item, cell)) {
-			if (ds.isset(text)) 
+			if (ds.isset(text))
 				text = `<span class="op05">${text}</span>`;
 		} else if (cell.options.link) {
 			if (!text) text = '(пусто)';
@@ -5261,7 +5261,7 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 					self._dataGrid._sortDirection = 'asc';
 				}
 				self._dataGrid._trigger('sort', self._dataGrid._sortColumn, self._dataGrid._sortDirection);
-				self._dataGrid.needsUpdate();	
+				self._dataGrid.needsUpdate();
 			}
 			return true;
 		});
@@ -5401,7 +5401,7 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 		let value = cell.row.item[cell.column.dataKey] == 1 ? 0 : 1;
 		cell.row.item[cell.column.dataKey] = value;
 		cell.column.cells.forEach(c => {
-			if (c.row.item == cell.row.item) ds.ui.element_classif(c.cell.element, '__checked', value == 1);		
+			if (c.row.item == cell.row.item) ds.ui.element_classif(c.cell.element, '__checked', value == 1);
 		});
 		if (triggerEvent) self._dataGrid._trigger('check', cell, value == 1);
 	},
@@ -5647,11 +5647,11 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 						if (row.group) self._state.expanded[row.group.id] = true;
 						if (ds.isPrototypeOf(cell.cell, ds.ui.Cell)) {
 							cell.cell._highlightedText = self._dataGrid.search;
-							cell.cell.update();	
+							cell.cell.update();
 						}
 					}
 				});
-			});	
+			});
 		}
 		self._groups = groups;
 		self._rows = rows;
@@ -5692,7 +5692,7 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 				const disabled = ds.get(this.__cell, 'options.disabled') || false;
 				if (!disabled) {
 					self._toggleCheckCell(this.__cell);
-					(self._groups || []).forEach(group => self._updateGroupCheck(group));	
+					(self._groups || []).forEach(group => self._updateGroupCheck(group));
 				}
 			}
 			return true;
@@ -5912,7 +5912,7 @@ ds.ui.Alert = ds.ui.View.extend({
 	template: `<div class="__xalrt row {{ '__' + this._kind }}">
 					<div class="flex">
 						<div class="__xalrt_ttl">{{ this._title }}</div>
-						<div class="__xalrt_bdy">{{ this._getBody() }}</div>	
+						<div class="__xalrt_bdy">{{ this._getBody() }}</div>
 					</div>
 					<div>
 						<div x-on:click="self.fadeOut()" class="pl pt pr pb hnd dhvr"><i class="fa fa-times sm dhvrc"></i></div>
@@ -6574,7 +6574,7 @@ ds.ui.element_animate = function(element, duration, from, to, callback) {
 ds.ui.element_animateClass = function(element, classes, callback) {
 	var classes_arr = classes.split(' ').map(cls => cls.trim());
 	element.classList.add.apply(element.classList, classes_arr);
-	//webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend 
+	//webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend
 	element.addEventListener('animationend', e => {
 		element.classList.remove.apply(element.classList, classes_arr);
 		if (callback) callback();
@@ -6682,8 +6682,8 @@ ds.ui.attachScript = function(path) {
 				document.head.appendChild(script_element);
 				script_element.onload = resolve;
 				script_element.onerror = reject;
-				script_element.setAttribute('src', path);	
-			}	
+				script_element.setAttribute('src', path);
+			}
 		} catch(e) {
 			reject(e);
 		}
@@ -7058,7 +7058,7 @@ ds.ui.DataObject = ds.Object.extend({
 		if (!self.id) throw new Error('ds.ui.DataObject: id not specified.');
 		let data = null;
 		try {
-			data = await self.connection.request('get', self.url + '/' + self.id.toString(), null);	
+			data = await self.connection.request('get', self.url + '/' + self.id.toString(), null);
 		} catch(e) {
 			self._trigger('error', e);
 			throw e;
@@ -7096,10 +7096,10 @@ ds.ui.DataObject = ds.Object.extend({
 			});
 			if (needs_load_trigger) {
 				Object.assign(self._data_get, data);
-				self._trigger('load');	
+				self._trigger('load');
 			}
 		}
-		return data.id;	
+		return data.id;
 	},
 	reset() {
 		const self = this;
