@@ -3357,7 +3357,7 @@ ds.ui.Edit = ds.ui.View.extend({
 	loadingWhile(fn) {
 		const self = this;
 		if (!ds.isFunction(fn)) throw new Error('ds.ui.Edit: "fn" must be a function.');
-		(async () => {
+		return (async () => {
 			self.loadingShow();
 			try { await fn(); }
 			finally { self.loadingHide(); }
