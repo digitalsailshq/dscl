@@ -3183,6 +3183,7 @@ ds.ui.Calendar = ds.ui.View.extend({
 			const date = new Date(page_year, page_month, day_n);
 			date.setHours(0, 0, 0, 0);
 			var cell_n = self.DAY_CONVERT[date.getDay()];
+			matrix[row_n].filled = true;
 			matrix[row_n].cells[cell_n].element.classList.add('hvr', 'hnd', '__xcal_cell');
 			matrix[row_n].cells[cell_n].element.setAttribute('date-date', day_n);
 			matrix[row_n].cells[cell_n].element.setAttribute('date-month', page_month);
@@ -3204,6 +3205,10 @@ ds.ui.Calendar = ds.ui.View.extend({
 			}
 			if (cell_n == 6) row_n++;
 		}
+		Object.keys(matrix).forEach(key => {
+			if (!matrix[key].filled)
+				matrix[key].element.remove();
+		});
 	},
 	init() {
 		var self = this;
