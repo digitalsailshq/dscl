@@ -102,7 +102,7 @@ ds.validate = (target, scheme, options) => {
 			for (let item of target) {
 				if (!check_allowed(item, scheme.allowed)) return error(`Value ${item} is out of allowed values [${scheme.allowed}]${options.__targetPath ? ` at ${options.__targetPath}` : ''}.`);
 			}
-			
+
 		} else if (!check_allowed(target, scheme.allowed)) return error(`Value ${target} is out of allowed values [${scheme.allowed}]${options.__targetPath ? ` at ${options.__targetPath}` : ''}.`);
 	}
 	if (scheme.hasOwnProperty('allowedCI')) {
@@ -110,7 +110,7 @@ ds.validate = (target, scheme, options) => {
 			for (let item of target) {
 				if (!check_allowedCI(item, scheme.allowedCI)) return error(`Value ${item} is out of allowed values [${scheme.allowedCI}]${options.__targetPath ? ` at ${options.__targetPath}` : ''}.`);
 			}
-			
+
 		} else if (!check_allowedCI(target, scheme.allowedCI)) return error(`Value ${target} is out of allowed values [${scheme.allowedCI}]${options.__targetPath ? ` at ${options.__targetPath}` : ''}.`);
 	}
 	if (scheme.hasOwnProperty('props')) {
@@ -422,7 +422,7 @@ ds.evalScope = (expr, scope, this_) => {
 		code = '(function(' + arg_names.join(',') + ') { return ' + expr + '; }).call(this_,' + arg_vals.join(',') + ')';
 	} else code = '(function(' + ds.allKeys(scope).filter(skip).join(',') + ') { return ' + expr + '; }).call(this_,' + ds.allKeys(scope).filter(skip).map(key => 'scope.' + key).join(',') + ')';
 	try {
-		return eval(code);	
+		return eval(code);
 	} catch(e) {
 		console.log(expr);
 		console.log(e);
@@ -481,7 +481,7 @@ ds.assert = (value, descr = null, errp = Error) => {
 			return this;
 		},
 		lessThan(rvalue) {
-			if ((isset || !optional) && !(value < rvalue)) throw new errp(`${ descr || 'Assert:' } value "${value}" is not less than "${rvalue}".`);	
+			if ((isset || !optional) && !(value < rvalue)) throw new errp(`${ descr || 'Assert:' } value "${value}" is not less than "${rvalue}".`);
 			return this;
 		},
 		lessThanOrEquals(rvalue) {
@@ -489,7 +489,7 @@ ds.assert = (value, descr = null, errp = Error) => {
 			return this;
 		},
 		odd() {
-			if ((isset || !optional) && (value % 2) == 0) throw new errp(`${ descr || 'Assert:' } value "${value}" is not odd.`);	
+			if ((isset || !optional) && (value % 2) == 0) throw new errp(`${ descr || 'Assert:' } value "${value}" is not odd.`);
 			return this;
 		},
 		even() {
@@ -694,6 +694,14 @@ ds.Date = ds.Object.extend({
 	MONTH_NAMES_EN_SHORT: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
 	DAY_NAMES: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
 	DAY_IDS: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
+	DATEPART_MS: {
+		week: (7 * 24 * 60 * 60 * 1000),
+		day: (24 * 60 * 60 * 1000),
+		hour: (60 * 60 * 1000),
+		minute: (60 * 1000),
+		second: 1000,
+		millisecond: 1
+	},
 	d: null,
 	m: null,
 	y: null,
@@ -705,7 +713,7 @@ ds.Date = ds.Object.extend({
 	fromDate(dateTime) {
 		const self = this;
 		self.d = dateTime.getDate();
-		self.m = dateTime.getMonth() + 1; //!!! 
+		self.m = dateTime.getMonth() + 1; //!!!
 		self.y = dateTime.getFullYear();
 		self.h = dateTime.getHours();
 		self.mi = dateTime.getMinutes();
@@ -785,7 +793,7 @@ ds.Date = ds.Object.extend({
 			self.mi.toString().padStart(2, '0') + ':' +
 			self.s.toString().padStart(2, '0');
 	},
-	diff(datepart, target) { // datepart: 'y', 'm', 'w', 'd', 'h', 's'
+	diff(datepart, target) {
 		const self = this;
 		if (!ds.isPrototypeOf(target, ds.Date)) target = ds.Date.newFromDate(target);
 		datepart = datepart.toLowerCase();
@@ -808,6 +816,26 @@ ds.Date = ds.Object.extend({
 			return h.toString() + 'ч ' + m.toString() + 'м';
 		} else if (m_diff > 0) return m_diff.toString() + 'м';
 		else return nowText;
+	},
+	add(value, datepart) {
+		const self = this;
+		ds.assert(value, 'ds.Date.add: "value"').required().number();
+		ds.assert(datepart, 'ds.Date.add: "datepart"').required().oneOf(['week', 'day', 'hour', 'minute', 'second', 'millisecond']);
+		return ds.Date.newFromDate(
+			new Date(
+				self.toDate().getTime() + (value * ds.Date.DATEPART_MS[datepart])
+			)
+		);
+	},
+	subtract(value, datepart) {
+		const self = this;
+		ds.assert(value, 'ds.Date.subtract: "value"').required().number();
+		ds.assert(datepart, 'ds.Date.subtract: "datepart"').required().oneOf(['week', 'day', 'hour', 'minute', 'second', 'millisecond']);
+		return ds.Date.newFromDate(
+			new Date(
+				self.toDate().getTime() - (value * ds.Date.DATEPART_MS[datepart])
+			)
+		);
 	},
 	YYYYMMDD_HH() {
 		const self = this;
@@ -880,7 +908,7 @@ ds.Date = ds.Object.extend({
 		const self = this;
 		var dt = new Date();
 		self.d = self.d || dt.getDate();
-		self.m = self.m || dt.getMonth() + 1; //!!! 
+		self.m = self.m || dt.getMonth() + 1; //!!!
 		self.y = self.y || dt.getFullYear();
 		self.h = self.h || dt.getHours();
 		self.mi = self.mi || dt.getMinutes();
@@ -981,7 +1009,7 @@ ds.Audit = ds.Object.extend({
 			const f1 = self._libpath.join(process.cwd(), 'logs');
 			const f2 = process.cwd();
 			self._last_module = self.module;
-			self._last_filename = self._libpath.join((self._libfs.existsSync(f1) ? f1 : f2), `${self.module}.log`);	
+			self._last_filename = self._libpath.join((self._libfs.existsSync(f1) ? f1 : f2), `${self.module}.log`);
 		}
 		return self._last_filename;
 	},
@@ -1166,5 +1194,5 @@ if (ds.isNode()) {
 		}
 		ds.ht_begin = () => process.hrtime();
 		ds.ht_end = ht => (ht = process.hrtime(ht), ht[0] == 0 ? (Math.floor(ht[1] / 1e6).toString() + ' ms') : (ht[0].toString() + ' s, ' + Math.floor(ht[1] / 1e6).toString() + ' ms'));
-	})();		
+	})();
 }
