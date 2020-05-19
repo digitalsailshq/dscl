@@ -3161,6 +3161,7 @@ ds.ui.Calendar = ds.ui.View.extend({
 	},
 	update() {
 		const self = this;
+		ds.ui.View.update.call(self);
 		if (!self.element) return;
 		const today =  new Date();
 		today.setHours(0, 0, 0, 0);
