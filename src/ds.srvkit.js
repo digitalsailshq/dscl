@@ -379,7 +379,7 @@ var __template_process = function(template, args) {
 				try {
 					eval('var ' + key + ' = null;'); // to avoid declaring variable with keyword name...
 					vars += '\n\tvar ' + key + ' = args_[\'' + key + '\'];';
-				} catch(e) { } 
+				} catch(e) { }
 			}
 			return eval('(function() {' + vars + '\n\treturn ' + expr + ';\n})()');
 		}
@@ -438,6 +438,7 @@ ds.srvkit.Server = ds.srvkit.RequestHandler.extend({
 	_rootPath: null,
 	indexPath: null,
 	compress: true,
+	cache: true,
 	use(middleware) {
 		const self = this;
 		self._middlewares.push(middleware);
@@ -486,7 +487,8 @@ ds.srvkit.Server = ds.srvkit.RequestHandler.extend({
 				this.writeHead(404);
 				this.end();
 			} else {
-				this.setHeader('Cache-Control', 'public, max-age=3600');
+				if (self.catch)
+					this.setHeader('Cache-Control', 'public, max-age=3600');
 				const MIMETypes = {
 					'css': 	'text/css',
 					'html': 'text/html',
@@ -507,7 +509,8 @@ ds.srvkit.Server = ds.srvkit.RequestHandler.extend({
 		};
 		res.endBuffer = function(buf, options) {
 			this.statusCode = 200;
-			this.setHeader('Cache-Control', 'public, max-age=3600');
+			if (self.catch)
+				this.setHeader('Cache-Control', 'public, max-age=3600');
 			if (options.contentType) this.setHeader('Content-Type', options.contentType);
 			if (compress) {
 				this.setHeader('Content-Encoding', 'gzip');
