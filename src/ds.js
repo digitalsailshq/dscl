@@ -550,6 +550,7 @@ ds.assert = (value, descr = null, errp = Error) => {
 	}
 }
 ds.isNode = () => (typeof process != 'undefined') && (process.cwd !== null) && (process.cwd !== undefined);
+ds.isBrowser = () => (typeof window != 'undefined') && (typeof document != 'undefined');
 ds.Events = function() {
 	const supported_events = {};
 	for (let arg of arguments) {
