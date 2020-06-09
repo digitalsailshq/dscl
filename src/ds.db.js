@@ -1,7 +1,7 @@
 // dependencies...
 if (typeof ds == 'undefined') throw 'ds module required.';
 // namespace...
-ds.db = { SQL_LOG: true, SQL_LOG_THRESHOLD: 20 };
+ds.db = { SQL_LOG: true, SQL_LOG_THRESHOLD: 100 };
 // libs...
 const fslib = require('fs');
 const pathlib = require('path');
@@ -39,17 +39,17 @@ ds.db.preprocessor = {
 	year: (conn, expr) => {
 		if (conn.__type == 'libpq') return 'date_part(\'year\', ' + expr + ')';
 		else if (conn.__type == 'odbc') return 'datepart(year, ' + expr + ')';
-		else throw new Error('ds.db.preprocessor.year: Connection type "' + conn.__type + '" is not supported.');	
+		else throw new Error('ds.db.preprocessor.year: Connection type "' + conn.__type + '" is not supported.');
 	},
 	month: (conn, expr) => {
 		if (conn.__type == 'libpq') return 'date_part(\'month\', ' + expr + ')';
 		else if (conn.__type == 'odbc') return 'datepart(month, ' + expr + ')';
-		else throw new Error('ds.db.preprocessor.month: Connection type "' + conn.__type + '" is not supported.');	
+		else throw new Error('ds.db.preprocessor.month: Connection type "' + conn.__type + '" is not supported.');
 	},
 	day: (conn, expr) => {
 		if (conn.__type == 'libpq') return 'date_part(\'day\', ' + expr + ')';
 		else if (conn.__type == 'odbc') return 'datepart(day, ' + expr + ')';
-		else throw new Error('ds.db.preprocessor.day: Connection type "' + conn.__type + '" is not supported.');	
+		else throw new Error('ds.db.preprocessor.day: Connection type "' + conn.__type + '" is not supported.');
 	},
 	string: (conn, size) => {
 		if (conn.__type == 'libpq') return size == 'max' ? 'text' : `varchar(${size || '4000'})`;
@@ -420,7 +420,7 @@ ds.db.field_info = (conn, field_name, table_name, catalog, schema) => {
 		length: row.character_maximum_length,
 		nullable: row.is_nullable.toLowerCase() == 'yes' ? true : false,
 		default: row.column_default
-	}        
+	}
 }
 ds.db.drop_table = (conn, table_name) => {
 	const exists = ds.db.table_exists(conn, table_name);
