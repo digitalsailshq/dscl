@@ -1163,6 +1163,7 @@ if (ds.isNode()) {
 	(() => {
 		const libfs = require('fs');
 		const libpath = require('path');
+		const libcrypto = require('crypto');
 		ds.red = a => `\x1b[31m${a}\x1b[0m`;
 		ds.green = a => `\x1b[32m${a}\x1b[0m`;
 		ds.yellow = a => `\x1b[33m${a}\x1b[0m`;
@@ -1195,5 +1196,15 @@ if (ds.isNode()) {
 		}
 		ds.ht_begin = () => process.hrtime();
 		ds.ht_end = ht => (ht = process.hrtime(ht), ht[0] == 0 ? (Math.floor(ht[1] / 1e6).toString() + ' ms') : (ht[0].toString() + ' s, ' + Math.floor(ht[1] / 1e6).toString() + ' ms'));
+		const rnds8 = new Uint8Array(16);
+		const byte2hex = [];
+		for (let i = 0; i < 256; i++)
+			byte2hex.push((i + 0x100).toString(16).substr(1));
+		ds.uuid = () => {
+			const rnds = libcrypto.randomFillSync(rnds8);
+			rnds[6] = rnds[6] & 0x0f | 0x40;
+			rnds[8] = rnds[8] & 0x3f | 0x80;
+			return (byte2hex[rnds[0]] + byte2hex[rnds[1]] + byte2hex[rnds[2]] + byte2hex[rnds[3]] + '-' + byte2hex[rnds[4]] + byte2hex[rnds[5]] + '-' + byte2hex[rnds[6]] + byte2hex[rnds[7]] + '-' + byte2hex[rnds[8]] + byte2hex[rnds[9]] + '-' + byte2hex[rnds[10]] + byte2hex[rnds[11]] + byte2hex[rnds[12]] + byte2hex[rnds[13]] + byte2hex[rnds[14]] + byte2hex[rnds[15]]).toLowerCase();
+		};
 	})();
 }
