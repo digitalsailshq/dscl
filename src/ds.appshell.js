@@ -309,7 +309,6 @@ ds.appshell.__Actions = ds.Object.extend({
 				if (!controller_prototype) throw new Error('ds.appshell.__Actions: Controller prototype not found by "' + args.controller + '".');
 				const controller = controller_prototype.new(Object.assign({ __navbar_node: args.navBarNode }, args.controllerArgs || {}));
 				if (!controller.__navbar_node) controller.__navbar_node = self.appShell.appView.navBarView.openedSection.addNode({ _controller: controller });
-				controller.view.visible = false;
 				self.appShell.openedController.push(controller);
 				//self.appShell.appView.tabs_content.appendChild(controller.view.element);
 				if (!args.nofocus) self.exec('show_controller', { controller });
