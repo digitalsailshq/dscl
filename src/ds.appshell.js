@@ -310,7 +310,6 @@ ds.appshell.__Actions = ds.Object.extend({
 				const controller = controller_prototype.new(Object.assign({ __navbar_node: args.navBarNode }, args.controllerArgs || {}));
 				if (!controller.__navbar_node) controller.__navbar_node = self.appShell.appView.navBarView.openedSection.addNode({ _controller: controller });
 				self.appShell.openedController.push(controller);
-				//self.appShell.appView.tabs_content.appendChild(controller.view.element);
 				if (!args.nofocus) self.exec('show_controller', { controller });
 				return controller;
 			}
