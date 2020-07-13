@@ -96,7 +96,7 @@ ds.appshell.__NavBarNodeView = ds.ui.View.extend({
 								text: this._getText(),
 								image: this._getImage() || ds.ui.Cell.EMPTY_IMG,
 								badge: this.badge,
-								badgeClassName: 'gray' 
+								badgeClassName: 'gray'
 							}) }}
 						<div x-if="this._getCanClose()" class="hnd thvr sm gray tac col mid cen x18 mr05 vhvrc" x-on:click="self._nodeClose(e)">
 							<i class="fa fa-times"></i>
@@ -226,7 +226,7 @@ ds.appshell.__NavBarView = ds.ui.View.extend({
 	template: `<div class="col bk br">
 					{{ this.userView ||= ds.appshell.__UserView.new({ className: 'ml2 mr15 mb2', style: { 'margin-top': '13px' } }) }}
 					<div class="flex col scroll">
-						{{ this._sections }}	
+						{{ this._sections }}
 					</div>
 				</div>`,
 	_sections: null,
@@ -311,7 +311,7 @@ ds.appshell.__Actions = ds.Object.extend({
 				if (!controller.__navbar_node) controller.__navbar_node = self.appShell.appView.navBarView.openedSection.addNode({ _controller: controller });
 				controller.view.visible = false;
 				self.appShell.openedController.push(controller);
-				self.appShell.appView.tabs_content.appendChild(controller.view.element);
+				//self.appShell.appView.tabs_content.appendChild(controller.view.element);
 				if (!args.nofocus) self.exec('show_controller', { controller });
 				return controller;
 			}
@@ -322,15 +322,15 @@ ds.appshell.__Actions = ds.Object.extend({
 				if (!args.controller) throw new Error('ds.appshell.__Actions: "controller" property not found when performing "open_controller" action.');
 				if (self.appShell.activeController) {
 					self.appShell.activeController.__navbar_node.selected = false;
-					self.appShell.activeController.view.visible = false;
+					self.appShell.activeController.view.element.remove();
 					if (self.appShell.activeController.__props_controller)
-						self.appShell.activeController.__props_controller.view.visible = false;
+						self.appShell.activeController.__props_controller.view.element.remove();
 				}
 				self.appShell.activeController = args.controller;
 				self.appShell.activeController.__navbar_node.selected = true;
-				self.appShell.activeController.view.visible = true;
+				self.appShell.activeController.view.appendTo(self.appShell.appView.tabs_content)
 				if (self.appShell.activeController.__props_controller) {
-					self.appShell.activeController.__props_controller.view.visible = true;
+					self.appShell.activeController.__props_controller.view.appendTo(self.appShell.appView.props_content);
 					this.appShell.appView.propsSplitter.visible = true;
 					this.appShell.appView.props_content.style.setProperty('display', '');
 				} else {
