@@ -352,6 +352,7 @@ ds.appshell.__Actions = ds.Object.extend({
 					args.controller.__navbar_node.free();
 					args.controller.__navbar_node = null;
 				}
+				args.controller.view.element.remove();
 				args.controller.free();
 				self.appShell.openedController = self.appShell.openedController.filter(c => c != args.controller);
 				self.appShell.showHistory = self.appShell.showHistory.filter(c => c != args.controller);
