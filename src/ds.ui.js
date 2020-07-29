@@ -3099,7 +3099,7 @@ ds.ui.Calendar = ds.ui.View.extend({
 							<img src="${ ds.ui.CARET_LEFT_IMG }" class="x12 dhvrc" />
 						</div>
 						<div x-ref="month_element" class="__xcal_hdr_mnth flex fs11 strong tac"></div>
-						<div class="__xcal_hdr_now hnd hvr pl pt pr pb dhvr" x-on:click="self.now(), self._trigger('select', self.value)">
+						<div class="__xcal_hdr_now hnd hvr pl pt pr pb dhvr" title="Сегодня" x-on:click="self.now(), self._trigger('select', self.value)">
 							<img src="${ ds.ui.CALENDAR_IMG }" class="x12 dhvrc" />
 						</div>
 						<div class="__xcal_hdr_next hnd hvr pl pt pr pb dhvr" x-on:click="self.next()">
