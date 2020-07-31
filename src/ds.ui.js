@@ -3386,7 +3386,8 @@ ds.ui.DateTimeSheet = ds.ui.View.extend({
 	_getFirstMonday() {
 		const self = this;
 		const first = self._getFirstDate();
-		const diff = (1000 * 60 * 60 * 24 * (first.getDay() - 1));
+		const day = first.getDay();
+		const diff = (1000 * 60 * 60 * 24 * (day == 0 ? 6 : (day - 1)));
 		return new Date(first.getTime() - diff);
 	},
 	_math(part, value, op) {
