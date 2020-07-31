@@ -3297,6 +3297,7 @@ ds.ui.DateTimeSheet = ds.ui.View.extend({
 	_month: 0,
 	_time: false,
 	_seconds: false,
+	_noPast: false,
 	_selectedYear: null,
 	_selectedMonth: null,
 	_selectedDate: null,
@@ -3305,6 +3306,8 @@ ds.ui.DateTimeSheet = ds.ui.View.extend({
 	set time(value) { this._time = value; this.needsUpdate() },
 	get seconds() { return this._seconds; },
 	set seconds(value) { this._seconds = value; this.needsUpdate() },
+	get noPast() { return this._noPast; },
+	set noPast(value) { this._noPast = value; this.needsUpdate() },
 	get value() {
 		const self = this;
 		return self._constructDate({
@@ -3318,17 +3321,27 @@ ds.ui.DateTimeSheet = ds.ui.View.extend({
 	},
 	set value(value) {
 		const self = this;
-		ds.assert(value).required();
-		const dest = self._destructDate(value);
-		self._selectedYear = dest.year;
-		self._selectedMonth = dest.month;
-		self._selectedDate = dest.date;
-		if (self._time) {
+		if (ds.isset(value)) {
+			const dest = self._destructDate(value);
+			self._selectedYear = dest.year;
+			self._selectedMonth = dest.month;
+			self._selectedDate = dest.date;
+			if (self._time) {
+				self._disableTimeEvent = true;
+				self.hourEdit.value = dest.hour;
+				self.minuteEdit.value = dest.minute;
+				if (self._seconds)
+					self.secondEdit.value = dest.second;
+				self._disableTimeEvent = false;
+			}
+		} else {
+			self._selectedYear = null;
+			self._selectedMonth = null;
+			self._selectedDate = null;
 			self._disableTimeEvent = true;
-			self.hourEdit.value = dest.hour;
-			self.minuteEdit.value = dest.minute;
-			if (self._seconds)
-				self.secondEdit.value = dest.second;
+			self.hourEdit.value = '0';
+			self.minuteEdit.value = '0';
+			self.secondEdit.value = '0';
 			self._disableTimeEvent = false;
 		}
 		self._trigger('change', self.value);
@@ -3520,6 +3533,11 @@ ds.ui.DateTimeSheet = ds.ui.View.extend({
 		self.yearcells_element.innerHTML = '';
 
 		const today = new Date();
+		const past = (() => {
+			const ret = today;
+			ret.setHours(0, 0, 0, 0);
+			return ret.getTime();
+		})();
 		const today_year = today.getFullYear();
 		const today_month = today.getMonth() + 1;
 		const value = self.value;
@@ -3545,6 +3563,14 @@ ds.ui.DateTimeSheet = ds.ui.View.extend({
 			if (self._compareDate(date, value)) {
 				cell_element.classList.add('strong');
 				cell_element.classList.add('bl', 'bt', 'br', 'bb');
+			}
+			if (self._noPast) {
+				const present = date;
+				present.setHours(0, 0, 0, 0);
+				if (present < past) {
+					cell_element.classList.add('gray');
+					cell_element.style.setProperty('pointer-events', 'none');
+				}
 			}
 
 			date = new Date(date.getTime() + (1000 * 60 * 60 * 24));
@@ -4641,13 +4667,13 @@ ds.ui.TreeLookupEdit = ds.ui.DropDownEdit.extend({
 ds.ui.DateTimeEdit = ds.ui.DropDownEdit.extend({
 	template: `@extend ds.ui.DropDownEdit.template
 					@slot dropdown
-						{{ this.calendar ||= ds.ui.Calendar.new({ className: 'flex', _noPast: this._noPast })
+						{{ this.calendar ||= ds.ui.DateTimeSheet.new({ className: 'flex', _noPast: this._noPast })
 							.on('change', value => {
 								this.value = ds.Date.newFromDate(value).toISODate();
 								this._trigger('user_change', this.value);
-								this.calendar.needsUpdate().then(() => this._popupHelper.adjust());
-							})
-							.on('select', () => this.close()) }}
+								this.close();
+								//this.calendar.needsUpdate().then(() => this._popupHelper.adjust());
+							}) }}
 					@end
 				@end`,
 	_noPast: false,
@@ -4694,11 +4720,11 @@ ds.ui.DateTimeEdit = ds.ui.DropDownEdit.extend({
 	init() {
 		const self = this;
 		ds.ui.DropDownEdit.init.call(self);
-		self.dropdown_element.style.setProperty('min-width', '210px');
-		self.dropdown_element.style.setProperty('max-width', '210px');
+		self.dropdown_element.style.setProperty('min-width', '224px');
+		self.dropdown_element.style.setProperty('max-width', '224px');
 		self._openBtn.image = ds.ui.CALENDAR_IMG;
 		self.calendar._disableEvents = true;
-		self.calendar.now();
+		self.calendar.value = new Date();
 		self.calendar._disableEvents = false;
 	}
 }, ds.Events('select'));
