@@ -3441,8 +3441,8 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 							<div class="__xedt_frm_img" style="display:{{ this.image ? '' : 'none'; }}">
 								<img src="{{ this.image || 'data:image/png;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==' }}" />
 							</div>
-							<input x-ref="input_element" x-if="!this._textareaMode" type="text" size="1" maxlength="{{ this.maxLength.toString() }}" placeholder="{{ this._getPlaceholder() }}" />
-							<textarea x-ref="textarea_element" x-if="this._textareaMode" maxlength="{{ this.maxLength.toString() }}" placeholder="{{ this._getPlaceholder() }}"></textarea>
+							<input x-ref="input_element" x-if="!this._textareaMode" type="text" size="1" maxlength="{{ this.maxLength.toString() }}" placeholder="{{ this._getPlaceholder() }}" style="{{ this._center ? 'text-align: center' : '' }}" />
+							<textarea x-ref="textarea_element" x-if="this._textareaMode" maxlength="{{ this.maxLength.toString() }}" placeholder="{{ this._getPlaceholder() }}" style="{{ this._center ? 'text-align: center' : '' }}"></textarea>
 							{{ this._inlineElements }}
 						</div>
 						@@buttons
@@ -3467,6 +3467,7 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 	_allowedKeys: null,
 	_numericAfterLatin: false,
 	_keepFocus: false,
+	_center: false,
 	get clearButton() { return this._clearButton; },
 	set clearButton(value) { this._clearButton = value; this.needsUpdate(); },
 	get placeholder() { return this._placeholder; },
@@ -3485,6 +3486,8 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 	set numericAfterLatin(value) { this._numericAfterLatin = value; this.needsUpdate(); },
 	get keepFocus() { return this._keepFocus; },
 	set keepFocus(value) { this._keepFocus = value; this.needsUpdate(); },
+	get center() { return this._center; },
+	set center(value) { this._center = value; this.needsUpdate(); },
 	_getValue() {
 		if (!this._getInputElement()) return null;
 		if (this._getInputElement().value == '') return null;
