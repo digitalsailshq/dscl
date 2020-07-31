@@ -2745,7 +2745,6 @@ ds.ui.Button = ds.ui.View.extend({
 				border-style: solid;
 				border-width: 1px;
 				border-color: rgb(204, 204, 204);
-				border-radius: 3px;
 				padding: 0px 11px 0px 11px;
 				cursor: pointer;
 				color: var(--text-color);
@@ -2757,6 +2756,8 @@ ds.ui.Button = ds.ui.View.extend({
 			.__xbtn.__dropdown {
 				position: relative;
 				padding-right: 22px;  }
+			.__xbtn.__rounded {
+				border-radius: 3px; }
 			.__xbtn.__small {
 				font-size: 12px;
 				padding-left: 6px;
@@ -2850,6 +2851,7 @@ ds.ui.Button = ds.ui.View.extend({
 				border-bottom-right-radius: 3px; }
 			.btn-grp .__xbtn:last-child:first-child { border-radius: 3px; }`,
 	_className: '__xbtn',
+	_rounded: true,
 	_grayed: false,
 	_down: false,
 	_flat: false,
@@ -2870,6 +2872,8 @@ ds.ui.Button = ds.ui.View.extend({
 	_imageWidth: 16,
 	_imageHeight: 16,
 	_hint: '',
+	get rounded() { return this._rounded; },
+	set rounded(value) { this._rounded = value; this.needsUpdate(); },
 	get grayed() { return this._grayed; },
 	set grayed(value) { this._grayed = value; this.needsUpdate(); },
 	get down() { return this._down; },
@@ -2930,6 +2934,7 @@ ds.ui.Button = ds.ui.View.extend({
 			self.element,
 			'__down', 			self.down,
 			'__grayed', 		self.grayed,
+			'__rounded', 		self.rounded,
 			'__flat', 			self.flat,
 			'__dropdown', 		self.dropdown,
 			'__droppeddown', 	self.droppeddown,
