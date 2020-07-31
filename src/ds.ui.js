@@ -3232,6 +3232,410 @@ ds.ui.Calendar = ds.ui.View.extend({
 		});
 	}
 }, ds.Events('change', 'select'));
+ds.ui.DateTimeSheet = ds.ui.View.extend({
+	MONTH_NAME: [null, 'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+	styles: `.__xdtsheet_tri { position: absolute; bottom: 3px;	right: 3px; width: 0px; height: 0px; border-style: solid;
+								border-width: 0 0 8px 8px; border-color: transparent transparent var(--border-color-blue) transparent; }
+			.__xdtsheet_cell { box-sizing: border-box; border-color: var(--border-color-blue); }`,
+	template: `<div>
+					<div x-ref="date_element" style="display: {{ this._show == 'date' ? '' : 'none' }}">
+						<div class="row bk">
+							<div class="x32 col mid cen hvr dhvr hnd" x-on:click="self._prevMonth()">
+								<img src="${ds.ui.CARET_LEFT_IMG}" class="x12 dhvrc" />
+							</div>
+							<div x-ref="datetitle_element" class="flex col mid cen strong hvr hnd" x-on:click="self._setShow('month')"></div>
+							<div class="x32 col mid cen hvr dhvr hnd" x-on:click="self._nextMonth()">
+								<img src="${ds.ui.CARET_RIGHT_IMG}" class="x12 dhvrc" />
+							</div>
+						</div>
+						<div class="row fs11">
+							<div class="x32 col mid cen strong">ПН</div>
+							<div class="x32 col mid cen strong">ВТ</div>
+							<div class="x32 col mid cen strong">СР</div>
+							<div class="x32 col mid cen strong">ЧТ</div>
+							<div class="x32 col mid cen strong">ПТ</div>
+							<div class="x32 col mid cen strong red">СБ</div>
+							<div class="x32 col mid cen strong red">ВС</div>
+						</div>
+						<div x-ref="datecells_element"></div>
+					</div>
+					<div x-ref="month_element" style="width: 224px; display: {{ this._show == 'month' ? '' : 'none' }}">
+						<div class="row bk" style="height: 32px;">
+							<div x-ref="monthtitle_element" class="flex col mid cen strong hvr hnd" x-on:click="self._setShow('year')"></div>
+						</div>
+						<div x-ref="monthcells_element"></div>
+					</div>
+					<div x-ref="year_element" style="width: 224px; display: {{ this._show == 'year' ? '' : 'none' }}">
+						<div x-ref="yeartitle_element" class="bk flex col mid cen strong" style="height: 32px;">XXI</div>
+						<div x-ref="yearcells_element"></div>
+					</div>
+					<div x-ref="time_element" class="row pb mid cen bt" style="{{ !this._time ? 'display: none' : '' }}">
+						<div class="col">
+							<div class="fs11 strong mt mb col mid cen">ЧАС</div>
+							{{ this.hourUpBtn ||= ds.ui.Button.new({ className: 'row cen ty1', small: true, narrow: true, text: '<i class="fa fa-caret-up"></i>', rounded: false }) }}
+							{{ this.hourEdit ||= ds.ui.NumberEdit.new({ precision: 0, center: true, style: { width: '42px', 'z-index': 2 } }) }}
+							{{ this.hourDownBtn ||= ds.ui.Button.new({ className: 'row cen ty-1', small: true, narrow: true, text: '<i class="fa fa-caret-down"></i>', rounded: false }) }}
+						</div>
+						<div class="mt3 ml mr strong">:</div>
+						<div class="col">
+							<div class="fs11 strong mt mb col mid cen">МИН</div>
+							{{ this.minuteUpBtn ||= ds.ui.Button.new({ className: 'row cen ty1', small: true, narrow: true, text: '<i class="fa fa-caret-up"></i>', rounded: false }) }}
+							{{ this.minuteEdit ||= ds.ui.NumberEdit.new({ precision: 0, center: true, style: { width: '42px', 'z-index': 2 } }) }}
+							{{ this.minuteDownBtn ||= ds.ui.Button.new({ className: 'row cen ty-1', small: true, narrow: true, text: '<i class="fa fa-caret-down"></i>', rounded: false }) }}
+						</div>
+						<div class="mt3 ml mr strong" style="{{ !this._seconds ? 'display: none' : '' }}">:</div>
+						<div class="col" style="{{ !this._seconds ? 'display: none' : '' }}">
+							<div class="fs11 strong mt mb col mid cen">СЕК</div>
+							{{ this.secondUpBtn ||= ds.ui.Button.new({ className: 'row cen ty1', small: true, narrow: true, text: '<i class="fa fa-caret-up"></i>', rounded: false }) }}
+							{{ this.secondEdit ||= ds.ui.NumberEdit.new({ precision: 0, center: true, style: { width: '42px', 'z-index': 2 } }) }}
+							{{ this.secondDownBtn ||= ds.ui.Button.new({ className: 'row cen ty-1', small: true, narrow: true, text: '<i class="fa fa-caret-down"></i>', rounded: false }) }}
+						</div>
+					</div>
+				</div>`,
+	_show: 'date',
+	_year: 0,
+	_month: 0,
+	_time: false,
+	_seconds: false,
+	_selectedYear: null,
+	_selectedMonth: null,
+	_selectedDate: null,
+	_disableTimeEvent: false,
+	get time() { return this._time; },
+	set time(value) { this._time = value; this.needsUpdate() },
+	get seconds() { return this._seconds; },
+	set seconds(value) { this._seconds = value; this.needsUpdate() },
+	get value() {
+		const self = this;
+		return self._constructDate({
+			date: self._selectedDate,
+			month: self._selectedMonth,
+			year: self._selectedYear,
+			hour: self._time ? parseInt(self.hourEdit.value || 0, 10) : 0,
+			minute: self._time ? parseInt(self.minuteEdit.value || 0, 10) : 0,
+			second: (self._time && self._seconds) ? parseInt(self.secondEdit.value || 0, 10) : 0
+		});
+	},
+	set value(value) {
+		const self = this;
+		ds.assert(value).required();
+		const dest = self._destructDate(value);
+		self._selectedYear = dest.year;
+		self._selectedMonth = dest.month;
+		self._selectedDate = dest.date;
+		if (self._time) {
+			self._disableTimeEvent = true;
+			self.hourEdit.value = dest.hour;
+			self.minuteEdit.value = dest.minute;
+			if (self._seconds)
+				self.secondEdit.value = dest.second;
+			self._disableTimeEvent = false;
+		}
+		self._trigger('change', self.value);
+		self.needsUpdate();
+	},
+	_constructDate(props) {
+		const self = this;
+		ds.assert(props).required();
+		ds.assert(props.date).optional().number().greaterThanOrEquals(1).lessThanOrEquals(31);
+		ds.assert(props.month).optional().number().greaterThanOrEquals(1).lessThanOrEquals(12);
+		ds.assert(props.year).optional().number().greaterThanOrEquals(1990).lessThanOrEquals(2100);
+		ds.assert(props.hour).optional().number().greaterThanOrEquals(0).lessThanOrEquals(23);
+		ds.assert(props.minute).optional().number().greaterThanOrEquals(0).lessThanOrEquals(59);
+		ds.assert(props.second).optional().number().greaterThanOrEquals(0).lessThanOrEquals(59);
+		return new Date(
+			props.year,
+			((props.month || 1) - 1),
+			(props.date || 1),
+			(props.hour || 0),
+			(props.minute || 0),
+			(props.second || 0),
+			0
+		);
+	},
+	_destructDate(date) {
+		const self = this;
+		ds.assert(date).required();
+		return {
+			day: date.getDay(),
+			date: date.getDate(),
+			month: (date.getMonth() + 1), //!!!
+			year: date.getFullYear(),
+			hour: date.getHours(),
+			minute: date.getMinutes(),
+			second: date.getSeconds(),
+			time: date.getTime()
+		};
+	},
+	_compareDate(a, b) {
+		const self = this;
+		const aa = self._destructDate(a);
+		const bb = self._destructDate(b);
+		return (aa.year == bb.year)
+			&& (aa.month == bb.month)
+			&& (aa.date == bb.date);
+	},
+	_getFirstDate() {
+		const self = this;
+		return self._constructDate({
+			date: 1,
+			month: this._month,
+			year: this._year
+		});
+	},
+	_getFirstMonday() {
+		const self = this;
+		const first = self._getFirstDate();
+		const diff = (1000 * 60 * 60 * 24 * (first.getDay() - 1));
+		return new Date(first.getTime() - diff);
+	},
+	_math(part, value, op) {
+		const self = this;
+		const MOD = {};
+		MOD.second = 1000;
+		MOD.minute = (MOD.second * 60);
+		MOD.hour = (MOD.minute * 60);
+		MOD.day = (MOD.hour * 24);
+		MOD.week = (MOD.day * 7);
+		ds.assert(part).required().oneOf(['day', 'week', 'hour', 'minute', 'second']);
+		ds.assert(value).required().number();
+		ds.assert(op).required().oneOf(['+', '-']);
+		if (op == '+') self._setDate(self._time + (value * MOD[part]));
+		else if (op == '-') self._setDate(self._time - (value * MOD[part]));
+	},
+	_setShow(what) {
+		const self = this;
+		ds.assert(what).required().oneOf(['date', 'month', 'year']);
+		self._show = what;
+		self.needsUpdate();
+	},
+	_prevMonth() {
+		const self = this;
+		if (self._month == 1) {
+			self._month = 12;
+			self._year -= 1;
+		} else {
+			self._month -= 1;
+		}
+		self.needsUpdate();
+	},
+	_nextMonth() {
+		const self = this;
+		if (self._month == 12) {
+			self._month = 1;
+			self._year += 1;
+		} else {
+			self._month += 1;
+		}
+		self.needsUpdate();
+	},
+	_hourUp() {
+		const self = this;
+		let hour = parseInt(ds.ifnull(self.hourEdit.value, '23'), 10) + 1;
+		if (hour > 23) hour = 0;
+		self.hourEdit.value = hour;
+	},
+	_hourDown() {
+		const self = this;
+		let hour = parseInt(ds.ifnull(self.hourEdit.value, '0'), 10) - 1;
+		if (hour < 0) hour = 23;
+		self.hourEdit.value = hour;
+	},
+	_minuteUp() {
+		const self = this;
+		let minute = parseInt(ds.ifnull(self.minuteEdit.value, '59'), 10) + 1;
+		if (minute > 59) minute = 0;
+		self.minuteEdit.value = minute;
+	},
+	_minuteDown() {
+		const self = this;
+		let minute = parseInt(ds.ifnull(self.minuteEdit.value, '0'), 10) - 1;
+		if (minute < 0) minute = 59;
+		self.minuteEdit.value = minute;
+	},
+	_secondUp() {
+		const self = this;
+		let second = parseInt(ds.ifnull(self.secondEdit.value, '59'), 10) + 1;
+		if (second > 59) second = 0;
+		self.secondEdit.value = second;
+	},
+	_secondDown() {
+		const self = this;
+		let second = parseInt(ds.ifnull(self.secondEdit.value, '0'), 10) - 1;
+		if (second < 0) second = 59;
+		self.secondEdit.value = second;
+	},
+	_timeChanged(user) {
+		const self = this;
+
+		self._disableTimeEvent = true;
+		if (ds.isnull(self.hourEdit.value) || self.hourEdit.value === '')
+			self.hourEdit.value = '0';
+		if (ds.isnull(self.minuteEdit.value) || self.minuteEdit.value === '')
+			self.minuteEdit.value = '0';
+		if (self._seconds) {
+			if (ds.isnull(self.secondEdit.value) || self.secondEdit.value === '')
+				self.secondEdit.value = '0';
+		}
+		const hour = parseInt(self.hourEdit.value, 10);
+		const minute = parseInt(self.minuteEdit.value, 10);
+		const second = parseInt(self.secondEdit.value, 10);
+		if (hour > 23) self.hourEdit.value = '23';
+		if (hour < 0) self.hourEdit.value = '0';
+		if (minute > 59) self.minuteEdit.value = '59';
+		if (minute < 0) self.minuteEdit.value = '0';
+		if (second > 59) self.secondEdit.value = '59';
+		if (second < 0) self.secondEdit.value = '0';
+		self._disableTimeEvent = false;
+
+		if (self._disableTimeEvent)
+			return;
+
+		const value = self.value;
+		self._trigger('change', value);
+		if (user)
+			self._trigger('user_change', value);
+	},
+ 	add(part, value) {
+		const self = this;
+		ds.assert(part, 'DateTimeSheet.add: "part"').required().oneOf(['day', 'week', 'hour', 'minute', 'second']);
+		ds.assert(value, 'DateTimeSheet.add: "value"').required().number();
+		self._math(part, value, '+');
+	},
+	subtract(part, value) {
+		const self = this;
+		ds.assert(part, 'DateTimeSheet.subtract: "part"').required().oneOf(['day', 'week', 'hour', 'minute', 'second']);
+		ds.assert(value, 'DateTimeSheet.subtract: "value"').required().number();
+		self._math(part, value, '-');
+	},
+	update() {
+		const self = this;
+		ds.ui.View.update.call(self);
+
+		self.datetitle_element.textContent = `${self.MONTH_NAME[self._month]} ${self._year}`;
+		self.monthtitle_element.textContent = `${self._year}`;
+		self.datecells_element.innerHTML = '';
+		self.monthcells_element.innerHTML = '';
+		self.yearcells_element.innerHTML = '';
+
+		const today = new Date();
+		const today_year = today.getFullYear();
+		const today_month = today.getMonth() + 1;
+		const value = self.value;
+		const year_from = (self._year - 7);
+
+		let row_element = null;
+		let cell_element = null;
+		let date = self._getFirstMonday();
+
+		for (let i = 0; i < (6 * 7); i++) {
+			if (i % 7 == 0) {
+				row_element = ds.ui.element(`<div class="row"></div>`);
+				self.datecells_element.appendChild(row_element);
+			}
+			cell_element = ds.ui.element(`<div class="x32 col cen mid hvr hnd __xdtsheet_cell __xdtsheet_datecell" data-year="${date.getFullYear()}" data-month="${date.getMonth() + 1}" data-date="${date.getDate()}">${date.getDate()}</div>`);
+			row_element.appendChild(cell_element);
+			if ((date.getMonth() + 1) != self._month)
+				cell_element.classList.add('gray');
+			if (self._compareDate(date, today)) {
+				cell_element.style.setProperty('position', 'relative');
+				cell_element.appendChild(ds.ui.element('<div class="__xdtsheet_tri"></div>'));
+			}
+			if (self._compareDate(date, value)) {
+				cell_element.classList.add('strong');
+				cell_element.classList.add('bl', 'bt', 'br', 'bb');
+			}
+
+			date = new Date(date.getTime() + (1000 * 60 * 60 * 24));
+		}
+
+		for (let i = 0; i < 12; i++) {
+			if ((i % 3) == 0) {
+				row_element = ds.ui.element(`<div class="row"></div>`);
+				self.monthcells_element.appendChild(row_element);
+			}
+			cell_element = ds.ui.element(`<div class="flex col cen mid hvr hnd __xdtsheet_cell __xdtsheet_monthcell" data-year="${self._year}" data-month="${i + 1}" style="height: 32px;">${self.MONTH_NAME[i + 1]}</div>`);
+			row_element.appendChild(cell_element);
+			if (((i + 1) == today_month) && (self._year == today_year)) {
+				cell_element.style.setProperty('position', 'relative');
+				cell_element.appendChild(ds.ui.element('<div class="__xdtsheet_tri"></div>'));
+			}
+			if (((i + 1) == self._selectedMonth) && (self._year == self._selectedYear)) {
+				cell_element.classList.add('strong');
+				cell_element.classList.add('bl', 'bt', 'br', 'bb');
+			}
+		}
+
+		for (let i = 0; i < 15; i++) {
+			if ((i % 3) == 0) {
+				row_element = ds.ui.element(`<div class="row"></div>`);
+				self.yearcells_element.appendChild(row_element);
+			}
+			cell_element = ds.ui.element(`<div class="flex col cen mid hvr hnd __xdtsheet_cell __xdtsheet_yearcell" data-year="${(year_from + i)}" style="height: 32px;">${year_from + i}</div>`);
+			row_element.appendChild(cell_element);
+			if ((year_from + i) == today_year) {
+				cell_element.style.setProperty('position', 'relative');
+				cell_element.appendChild(ds.ui.element('<div class="__xdtsheet_tri"></div>'));
+			}
+			if ((year_from + i) == self._selectedYear) {
+				cell_element.classList.add('strong');
+				cell_element.classList.add('bl', 'bt', 'br', 'bb');
+			}
+		}
+	},
+	init() {
+		const self = this;
+		const dest = self._destructDate(new Date());
+		self._month = dest.month;
+		self._year = dest.year;
+
+		ds.ui.View.init.call(self);
+
+		self.hourEdit.value = 0;
+		self.minuteEdit.value = 0;
+		self.secondEdit.value = 0;
+		self.hourEdit.on('change', () => self._timeChanged(false));
+		self.minuteEdit.on('change', () => self._timeChanged(false));
+		self.secondEdit.on('change', () => self._timeChanged(false));
+		self.hourEdit.on('user_change', () => self._timeChanged(true));
+		self.minuteEdit.on('user_change', () => self._timeChanged(true));
+		self.secondEdit.on('user_change', () => self._timeChanged(true));
+		self.hourUpBtn.on('click', () => self._hourUp());
+		self.hourDownBtn.on('click', () => self._hourDown());
+		self.minuteUpBtn.on('click', () => self._minuteUp());
+		self.minuteDownBtn.on('click', () => self._minuteDown());
+		self.secondUpBtn.on('click', () => self._secondUp());
+		self.secondDownBtn.on('click', () => self._secondDown());
+
+		ds.ui.element_on(self.datecells_element, 'click', '.__xdtsheet_datecell', function(e) {
+			if (self.__freed) return false;
+			self._selectedYear = parseInt(this.getAttribute('data-year'), 10);
+			self._selectedMonth = parseInt(this.getAttribute('data-month'), 10);
+			self._selectedDate = parseInt(this.getAttribute('data-date'), 10);
+
+			const value = self.value;
+			self._trigger('change', value);
+			self._trigger('user_change', value);
+
+			self.needsUpdate();
+			return true;
+
+		});
+		ds.ui.element_on(self.monthcells_element, 'click', '.__xdtsheet_monthcell', function(e) {
+			if (self.__freed) return false;
+			self._year = parseInt(this.getAttribute('data-year'), 10);
+			self._month = parseInt(this.getAttribute('data-month'), 10);
+			self._setShow('date');
+			return true;
+		});
+		ds.ui.element_on(self.yearcells_element, 'click', '.__xdtsheet_yearcell', function(e) {
+			if (self.__freed) return false;
+			self._year = parseInt(this.getAttribute('data-year'), 10);
+			self._setShow('month');
+			return true;
+		});
+	}
+}, ds.Events('change', 'user_change'));
 ds.ui.Edit = ds.ui.View.extend({
 	styles: `.__xedt { display: flex; flex-flow: row; }
 			.__xedt .__xedt_prts { display: flex; flex-flow: row; flex: 1; overflow-y: hidden; }
