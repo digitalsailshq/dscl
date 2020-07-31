@@ -3441,8 +3441,8 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 							<div class="__xedt_frm_img" style="display:{{ this.image ? '' : 'none'; }}">
 								<img src="{{ this.image || 'data:image/png;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==' }}" />
 							</div>
-							<input x-ref="input_element" x-if="!this._textareaMode" type="text" size="1" maxlength="{{ this.maxLength.toString() }}" placeholder="{{ this._getPlaceholder() }}" style="{{ this._center ? 'text-align: center' : '' }}" />
-							<textarea x-ref="textarea_element" x-if="this._textareaMode" maxlength="{{ this.maxLength.toString() }}" placeholder="{{ this._getPlaceholder() }}" style="{{ this._center ? 'text-align: center' : '' }}"></textarea>
+							<input x-ref="input_element" x-if="!this._textareaMode" type="text" size="1" maxlength="{{ this.maxLength.toString() }}" placeholder="{{ this._getPlaceholder() }}" />
+							<textarea x-ref="textarea_element" x-if="this._textareaMode" maxlength="{{ this.maxLength.toString() }}" placeholder="{{ this._getPlaceholder() }}"></textarea>
 							{{ this._inlineElements }}
 						</div>
 						@@buttons
@@ -3601,6 +3601,8 @@ ds.ui.TextEdit = ds.ui.Edit.extend({
 		if (!self.element) return;
 		if (self.disabled || self.readOnly) self._getInputElement().setAttribute('readonly', 'true');
 		else self._getInputElement().removeAttribute('readonly');
+		if (self.center) self._getInputElement().style.setProperty('text-align', 'center');
+		else self._getInputElement().style.setProperty('text-align', '');
 	},
 	clear() {
 		const self = this;
