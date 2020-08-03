@@ -5404,7 +5404,7 @@ ds.ui.DataGridActionColumn = ds.ui.DataGridColumn.extend({
 	createCell(item, cell) {
 		const self = this;
 		const options = Object.assign({ visible: true }, self._dataGrid._trigger('action_options', cell));
-		const cell = ds.ui.Cell.new({
+		const ret = ds.ui.Cell.new({
 			_visible: options.visible,
 			_text: ds.ifnull(self.actionText, ''),
 			_textAlign: 'center',
@@ -5412,8 +5412,8 @@ ds.ui.DataGridActionColumn = ds.ui.DataGridColumn.extend({
 			__cell: cell
 		});
 		if (ds.isset(self.actionHint))
-			cell.element.setAttribute('title', self.actionHint);
-		return cell;
+			ret.element.setAttribute('title', self.actionHint);
+		return ret;
 	}
 });
 ds.ui.DataGridCheckColumn = ds.ui.DataGridColumn.extend({
