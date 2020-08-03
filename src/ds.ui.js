@@ -5399,17 +5399,21 @@ ds.ui.DataGridUserColumn = ds.ui.DataGridColumn.extend({
 ds.ui.DataGridActionColumn = ds.ui.DataGridColumn.extend({
 	width: 41, // <-- 41 is optimal for font-awesome icons in text-align:center mode.
 	hover: false,
-	actionText: '',
+	actionText: null,
+	actionHint: null,
 	createCell(item, cell) {
 		const self = this;
 		const options = Object.assign({ visible: true }, self._dataGrid._trigger('action_options', cell));
-		return ds.ui.Cell.new({
+		const cell = ds.ui.Cell.new({
 			_visible: options.visible,
-			_text: self.actionText,
+			_text: ds.ifnull(self.actionText, ''),
 			_textAlign: 'center',
 			className: '__xgrd_cell_actn thvr hnd pl pt pr pb',
 			__cell: cell
 		});
+		if (ds.isset(self.actionHint))
+			cell.element.setAttribute('title', self.actionHint);
+		return cell;
 	}
 });
 ds.ui.DataGridCheckColumn = ds.ui.DataGridColumn.extend({

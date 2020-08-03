@@ -106,7 +106,8 @@ ds.db.__odbc_exec = (conn, sql, args) => {
 				})();
 	const data = res.fetchAllSync().map(row => {
 		Object.keys(row).forEach(key => {
-			if (ds.isDate(row[key])) row[key] = ds.Date.newFromDate(row[key]).toISODateTime();
+			if (ds.isDate(row[key]))
+				row[key] = ds.Date.newFromDate(row[key]).toISODateTime();
 		})
 		return row;
 	});
