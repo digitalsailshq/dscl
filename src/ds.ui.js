@@ -4676,6 +4676,7 @@ ds.ui.DateTimeEdit = ds.ui.DropDownEdit.extend({
 							}) }}
 					@end
 				@end`,
+	_time: false,
 	_noPast: false,
 	_dateValue: null,
 	_value: null,
@@ -4684,6 +4685,8 @@ ds.ui.DateTimeEdit = ds.ui.DropDownEdit.extend({
 	set valueKey(value) { this._valueKey = value; this.needsUpdate(); },
 	get noPast() { return this._noPast; },
 	set noPast(value) { this._noPast = value; this.needsUpdate(); },
+	get time() { return this._time; },
+	set time(value) { this._time = value; this.needsUpdate(); },
 	_getValue() { return this._value; },
 	_setValue(value) {
 		const self = this;
