@@ -457,7 +457,7 @@ ds.assert = (value, descr = null, errp = Error) => {
 			return this;
 		},
 		prototypeOf(proto) {
-			if ((isset || !optional) && !ds.isPrototypeOf(value, proto)) throw new errp(`${ descr || 'Assert:' } object is not prototype of "${prop}".`);
+			if ((isset || !optional) && !ds.isPrototypeOf(value, proto)) throw new errp(`${ descr || 'Assert:' } object is not prototype of "${proto}".`);
 			return this;
 		}
 	});
