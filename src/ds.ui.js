@@ -2076,16 +2076,16 @@ ds.ui.PopupHelper = ds.Object.extend({
 	styles: `:root { --pptrgt-arw-bk: white; }
 			 .__pptrgt { position: absolute !important; z-index: 19; }
 			 .__pptrgt-tr::before, .__pptrgt-tr::after { content: ""; position: absolute; border-style: solid; right: -16px; top: var(--pptrgt-arw-pos); }
-			 .__pptrgt-tr::before { border-color: transparent transparent transparent var(--border-color); border-width: 8px; }
+			 .__pptrgt-tr::before { border-color: transparent transparent transparent var(--pptrgt-arw-br); border-width: 8px; }
 			 .__pptrgt-tr::after { border-color: transparent transparent transparent var(--pptrgt-arw-bk); border-width: 7px; transform: translate(-2px, 1px) }
 			 .__pptrgt-tl::before, .__pptrgt-tl::after { content: ""; position: absolute; border-style: solid; left: -16px; top: var(--pptrgt-arw-pos); }
-			 .__pptrgt-tl::before { border-color: transparent var(--border-color) transparent transparent; border-width: 8px; }
+			 .__pptrgt-tl::before { border-color: transparent var(--pptrgt-arw-br) transparent transparent; border-width: 8px; }
 			 .__pptrgt-tl::after { border-color: transparent var(--pptrgt-arw-bk) transparent transparent; border-width: 7px; transform: translate(2px, 1px); }
 			 .__pptrgt-tb::before, .__pptrgt-tb::after { content: ""; position: absolute; border-style: solid; bottom: -16px; left: var(--pptrgt-arw-pos); }
-			 .__pptrgt-tb::before { border-color: var(--border-color) transparent transparent transparent; border-width: 8px; }
+			 .__pptrgt-tb::before { border-color: var(--pptrgt-arw-br) transparent transparent transparent; border-width: 8px; }
 			 .__pptrgt-tb::after { border-color: var(--pptrgt-arw-bk) transparent transparent transparent; border-width: 7px; transform: translate(1px, -2px) }
 			 .__pptrgt-tt::before, .__pptrgt-tt::after { content: ""; position: absolute; border-style: solid; top: -16px; left: var(--pptrgt-arw-pos); }
-			 .__pptrgt-tt::before { border-color: transparent transparent var(--border-color) transparent; border-width: 8px; }
+			 .__pptrgt-tt::before { border-color: transparent transparent var(--pptrgt-arw-br) transparent; border-width: 8px; }
 			 .__pptrgt-tt::after { border-color: transparent transparent var(--pptrgt-arw-bk) transparent; border-width: 7px; transform: translate(1px, 2px); }
 			 .__pptrgt-rw { max-width: var(--pptrgt-max-width); }
 			 .__pptrgt-rh { max-height: var(--pptrgt-max-height); }
@@ -2106,6 +2106,7 @@ ds.ui.PopupHelper = ds.Object.extend({
 	offset: null,
 	triangle: false,
 	triangleBkColor: 'white',
+	triangleBrdColor: '#d7d7d7',
 	closeOnBCRChange: true,
 	isOpened() { return this.target && this.target.__popup_opened; },
 	close() {
@@ -2119,6 +2120,7 @@ ds.ui.PopupHelper = ds.Object.extend({
 		self.target.style.display = 'none';
 		self.target.style.setProperty('--pptrgt-arw-pos', null);
 		self.target.style.setProperty('--pptrgt-arw-bk', null);
+		self.target.style.setProperty('--pptrgt-arw-br', null);
 		self.target.style.setProperty('--pptrgt-max-width', null);
 		self.target.style.setProperty('--pptrgt-max-height', null);
 		self.target.removeEventListener('click', self._sip_listener);
@@ -2384,6 +2386,7 @@ ds.ui.PopupHelper = ds.Object.extend({
 		self.target.style.top = (position.top + correction.top).toString() + 'px';
 		self.target.style.setProperty('--pptrgt-arw-pos', position.triangle_pos.toString() + 'px');
 		self.target.style.setProperty('--pptrgt-arw-bk', self.triangleBkColor || 'white');
+		self.target.style.setProperty('--pptrgt-arw-br', self.triangleBrdColor || '#d7d7d7');
 	},
 	init() {
 		const self = this;
