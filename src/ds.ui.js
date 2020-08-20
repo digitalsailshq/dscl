@@ -2108,6 +2108,7 @@ ds.ui.PopupHelper = ds.Object.extend({
 	triangleBkColor: 'white',
 	triangleBrdColor: '#d7d7d7',
 	closeOnBCRChange: true,
+	closeOnOuterClick: true,
 	isOpened() { return this.target && this.target.__popup_opened; },
 	close() {
 		const self = this;
@@ -2390,14 +2391,16 @@ ds.ui.PopupHelper = ds.Object.extend({
 	},
 	init() {
 		const self = this;
-		self._one_listener = e => self.close();
-		self._sip_listener = e => e.stopImmediatePropagation();
-		self._scr_listener = e => {
-			if (!self.closeOnBCRChange || !self.related || self._scr_timeout) return;
-			self._scr_timeout = setTimeout(() => self._scr_timeout = null, 50);
-			let bcr = self.related.getBoundingClientRect();
-			if (bcr.left != self._related_rect.left || bcr.top != self._related_rect.top) self.close();
-		};
+		if (self.closeOnOuterClick) {
+			self._one_listener = e => self.close();
+			self._sip_listener = e => e.stopImmediatePropagation();
+			self._scr_listener = e => {
+				if (!self.closeOnBCRChange || !self.related || self._scr_timeout) return;
+				self._scr_timeout = setTimeout(() => self._scr_timeout = null, 50);
+				let bcr = self.related.getBoundingClientRect();
+				if (bcr.left != self._related_rect.left || bcr.top != self._related_rect.top) self.close();
+			};
+		}
 		self.offset = Object.assign({ left: 0, top: 0 }, self.offset);
 	}
 }, ds.Events('open', 'close', 'before_open', 'before_close'));
