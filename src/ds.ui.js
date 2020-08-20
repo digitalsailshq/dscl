@@ -3352,7 +3352,7 @@ ds.ui.DateTimeSheet = ds.ui.View.extend({
 		ds.assert(props).required();
 		ds.assert(props.date).optional().number().greaterThanOrEquals(1).lessThanOrEquals(31);
 		ds.assert(props.month).optional().number().greaterThanOrEquals(1).lessThanOrEquals(12);
-		ds.assert(props.year).optional().number().greaterThanOrEquals(1990).lessThanOrEquals(2100);
+		ds.assert(props.year).optional().number().greaterThanOrEquals(1970).lessThanOrEquals(2100);
 		ds.assert(props.hour).optional().number().greaterThanOrEquals(0).lessThanOrEquals(23);
 		ds.assert(props.minute).optional().number().greaterThanOrEquals(0).lessThanOrEquals(59);
 		ds.assert(props.second).optional().number().greaterThanOrEquals(0).lessThanOrEquals(59);
