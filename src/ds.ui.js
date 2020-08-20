@@ -4696,6 +4696,8 @@ ds.ui.DateTimeEdit = ds.ui.DropDownEdit.extend({
 	_getValue() { return this._value; },
 	_setValue(value) {
 		const self = this;
+		self._hideError();
+		self._pendingchanges = false;
 		self._value = value;
 		if (!self._value) {
 			self._dateValue = null;
@@ -4705,7 +4707,11 @@ ds.ui.DateTimeEdit = ds.ui.DropDownEdit.extend({
 			self.calendar._disableEvents = false;
 		} else {
 			self._dateValue = new Date(self._value);
-			self._getInputElement().value = ds.Date.newFromDate(self._dateValue).DDMMYYYY();
+			self._getInputElement().value = (
+				self._time
+				? ds.Date.newFromDate(self._dateValue).DDMMYYYY_HHMM()
+				: ds.Date.newFromDate(self._dateValue).DDMMYYYY()
+			);
 			if (self._dateValue != self.calendar.value) {
 				self.calendar._disableEvents = true;
 				self.calendar.value = self._dateValue;
@@ -4713,12 +4719,170 @@ ds.ui.DateTimeEdit = ds.ui.DropDownEdit.extend({
 			}
 		}
 	},
-	_applyChanges() { }, 	// <-- do not remove!...
-	_onInput() { }, 		// <-- do not remove!...
+	_applyChanges() {
+		const self = this;
+		const date = self._getInputElement().value;
+		const year = date.slice(6, 10);
+		const month = date.slice(3, 5);
+		const day = date.slice(0, 2);
+		const hour = (date.length == 16) ? date.slice(11, 13) : '00';
+		const min = (date.length == 16) ? date.slice(14, 16) : '00';
+		try {
+			const iso = `${year}-${month}-${day}T${hour}:${min}:00`;
+			const test = new Date(iso);
+			if (!isNaN(test)) {
+				if (self.noPast) {
+					const today = new Date();
+					const date = new Date(iso);
+					today.setHours(0, 0, 0, 0);
+					date.setHours(0, 0, 0, 0);
+					if (date < today) {
+						self._showError('Прошедшие даты не доступны для выбора');
+						return;
+					}
+				}
+				self.value = iso;
+				self._pendingchanges = false;
+			} else {
+				self._showError('Некорректное значение даты/времени');
+			}
+		} catch (e) {
+			self._showError('Некорректное значение даты/времени');
+		}
+	},
+	_onInput() { },
 	_onCanOpen() {
 		const self = this;
 		if (self.readOnly || self.disabled) return false;
 		return true;
+	},
+	_showError(message) {
+		const self = this;
+		if (ds.isset(self.__errorTooltip)) {
+			self.__errorTooltip.message_element.textContent = message;
+		} else {
+			self.__errorTooltip = ds.ui.View.new({
+				template: `<div class="row mid bkwr so2 pl bl bt br bb" style="border-color: var(--border-color-warning); border-radius: 5px;">
+								<div x-ref="message_element">
+									${message || 'Message not specified'}
+								</div>
+								<div x-on:click="self._close()" class="col mid cen x32 hnd dhvr">
+									<img src="${ds.ui.TIMES_IMG}" class="x10 dhvrc" />
+								</div>
+							</div>`,
+				_close() {
+					const self = this;
+					self.popupHelper.close();
+				}
+			});
+			self.__errorTooltip.popupHelper = ds.ui.PopupHelper.new({
+				tooltipView: self.__errorTooltip,
+				closeOnOuterClick: false,
+				direction: 'down',
+				alignment: 'center',
+				triangleBkColor: 'var(--background-color-warning)',
+				triangleBrdColor: 'var(--border-color-warning)',
+				triangle: true
+			});
+			self.__errorTooltip.popupHelper.target = self.__errorTooltip.element;
+			self.__errorTooltip.popupHelper.related = self.element;
+			self.__errorTooltip.popupHelper.on('close', () => {
+				self.__errorTooltip.free();
+				self.__errorTooltip = null;
+			});
+			self.__errorTooltip.popupHelper.open();
+		}
+	},
+	_hideError() {
+		const self = this;
+		if (ds.isset(self.__errorTooltip)) {
+			self.__errorTooltip.free();
+			self.__errorTooltip = null;
+		}
+	},
+	_processMouse(e) {
+		const self = this;
+		const element = self._getInputElement();
+		const maxCaret = (self.time ? 16 : 9);
+		const caret = element.selectionStart;
+		const select = ([2, 5, 10, 13].includes(caret) ? (caret - 1) : caret);
+		const sel = Math.min(Math.max(select, 0), maxCaret);
+		element.setSelectionRange(sel, sel + 1);
+		e.preventDefault();
+	},
+	_processInput(e) {
+		const self = this;
+
+		/* 	date: 	0   3   .   0   1   .   2   0   2   0     1  2  :  5  1
+			----------------------------------------------------------------
+			caret: 	0   1   2   3   4   5   6   7   8   9  10 11 12 13 14 15   */
+
+		e.preventDefault();
+
+		const element = self._getInputElement();
+		const maxCaret = (self.time ? 16 : 9);
+		const caret = element.selectionStart;
+
+		let select = 0;
+
+		if (e.keyCode == 13) {
+			self._onReturn();
+		} else if (e.key == 'ArrowLeft') {
+			select = (caret - 1) - ([3, 6, 11, 14].includes(caret) ? 1 : 0);
+		} else if (e.key == 'ArrowRight') {
+			select = (caret + 1) + ([1, 4, 9, 12].includes(caret) ? 1 : 0);
+		} else if (['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].includes(e.key)
+				&& (caret <= maxCaret)) {
+			const hooks = {
+				on_1: { minValue: 0, maxValue: 31, size: 2, step: 1 },
+				on_4: { minValue: 0, maxValue: 12, size: 2, step: 1 },
+				on_9: { minValue: 1970, maxValue: 2100, size: 4, step: 1 },
+				on_12: { minValue: 0, maxValue: 59, size: 2, step: 1 },
+				on_15: { minValue: 0, maxValue: 59, size: 2, step: 0 }
+			};
+
+			const value = ((element.value === null
+						|| element.value === undefined
+						|| element.value === '')
+							? (self.time ? ds.Date.new().DDMMYYYY_HHMM() : ds.Date.new().DDMMYYYY())
+							: element.value)
+								.split('');
+			const curr = parseInt(e.key, 10);
+			const prev = ((caret > 0) ? value[caret - 1] : null);
+			const hook = hooks[`on_${caret}`];
+
+			value[caret] = `${curr}`;
+
+			if (ds.isset(hook)) {
+				const from = ((caret - hook.size) + 1);
+				const to = (from + hook.size);
+				const slc = value.slice(from, to).join('');
+				const num = Math.max(
+					Math.min(
+						parseInt(slc, 10),
+						hook.maxValue
+					),
+					hook.minValue
+				);
+				const part = (`${num}`).padStart(hook.size, '0');
+
+				for (let i = 0; i < hook.size; i++)
+					value[from + i] = part[i];
+				element.value = value.join('');
+
+				select = (to + hook.step);
+			} else {
+				element.value = value.join('');
+				select = (caret + 1);
+			}
+
+			self._pendingchanges = true;
+		} else return;
+
+		const sel = Math.min(Math.max(select, 0), maxCaret);
+		element.setSelectionRange(sel, sel + 1);
+
+		self.needsUpdate();
 	},
 	update() {
 		const self = this;
@@ -4735,6 +4899,16 @@ ds.ui.DateTimeEdit = ds.ui.DropDownEdit.extend({
 		self.calendar._disableEvents = true;
 		self.calendar.value = new Date();
 		self.calendar._disableEvents = false;
+		ds.ui.element_on(self._getInputElement(), 'keydown', e => {
+			if (self.__freed) return false;
+			self._processInput(e);
+			return true;
+		});
+		ds.ui.element_on(self._getInputElement(), 'mouseup', e => {
+			if (self.__freed) return false;
+			self._processMouse(e);
+			return true;
+		});
 	}
 }, ds.Events('select'));
 ds.ui.ListView = ds.ui.View.extend({
