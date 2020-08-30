@@ -783,7 +783,7 @@ ds.Date = ds.Object.extend({
 		const self = this;
 		return self.y.toString() + '-' +
 			self.m.toString().padStart(2, '0') + '-' +
-			self.d.toString().padStart(2, '0') + 'T00:00:00';
+			self.d.toString().padStart(2, '0');
 	},
 	toISODateTime() {
 		const self = this;
