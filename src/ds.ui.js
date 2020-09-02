@@ -4762,7 +4762,8 @@ ds.ui.DateTimeEdit = ds.ui.DropDownEdit.extend({
 			self.__errorTooltip.message_element.textContent = message;
 		} else {
 			self.__errorTooltip = ds.ui.View.new({
-				template: `<div class="row mid bkwr so2 pl bl bt br bb" style="border-color: var(--border-color-warning); border-radius: 5px;">
+				template: `<div class="row mid bkwr so2 bl bt br bb" style="border-color: var(--border-color-warning); border-radius: 5px;">
+								<div class="pl"></div>
 								<div x-ref="message_element">
 									${message || 'Message not specified'}
 								</div>
