@@ -728,6 +728,10 @@ ds.Date = ds.Object.extend({
 	},
 	fromISO(isoString) {
 		const self = this;
+		if (ds.isnull(isoString)) {
+			self.fromDate(new Date(0));
+			return;
+		}
 		if (!isoString.includes('-')) throw 'ds.Date: Only format supported is yyyy-MM-dd HH:mm:ss,SSS';
 		const __incorrect = function(str) {
 			if (!str) return true;
