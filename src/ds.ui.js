@@ -5695,6 +5695,7 @@ ds.ui.DataGrid = ds.ui.View.extend({
 	_groupCheckboxRect: true,
 	_showIconOnEmpty: true,
 	_compact: false,
+	_lastColumnResizable: false,
 	columns: null,
 	data: null,
 	spoilers: null,
@@ -5786,6 +5787,8 @@ ds.ui.DataGrid = ds.ui.View.extend({
 	},
 	get compact() { return this._compact; },
 	set compact(value) { this._compact = value; this.needsUpdate(); },
+	get lastColumnResizable() { return this._lastColumnResizable; },
+	set lastColumnResizable(value) { this._lastColumnResizable = value; this.needsUpdate(); },
 	groupExpand(index, expand) {
 		const self = this;
 		let group = self._gridBody._groups[index];
@@ -5876,6 +5879,8 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 				return false;
 			if (ds.isPrototypeOf(column, ds.ui.DataGridActionColumn))
 				return false;
+			if (self._dataGrid._lastColumnResizable)
+				return true;
 			const nextColumn = self._columnList[index + 1];
 			if (ds.isset(nextColumn)) {
 				if (ds.isPrototypeOf(nextColumn, ds.ui.DataGridActionColumn))
@@ -5931,20 +5936,16 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 			const hcell = this.parentElement;
 			const hcell_next = ds.ui.element_next(hcell, '.__xgrd_hdr_cell');
 
-			self._resizeInfo = {
-				column: hcell.__column,
-				columnWidth: ds.ui.element_rects(hcell).border.width,
-				columnCells: [hcell, ...self._dataGrid.element.querySelectorAll(`div.__xgrd_bdy_cell[data-cell-index="${hcell.__column.index}"]`)],
-				nextColumn: ds.isset(hcell_next) ? hcell_next.__column : null,
-				nextColumnWidth: ds.isset(hcell_next) ? ds.ui.element_rects(hcell_next).border.width : null,
-				nextColumnCells: ds.isset(hcell_next)
-									? [hcell_next, ...self._dataGrid.element.querySelectorAll(`div.__xgrd_bdy_cell[data-cell-index="${hcell_next.__column.index}"]`)]
-									: []
-			};
+			self._resizeInfo = {};
+			self._resizeInfo.column = hcell.__column;
+			self._resizeInfo.columnWidth = ds.ui.element_rects(hcell).border.width;
+			self._resizeInfo.columnCells = [hcell, ...self._dataGrid.element.querySelectorAll(`div.__xgrd_bdy_cell[data-cell-index="${hcell.__column.index}"]`)];
 
-			if (ds.isPrototypeOf(self._resizeInfo.nextColumn, ds.ui.DataGridActionColumn)) {
-				self._resizeInfo.nextColumn = null;
-				self._resizeInfo.nextColumnWidth = null;
+			if (ds.isset(hcell_next)
+			&& !ds.isPrototypeOf(hcell_next.__column, ds.ui.DataGridActionColumn)) {
+				self._resizeInfo.nextColumn = hcell_next.__column;
+				self._resizeInfo.nextColumnWidth = ds.ui.element_rects(hcell_next).border.width;
+				self._resizeInfo.nextColumnCells = [hcell_next, ...self._dataGrid.element.querySelectorAll(`div.__xgrd_bdy_cell[data-cell-index="${hcell_next.__column.index}"]`)];
 			}
 
 			self._dragHelper.begin();
