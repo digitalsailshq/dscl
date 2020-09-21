@@ -5956,6 +5956,13 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 
 		});
 		self._dragHelper.on('drag', offset => {
+			if (offset.x < 0) {
+				offset.x = Math.max(offset.x, -(self._resizeInfo.columnWidth - 40));
+			} else if (offset.x > 0) {
+				if (ds.isset(self._resizeInfo.nextColumn))
+					offset.x = Math.min(offset.x, (self._resizeInfo.nextColumnWidth - 40));
+			}
+
 			self._resizeInfo.column.width = (self._resizeInfo.columnWidth + offset.x);
 			self._resizeInfo.columnCells.forEach(cell => {
 				cell.style.setProperty('flex', null);
