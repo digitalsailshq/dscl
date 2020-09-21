@@ -2408,7 +2408,7 @@ ds.ui.__parsestyles(ds.ui.PopupHelper.styles);
 ds.ui.DragHelper = ds.Object.extend({
 	_dragging: false,
 	_draggingPastSmallOffset: false,
-	_onceOptions: null,
+	_draggingOptions: null,
 	beginPosition: null,
 	position: null,
 	cursor: null,
@@ -2416,13 +2416,13 @@ ds.ui.DragHelper = ds.Object.extend({
 		const self = this;
 		self._dragging = true;
 		self._draggingPastSmallOffset = false;
-		self._onceOptions = options;
+		self._draggingOptions = options;
 	},
 	end() {
 		const self = this;
 		self._dragging = false;
 		self._draggingPastSmallOffset = false;
-		self._onceOptions = null;
+		self._draggingOptions = null;
 	},
 	init() {
 		const self = this;
@@ -2433,7 +2433,7 @@ ds.ui.DragHelper = ds.Object.extend({
 			self.beginPosition = {x: e.pageX, y: e.pageY};
 			if (!self._dragging) return true;
 			self._trigger('begin', self.beginPosition, e);
-			if (self._onceOptions && ds.isFunction(self._onceOptions.begin)) self._onceOptions.begin(self.beginPosition, e);
+			if (self._draggingOptions && ds.isFunction(self._draggingOptions.begin)) self._draggingOptions.begin(self.beginPosition, e);
 			document.body.style.cursor = self.cursor;
 			return true;
 		});
@@ -2447,7 +2447,7 @@ ds.ui.DragHelper = ds.Object.extend({
 			if (Math.abs(offset.x) > 3 || Math.abs(offset.y) > 3 || self._draggingPastSmallOffset) {
 				self._draggingPastSmallOffset = true;
 				self._trigger('drag', offset, self.position, self.beginPosition, e);
-				if (self._onceOptions && ds.isFunction(self._onceOptions.drag)) self._onceOptions.drag(offset, self.position, self.beginPosition, e);
+				if (self._draggingOptions && ds.isFunction(self._draggingOptions.drag)) self._draggingOptions.drag(offset, self.position, self.beginPosition, e);
 			}
 			return true;
 		});
@@ -2459,7 +2459,7 @@ ds.ui.DragHelper = ds.Object.extend({
 				if (!self._dragging) return true;
 				if (Math.abs(offset.x) > 3 || Math.abs(offset.y) > 3 || self._draggingPastSmallOffset) {
 					self._trigger('end', offset, self.position, self.beginPosition, e);
-					if (self._onceOptions && ds.isFunction(self._onceOptions.end)) self._onceOptions.end(offset, self.position, self.beginPosition, e);
+					if (self._draggingOptions && ds.isFunction(self._draggingOptions.end)) self._draggingOptions.end(offset, self.position, self.beginPosition, e);
 				}
 				document.body.style.cursor = null;
 			} finally {
@@ -5452,6 +5452,7 @@ ds.ui.DataGridColumn = ds.Object.extend({
 	sortable: true,
 	sortDataType: String,
 	searchable: false,
+	resizable: false,
 	link: false,
 	emptyText: '',
 	appendEdit: null,
@@ -5852,16 +5853,31 @@ ds.ui.DataGrid = ds.ui.View.extend({
 }, ds.Events('data:single', 'link_click', 'action_options:single', 'action_click', 'header_click', 'row_click', 'row_dblclick', 'row_unselect', 'row_options:single', 'cell_options:single', 'cell', 'row', 'check', 'check_all', 'group_options:single', 'check_group', 'link_group_click', 'edit', 'update', 'sort'));
 ds.ui.__DataGridHeader = ds.ui.View.extend({
 	styles: `.__xgrd_hdr { }
+			 .__xgrd_hdr_cell_grip { cursor: ew-resize; width: 10px; background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMnB4IiBoZWlnaHQ9IjEycHgiIHZpZXdCb3g9IjAgMCAyIDEyIiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPgogICAgPGcgaWQ9InNwbGl0dGVyX2hhbmRsZV92IiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlLTYxIiBmaWxsPSIjQ0JDQkNCIiB4PSIwIiB5PSIxIiB3aWR0aD0iMiIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5IiBmaWxsPSIjRThFOEU4IiB4PSIwIiB5PSIwIiB3aWR0aD0iMiIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTMiIGZpbGw9IiNDQkNCQ0IiIHg9IjAiIHk9IjYiIHdpZHRoPSIyIiBoZWlnaHQ9IjEiPjwvcmVjdD4KICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlLTYxLUNvcHktMiIgZmlsbD0iI0U4RThFOCIgeD0iMCIgeT0iNSIgd2lkdGg9IjIiIGhlaWdodD0iMSI+PC9yZWN0PgogICAgICAgIDxyZWN0IGlkPSJSZWN0YW5nbGUtNjEtQ29weS01IiBmaWxsPSIjQ0JDQkNCIiB4PSIwIiB5PSIxMSIgd2lkdGg9IjIiIGhlaWdodD0iMSI+PC9yZWN0PgogICAgICAgIDxyZWN0IGlkPSJSZWN0YW5nbGUtNjEtQ29weS00IiBmaWxsPSIjRThFOEU4IiB4PSIwIiB5PSIxMCIgd2lkdGg9IjIiIGhlaWdodD0iMSI+PC9yZWN0PgogICAgPC9nPgo8L3N2Zz4='); background-repeat: no-repeat; background-position: center; }
 			 .__xgrd_hdr_cell_img_asc { transform: translateY(1px) rotate(180deg); opacity: 0.25 }
 			 .__xgrd_hdr_cell_img_desc { transform: translateY(1px); opacity: 0.25 }
 			 .__xgrd_hdr_cell { position: relative; overflow-x: hidden; }
 			 .__xgrd_hdr_cell:not(:first-child)::after { content: ''; position: absolute; left: 0px; top: 0px; bottom: 0px; width: 1px; background: linear-gradient(transparent, #cccccc67, transparent); }`,
 	template: `<div class="__xgrd_hdr __sbpad row bb">
-					<div x-for="column of this._dataGrid.columns.filter(c => c.visible && !c._hiddenByGrouping)" data-column-index="{{ column.index }}" class="__xgrd_hdr_cell{{ column.hover ? ' hvr hnd' : '' }}" style="{{ column.getOuterStyle() }}">
+					<div x-for="column of this._columnList() | store_item: __column" data-column-index="{{ column.index }}" class="__xgrd_hdr_cell row{{ column.hover ? ' hvr hnd' : '' }}" style="{{ column.getOuterStyle() }}">
 						{{ column.createHeaderCell() }}
+						<div x-if="this._columnIsGripVisible(column)" class="__xgrd_hdr_cell_grip"></div>
 					</div>
 				</div>`,
 	_dataGrid: null,
+	_dragHelper: null,
+	_resizeInfo: null,
+	_columnList() {
+		const self = this;
+		return self._dataGrid.columns.filter(c => c.visible && !c._hiddenByGrouping)
+	},
+	_columnIsGripVisible(column) {
+		const self = this;
+		if (ds.isPrototypeOf(column, ds.ui.DataGridActionColumn)) return false;
+		if (ds.last(self._dataGrid.columns) == column) return false;
+		//if (!column.resizable) return false;
+		return true;
+	},
 	update() {
 		const self = this;
 		self._dataGrid.columns.forEach(column => {
@@ -5875,9 +5891,10 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 		if (!self._dataGrid) throw 'ds.ui.__DataGridHeader: _dataGrid property must be specified.';
 		self._dataGrid.columns.forEach(column => column._dataGrid = self._dataGrid);
 		ds.ui.View.init.call(self);
-		ds.ui.element_on(self.element, 'click', 'div[data-column-index]', function(e) {
+		ds.ui.element_on(self.element, 'click', '.__xgrd_hdr_cell > .__xcell', function(e) {
 			if (self.__freed) return false;
-			const column = self._dataGrid.columns[this.getAttribute('data-column-index')];
+			const hcell = this.parentElement;
+			const column = self._dataGrid.columns[hcell.getAttribute('data-column-index')];
 			self._dataGrid._trigger('header_click', column);
 			if (!column.sortable || !column.dataKey) return true;
 			if (ds.isPrototypeOf(column, ds.ui.DataGridCheckColumn)) {
@@ -5899,6 +5916,49 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 				self._dataGrid.needsUpdate();
 			}
 			return true;
+		});
+		ds.ui.element_on(self.element, 'mousedown', '.__xgrd_hdr_cell_grip', function(e) {
+			if (self.__freed) return false;
+
+			const hcell = this.parentElement;
+			const hcell_next = ds.ui.element_next(hcell, '.__xgrd_hdr_cell');
+
+			self._resizeInfo = {
+				column: hcell.__column,
+				columnWidth: ds.ui.element_rects(hcell).border.width,
+				columnCells: [hcell, ...self._dataGrid.element.querySelectorAll(`div.__xgrd_bdy_cell[data-cell-index="${hcell.__column.index}"]`)],
+				nextColumn: ds.isset(hcell_next) ? hcell_next.__column : null,
+				nextColumnWidth: ds.isset(hcell_next) ? ds.ui.element_rects(hcell_next).border.width : null,
+				nextColumnCells: ds.isset(hcell_next)
+									? [hcell_next, ...self._dataGrid.element.querySelectorAll(`div.__xgrd_bdy_cell[data-cell-index="${hcell_next.__column.index}"]`)]
+									: []
+			};
+
+			if (ds.isPrototypeOf(self._resizeInfo.nextColumn, ds.ui.DataGridActionColumn)) {
+				self._resizeInfo.nextColumn = null;
+				self._resizeInfo.nextColumnWidth = null;
+			}
+
+			self._dragHelper.begin();
+			return true;
+		});
+		self._dragHelper = ds.ui.DragHelper.new();
+		self._dragHelper.on('begin', offset => {
+
+		});
+		self._dragHelper.on('drag', offset => {
+			self._resizeInfo.column.width = (self._resizeInfo.columnWidth + offset.x);
+			self._resizeInfo.columnCells.forEach(cell => {
+				cell.style.setProperty('flex', null);
+				cell.style.setProperty('width', `${self._resizeInfo.column.width}px`);
+			});
+			if (ds.isset(self._resizeInfo.nextColumn)) {
+				self._resizeInfo.nextColumn.width = (self._resizeInfo.nextColumnWidth - offset.x);
+				self._resizeInfo.nextColumnCells.forEach(cell => {
+					cell.style.setProperty('flex', null);
+					cell.style.setProperty('width', `${self._resizeInfo.nextColumn.width}px`);
+				});
+			}
 		});
 	}
 });
@@ -7102,6 +7162,21 @@ ds.ui.element_parent = function(element, selector, tillElement, includeSelf) {
         else return null;
     }
     return null;
+}
+ds.ui.element_next = function(element, selector) {
+	if (ds.isset(element.parentElement)) {
+		const list = Array.from(element.parentElement.children);
+		const index = list.indexOf(element);
+		if (index > -1) {
+			list.splice(0, index + 1);
+			if (ds.isset(selector)) {
+				for (let i = 0; i < list.length; i++)
+					if (list[i].matches(selector))
+						return list[i];
+				return null;
+			} else return list[0] || null;
+		} else return null;
+	} else return null;
 }
 ds.ui.element_on = function(element, event, a2, a3, a4) {
 	var __free = () => element.removeEventListener(event, __handler);
