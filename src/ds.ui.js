@@ -5850,7 +5850,7 @@ ds.ui.DataGrid = ds.ui.View.extend({
 		self._gridAppend = null;
 		ds.ui.View.free.call(self);
 	}
-}, ds.Events('data:single', 'link_click', 'action_options:single', 'action_click', 'header_click', 'row_click', 'row_dblclick', 'row_unselect', 'row_options:single', 'cell_options:single', 'cell', 'row', 'check', 'check_all', 'group_options:single', 'check_group', 'link_group_click', 'edit', 'update', 'sort'));
+}, ds.Events('data:single', 'link_click', 'action_options:single', 'action_click', 'header_click', 'row_click', 'row_dblclick', 'row_unselect', 'row_options:single', 'cell_options:single', 'cell', 'row', 'check', 'check_all', 'group_options:single', 'check_group', 'link_group_click', 'edit', 'update', 'sort', 'column_resize', 'column_did_resize'));
 ds.ui.__DataGridHeader = ds.ui.View.extend({
 	styles: `.__xgrd_hdr { }
 			 .__xgrd_hdr_cell_grip { cursor: ew-resize; width: 10px; background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMnB4IiBoZWlnaHQ9IjEycHgiIHZpZXdCb3g9IjAgMCAyIDEyIiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPgogICAgPGcgaWQ9InNwbGl0dGVyX2hhbmRsZV92IiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlLTYxIiBmaWxsPSIjQ0JDQkNCIiB4PSIwIiB5PSIxIiB3aWR0aD0iMiIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5IiBmaWxsPSIjRThFOEU4IiB4PSIwIiB5PSIwIiB3aWR0aD0iMiIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTMiIGZpbGw9IiNDQkNCQ0IiIHg9IjAiIHk9IjYiIHdpZHRoPSIyIiBoZWlnaHQ9IjEiPjwvcmVjdD4KICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlLTYxLUNvcHktMiIgZmlsbD0iI0U4RThFOCIgeD0iMCIgeT0iNSIgd2lkdGg9IjIiIGhlaWdodD0iMSI+PC9yZWN0PgogICAgICAgIDxyZWN0IGlkPSJSZWN0YW5nbGUtNjEtQ29weS01IiBmaWxsPSIjQ0JDQkNCIiB4PSIwIiB5PSIxMSIgd2lkdGg9IjIiIGhlaWdodD0iMSI+PC9yZWN0PgogICAgICAgIDxyZWN0IGlkPSJSZWN0YW5nbGUtNjEtQ29weS00IiBmaWxsPSIjRThFOEU4IiB4PSIwIiB5PSIxMCIgd2lkdGg9IjIiIGhlaWdodD0iMSI+PC9yZWN0PgogICAgPC9nPgo8L3N2Zz4='); background-repeat: no-repeat; background-position: center; }
@@ -5962,6 +5962,7 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 				cell.style.setProperty('min-width', null);
 				cell.style.setProperty('width', `${self._resizeInfo.column.width}px`);
 			});
+			self._dataGrid._trigger('column_resize', self._resizeInfo.column, self._resizeInfo.column.width);
 			if (ds.isset(self._resizeInfo.nextColumn)) {
 				self._resizeInfo.nextColumn.width = (self._resizeInfo.nextColumnWidth - offset.x);
 				self._resizeInfo.nextColumnCells.forEach(cell => {
@@ -5970,7 +5971,13 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 					cell.style.setProperty('min-width', null);
 					cell.style.setProperty('width', `${self._resizeInfo.nextColumn.width}px`);
 				});
+				self._dataGrid._trigger('column_resize', self._resizeInfo.nextColumn, self._resizeInfo.nextColumn.width);
 			}
+		});
+		self._dragHelper.on('end', () => {
+			self._dataGrid._trigger('column_did_resize', self._resizeInfo.column, self._resizeInfo.column.width);
+			if (ds.isset(self._resizeInfo.nextColumn))
+				self._dataGrid._trigger('column_did_resize', self._resizeInfo.nextColumn, self._resizeInfo.nextColumn.width);
 		});
 	}
 });
