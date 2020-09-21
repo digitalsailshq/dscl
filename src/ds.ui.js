@@ -5859,7 +5859,7 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 			 .__xgrd_hdr_cell { position: relative; overflow-x: hidden; }
 			 .__xgrd_hdr_cell:not(:first-child)::after { content: ''; position: absolute; left: 0px; top: 0px; bottom: 0px; width: 1px; background: linear-gradient(transparent, #cccccc67, transparent); }`,
 	template: `<div class="__xgrd_hdr __sbpad row bb">
-					<div x-for="column of this._columnList() | store_item: __column" data-column-index="{{ column.index }}" class="__xgrd_hdr_cell row{{ column.hover ? ' hvr hnd' : '' }}" style="{{ column.getOuterStyle() }}">
+					<div x-for="column of this._columnList | store_item: __column" data-column-index="{{ column.index }}" class="__xgrd_hdr_cell row{{ column.hover ? ' hvr hnd' : '' }}" style="{{ column.getOuterStyle() }}">
 						{{ column.createHeaderCell() }}
 						<div x-if="this._columnIsGripVisible(column)" class="__xgrd_hdr_cell_grip"></div>
 					</div>
@@ -5867,16 +5867,23 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 	_dataGrid: null,
 	_dragHelper: null,
 	_resizeInfo: null,
-	_columnList() {
-		const self = this;
-		return self._dataGrid.columns.filter(c => c.visible && !c._hiddenByGrouping)
-	},
+	_columnList: null,
 	_columnIsGripVisible(column) {
 		const self = this;
-		if (ds.isPrototypeOf(column, ds.ui.DataGridActionColumn)) return false;
-		if (ds.last(self._dataGrid.columns) == column) return false;
-		//if (!column.resizable) return false;
-		return true;
+		const index = self._columnList.indexOf(column);
+		if (index > -1) {
+			if (!column.resizable)
+				return false;
+			if (ds.isPrototypeOf(column, ds.ui.DataGridActionColumn))
+				return false;
+			const nextColumn = self._columnList[index + 1];
+			if (ds.isset(nextColumn)) {
+				if (ds.isPrototypeOf(nextColumn, ds.ui.DataGridActionColumn))
+					return false;
+				return true;
+			} else return false;
+			return true;
+		} return false;
 	},
 	update() {
 		const self = this;
@@ -5884,6 +5891,7 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 			column._hiddenByGrouping = self._dataGrid._grouped && self._dataGrid._groupHideColumn && self._dataGrid._groupDataKey == column.dataKey;
 			column._dataGrid = self._dataGrid;
 		});
+		self._columnList = self._dataGrid.columns.filter(c => c.visible && !c._hiddenByGrouping);
 		ds.ui.View.update.call(self);
 	},
 	init() {
@@ -5950,12 +5958,16 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 			self._resizeInfo.column.width = (self._resizeInfo.columnWidth + offset.x);
 			self._resizeInfo.columnCells.forEach(cell => {
 				cell.style.setProperty('flex', null);
+				cell.style.setProperty('max-width', null);
+				cell.style.setProperty('min-width', null);
 				cell.style.setProperty('width', `${self._resizeInfo.column.width}px`);
 			});
 			if (ds.isset(self._resizeInfo.nextColumn)) {
 				self._resizeInfo.nextColumn.width = (self._resizeInfo.nextColumnWidth - offset.x);
 				self._resizeInfo.nextColumnCells.forEach(cell => {
 					cell.style.setProperty('flex', null);
+					cell.style.setProperty('max-width', null);
+					cell.style.setProperty('min-width', null);
 					cell.style.setProperty('width', `${self._resizeInfo.nextColumn.width}px`);
 				});
 			}
