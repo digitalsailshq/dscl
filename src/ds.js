@@ -497,7 +497,7 @@ ds.assert = (value, descr = null, errp = Error) => {
 			return this;
 		},
 		inRange(from, to) {
-			if ((isset || !optional) && (value >= from && value <= to)) throw new errp(`${ descr || 'Assert:' } value "${value}" is in range ${from}..${to}.`);
+			if ((isset || !optional) && (value < from || value > to)) throw new errp(`${ descr || 'Assert:' } value "${value}" is not in range ${from}..${to}.`);
 			return this;
 		}
 	});
