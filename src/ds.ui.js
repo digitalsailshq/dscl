@@ -5997,7 +5997,7 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 			 .__xgrd_bdy_grp_hdr_cell { overflow-y: hidden; }
 			 .__xgrd_bdy_grp.__expanded .__xgrd_bdy_grp_hdr { border-bottom-width: 2px; }
 			 /*.__xgrd_bdy_row { border-bottom-color: rgb(228, 228, 228); border-bottom-style: solid; border-bottom-width: 1px; }*/
-			 .__xgrd_bdy_row { }
+			 .__xgrd_bdy_row { overflow-x: hidden; }
 			 .__xgrd_bdy.__xgrd_bdy_selarr_l .__xgrd_bdy_row.__selected::before, .__xgrd_bdy.__xgrd_bdy_selarr_l .__xgrd_bdy_row.__selected::after { content: ""; position: absolute; border-style: solid; left: 0px; top: 50%; transform: translateY(-50%); }
 			 .__xgrd_bdy.__xgrd_bdy_selarr_l .__xgrd_bdy_row.__selected::before { border-color: transparent transparent transparent var(--border-color); border-width: 8px; }
 			 .__xgrd_bdy.__xgrd_bdy_selarr_l .__xgrd_bdy_row.__selected::after { border-color: transparent transparent transparent white; border-width: 7px; }
