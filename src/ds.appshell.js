@@ -232,6 +232,7 @@ ds.appshell.__NavBarView = ds.ui.View.extend({
 	_sections: null,
 	homeNode: null,
 	openedSection: null,
+	showHomeNode: true,
 	addSection(options) {
 		const self = this;
 		const sectionView = ds.appshell.__NavBarSectionView.new(Object.assign(options, { _navBarView: self }));
@@ -243,12 +244,14 @@ ds.appshell.__NavBarView = ds.ui.View.extend({
 		const self = this;
 		ds.ui.View.init.call(self);
 		self._sections = [];
-		self.homeNode = self.addSection({ text: null, noTitle: true })
-							.addNode({
-			text: 'Домашняя страница',
-			controller: 'WidgetListController',
-			image: '/assets/images/home.svg'
-		});
+		if (self.showHomeNode) {
+			self.homeNode = self.addSection({ text: null, noTitle: true })
+								.addNode({
+				text: 'Домашняя страница',
+				controller: 'WidgetListController',
+				image: '/assets/images/home.svg'
+			});
+		}
 		self.openedSection = self.addSection({ text: 'Открытые' });
 	}
 });
