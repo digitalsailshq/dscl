@@ -1816,9 +1816,9 @@ ds.ui.Modal = function(target) {
 		const self = this;
 		if (self.__modal_inited) return;
 		const element = ds.isPrototypeOf(self, ds.ui.Controller) ? self.view.element : self.element;
-		self.modalSpacing = 15;
-		self.modalTopCorrection = 0.5;
-		self.modalLeftCorrection = 1;
+		if (!('modalSpacing' in self))			self.modalSpacing = 15;
+		if (!('modalTopCorrection' in self))	self.modalTopCorrection = 0.5;
+		if (!('modalLeftCorrection' in self))	self.modalLeftCorrection = 1;
 		self._modalDragInfo = { start: { left: 0, top: 0 } };
 		self._modalDragHelper = ds.ui.DragHelper.new();
 		self._modalDragHelper.on('begin', () => {
