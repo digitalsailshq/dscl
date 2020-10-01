@@ -1816,6 +1816,9 @@ ds.ui.Modal = function(target) {
 		const self = this;
 		if (self.__modal_inited) return;
 		const element = ds.isPrototypeOf(self, ds.ui.Controller) ? self.view.element : self.element;
+		self.modalSpacing = 15;
+		self.modalTopCorrection = 0.5;
+		self.modalLeftCorrection = 1;
 		self._modalDragInfo = { start: { left: 0, top: 0 } };
 		self._modalDragHelper = ds.ui.DragHelper.new();
 		self._modalDragHelper.on('begin', () => {
@@ -1823,12 +1826,20 @@ ds.ui.Modal = function(target) {
 			self._modalDragInfo.start.top = element.offsetTop;
 		});
 		self._modalDragHelper.on('drag', offset => {
-			let left = self._modalDragInfo.start.left + offset.x;
-			let top = self._modalDragInfo.start.top + offset.y;
-			if (top < 0) top = 0;
-			if (left < 0) left = 0;
-			if ((top + element.clientHeight) > window.innerHeight) top = window.innerHeight - element.clientHeight;
-			if ((left + element.clientWidth) > window.innerWidth) left = window.innerWidth - element.clientWidth;
+			const bounds = {
+				top: self.modalSpacing,
+				left: self.modalSpacing,
+				right: ((window.innerWidth - element.clientWidth) - self.modalSpacing),
+				bottom: ((window.innerHeight - element.clientHeight) - self.modalSpacing)
+			};
+
+			let left = (self._modalDragInfo.start.left + offset.x);
+			let top = (self._modalDragInfo.start.top + offset.y);
+			left = Math.max(left, bounds.left);
+			left = Math.min(left, bounds.right);
+			top = Math.max(top, bounds.top);
+			top = Math.min(top, bounds.bottom);
+
 			element.style.setProperty('left', left.toString() + 'px');
 			element.style.setProperty('top', top.toString() + 'px');
 		});
@@ -1852,9 +1863,13 @@ ds.ui.Modal = function(target) {
 		self.__modal_callback = callback;
 		self.__background_element = ds.ui.element('div.__xmdlpnl_bk', document.body);
 		self.__background_element.appendChild(element);
+
+		const left = parseInt(((document.body.clientWidth - element.clientWidth) / 2), 10) * self.modalLeftCorrection;
+		const top = parseInt(((document.body.clientHeight - element.clientHeight) / 2), 10) * self.modalTopCorrection;
+
 		element.classList.add('__xmdlpnl');
-		element.style.setProperty('left', parseInt(((document.body.clientWidth - element.clientWidth) / 2), 10).toString() + 'px');
-		element.style.setProperty('top', parseInt(((document.body.clientHeight - element.clientHeight) / 2) * 0.5, 10).toString() + 'px');
+		element.style.setProperty('left', left.toString() + 'px');
+		element.style.setProperty('top', top.toString() + 'px');
 		self._trigger('open');
 	}
 }
