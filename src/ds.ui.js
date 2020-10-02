@@ -1864,10 +1864,10 @@ ds.ui.Modal = function(target) {
 		self.__background_element = ds.ui.element('div.__xmdlpnl_bk', document.body);
 		self.__background_element.appendChild(element);
 
+		element.classList.add('__xmdlpnl');
+
 		const left = parseInt(((document.body.clientWidth - element.clientWidth) / 2), 10) * self.modalLeftCorrection;
 		const top = parseInt(((document.body.clientHeight - element.clientHeight) / 2), 10) * self.modalTopCorrection;
-
-		element.classList.add('__xmdlpnl');
 		element.style.setProperty('left', left.toString() + 'px');
 		element.style.setProperty('top', top.toString() + 'px');
 		self._trigger('open');
