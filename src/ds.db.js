@@ -59,6 +59,10 @@ ds.db.preprocessor = {
 		if (conn.__type == 'libpq') return 'int';
 		else if (conn.__type == 'odbc') return 'int';
 	},
+	bigint: conn => {
+		if (conn.__type == 'libpq') return 'bigint';
+		else if (conn.__type == 'odbc') return 'bigint';
+	},
 	smallint: conn => {
 		if (conn.__type == 'libpq') return 'smallint';
 		else if (conn.__type == 'odbc') return 'smallint';
