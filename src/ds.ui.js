@@ -6889,11 +6889,6 @@ ds.ui.ProgressBar = ds.ui.View.extend({
         const self = this;
         self.progress = current_value/goal_value;
     },
-    init() {
-        const self = this;
-        ds.ui.View.init.call(self);
-        document.body.appendChild(self.element);
-    }
 });
 ds.ui.Menu = ds.ui.View.extend({
 	styles: `.__xmnu {
