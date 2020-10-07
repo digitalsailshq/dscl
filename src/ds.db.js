@@ -87,6 +87,11 @@ ds.db.preprocessor = {
 		if (conn.__type == 'libpq') return `"${expr}"`;
 		else if (conn.__type == 'odbc') return `[${expr}]`;
 		else return expr;
+	},
+	identity: (conn, name) => {
+		if (conn.__type == 'libpq') return `"${name}" bigserial primary key`;
+		else if (conn.__type == 'odbc') return `[${name}] bigint identity(1, 1) primary key`;
+		else return `${name} primary key`;
 	}
 }
 // logging..
