@@ -78,6 +78,11 @@ ds.db.preprocessor = {
 	text: conn => {
 		if (conn.__type == 'libpq') return 'text';
 		else if (conn.__type == 'odbc') return `nvarchar(max)`;
+	},
+	ident: (conn, expr) => {
+		if (conn.__type == 'libpq') return `"${name}"`;
+		else if (conn.__type == 'odbc') return `[${name}]`;
+		else return expr;
 	}
 }
 // logging..
