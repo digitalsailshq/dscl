@@ -80,8 +80,8 @@ ds.db.preprocessor = {
 		else if (conn.__type == 'odbc') return `nvarchar(max)`;
 	},
 	ident: (conn, expr) => {
-		if (conn.__type == 'libpq') return `"${name}"`;
-		else if (conn.__type == 'odbc') return `[${name}]`;
+		if (conn.__type == 'libpq') return `"${expr}"`;
+		else if (conn.__type == 'odbc') return `[${expr}]`;
 		else return expr;
 	}
 }
