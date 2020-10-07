@@ -6863,6 +6863,33 @@ ds.ui.Progress = ds.ui.View.extend({
 		document.body.appendChild(self.element);
 	}
 });
+ds.ui.ProgressBar = ds.ui.View.extend({
+    styles: `.__xprgrsbr {  }
+            .__xprgrsbr_progress { background-color:#3498db }
+            .__xprgrsbr_residue { background-color:#ffffff }`,
+    template: `<div class="__xprgrsbr row bl bt br bb" style="width:{{ this._width }}px">
+					<div class="__xprgrsbr_progress col pt pb" style="width:{{ this._getProgressWidthPercentage() }}%"></div>
+					<div class="__xprgrsbr_residue col pt pb" style="width:{{ this._getResidueWidthPercentage() }}%"></div>
+				</div>`,
+    _getProgressWidthPercentage() { return Math.round(this._progress * 100) },
+    _getResidueWidthPercentage() { return 100 - this._getProgressWidthPercentage() },
+    _width: 200,
+    _progress: 0,
+    get width() { return this._width },
+    set width(value) { this._width = value; this.needsUpdate() },
+    get progress() { return this._progress },
+    set progress(value) {
+        const self = this;
+        const SEGMENT = [0, 1];
+        const new_progress = value < SEGMENT[0] ? SEGMENT[0] : value > SEGMENT[1] ? SEGMENT[1] : value;
+        self._progress = new_progress;
+        self.needsUpdate();
+    },
+    updateProgress(current_value, goal_value) {
+        const self = this;
+        self.progress = current_value/goal_value;
+    },
+});
 ds.ui.Menu = ds.ui.View.extend({
 	styles: `.__xmnu {
 				position: absolute;
