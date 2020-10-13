@@ -5635,6 +5635,18 @@ ds.ui.DataGridCheckColumn = ds.ui.DataGridColumn.extend({
 		element.__cell = cell;
 		return { element: element };
 	},
+    createHeaderCell() {
+        const self = this;
+
+        if(self._dataGrid.headerCheckboxRect){
+            const element = ds.ui.element(`<div class="__xgrd_cell_cbox pl pr pt pb __xcell"><div></div></div>`);
+            if (self.textAlign == 'right') element.classList.add('tar');
+            if (self.textAlign == 'center') element.classList.add('tac');
+            return { element: element };
+        }
+
+        return ds.ui.DataGridColumn.createHeaderCell.call(self);
+    },
 	getCheckedItems() {
 		const self = this;
 		var checked_items = [];
@@ -5643,7 +5655,7 @@ ds.ui.DataGridCheckColumn = ds.ui.DataGridColumn.extend({
 			if (this_cell && this_cell.row.item[self.dataKey] == 1) checked_items.push(this_cell.row.item);
 		});
 		return checked_items;
-	}
+	},
 });
 ds.ui.DataGridEditColumn = ds.ui.DataGridColumn.extend({
 	editPrototype: ds.ui.MultilineTextEdit.extend({ autoHeight: true, className: 'flex' }),
@@ -5676,7 +5688,7 @@ ds.ui.DataGrid = ds.ui.View.extend({
 	_header: true,
 	_headerGrayText: false,
 	_headerCheckbox: true,
-	_headerCheckboxRect: true,
+	_headerCheckboxRect: false,
 	_hoverRows: false,
 	_handRows: false,
 	_alternateRows: false,
@@ -5849,8 +5861,22 @@ ds.ui.DataGrid = ds.ui.View.extend({
 		if (self._gridHeader) self._gridHeader.update();
 		if (self._gridBody) self._gridBody.update();
 		if (self._gridAppend) self._gridAppend.update();
+		if (self.headerCheckboxRect) self._updateHeadersCheckboxRects();
 		self._trigger('update');
 	},
+    _updateHeadersCheckboxRects(){
+        const self = this;
+
+        self.columns.forEach(column => {
+            if (ds.isPrototypeOf(column, ds.ui.DataGridCheckColumn)) {
+                const headerElement = column._dataGrid._gridHeader.element.querySelector(`div[data-column-index="${column.index}"]`);
+
+                if(Boolean(column.cells) && Boolean(headerElement) && column.cells.every(i => i.row.item[column.dataKey])){
+                    headerElement.firstChild.classList.toggle('__checked', column.cells.every(i => i.row.item[column.dataKey]));
+                }
+            }
+        });
+    },
 	init() {
 		const self = this;
 		if (!self.columns) self.columns = [];
@@ -5927,6 +5953,7 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 			if (!column.sortable || !column.dataKey) return true;
 			if (ds.isPrototypeOf(column, ds.ui.DataGridCheckColumn)) {
 				if (!self._dataGrid._headerCheckbox) return true;
+                this.classList.toggle('__checked');
 				const dup = [];
 				column.cells
 					.filter(cell => dup.includes(cell.row.item) ? false : (dup.push(cell.row.item), true))
