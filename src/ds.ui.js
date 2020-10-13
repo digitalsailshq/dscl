@@ -5953,7 +5953,7 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 			if (!column.sortable || !column.dataKey) return true;
 			if (ds.isPrototypeOf(column, ds.ui.DataGridCheckColumn)) {
 				if (!self._dataGrid._headerCheckbox) return true;
-                this.classList.toggle('__checked');
+                self._dataGrid._updateHeadersCheckboxRects();
 				const dup = [];
 				column.cells
 					.filter(cell => dup.includes(cell.row.item) ? false : (dup.push(cell.row.item), true))
