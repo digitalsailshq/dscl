@@ -68,6 +68,7 @@ desktop.ini
 .Spotlight-V100
 .Trashes
 ._*
+.idea
 # Node specific
 package-lock.json
 dist/
