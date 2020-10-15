@@ -5871,7 +5871,7 @@ ds.ui.DataGrid = ds.ui.View.extend({
             if (ds.isPrototypeOf(column, ds.ui.DataGridCheckColumn)) {
                 const headerElement = column._dataGrid._gridHeader.element.querySelector(`div[data-column-index="${column.index}"]`);
 
-                if(Boolean(column.cells) && Boolean(headerElement) && column.cells.every(i => i.row.item[column.dataKey])){
+                if(Boolean(column.cells) && Boolean(headerElement)){
                     headerElement.firstChild.classList.toggle('__checked', column.cells.every(i => i.row.item[column.dataKey]));
                 }
             }
@@ -5953,7 +5953,6 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 			if (!column.sortable || !column.dataKey) return true;
 			if (ds.isPrototypeOf(column, ds.ui.DataGridCheckColumn)) {
 				if (!self._dataGrid._headerCheckbox) return true;
-                self._dataGrid._updateHeadersCheckboxRects();
 				const dup = [];
 				column.cells
 					.filter(cell => dup.includes(cell.row.item) ? false : (dup.push(cell.row.item), true))
@@ -6167,6 +6166,7 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 		cell.column.cells.forEach(c => {
 			if (c.row.item == cell.row.item) ds.ui.element_classif(c.cell.element, '__checked', value == 1);
 		});
+        if (self._dataGrid.headerCheckboxRect) self._dataGrid._updateHeadersCheckboxRects();
 		if (triggerEvent) self._dataGrid._trigger('check', cell, value == 1);
 	},
 	_checkCell(cell, checked = true, triggerEvent = true) {
@@ -6176,6 +6176,7 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 		if (!ds.isPrototypeOf(cell.column, ds.ui.DataGridCheckColumn)) return;
 		cell.row.item[cell.column.dataKey] = checked ? 1 : 0;
 		cell.cell.element.classList.add('__checked');
+        if (self._dataGrid.headerCheckboxRect) self._dataGrid._updateHeadersCheckboxRects();
 		if (triggerEvent) self._dataGrid._trigger('check', cell, checked);
 	},
 	_createGroupCell(group) {
