@@ -441,7 +441,15 @@ ds.db.drop_table = (conn, table_name) => {
 	const exists = ds.db.table_exists(conn, table_name);
 	if (exists) {
 		if (conn.__type == 'libpq') ds.db.exec(conn, `drop table "${table_name}"`);
-		else if (conn.__type == 'odbc') ds.db.exec(conn, `drop table "${table_name}"`);
+		else if (conn.__type == 'odbc') ds.db.exec(conn, `drop table [${table_name}]`);
 		else throw new Error(`ds.db.drop_table: Connection type "${conn.__type}" not supported.`);
+	}
+}
+ds.db.drop_field = (conn, table_name, field_name) => {
+	const exists = ds.db.table_exists(conn, table_name);
+	if (exists) {
+		if (conn.__type == 'libpq') ds.db.exec(conn, `alter table "${table_name}" drop column "${field_name}"`);
+		else if (conn.__type == 'odbc') ds.db.exec(conn, `alter table [${table_name}] drop column [${field_name}]`);
+		else throw new Error(`ds.db.drop_field: Connection type "${conn.__type}" not supported.`);
 	}
 }
