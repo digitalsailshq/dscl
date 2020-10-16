@@ -6008,6 +6008,8 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 					offset.x = Math.min(offset.x, (self._resizeInfo.nextColumnWidth - 40));
 			}
 
+			self._resizeInfo.column.maxWidth = null;
+			self._resizeInfo.column.minWidth = null;
 			self._resizeInfo.column.width = (self._resizeInfo.columnWidth + offset.x);
 			self._resizeInfo.columnCells.forEach(cell => {
 				cell.style.setProperty('flex', null);
@@ -6017,6 +6019,8 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 			});
 			self._dataGrid._trigger('column_resize', self._resizeInfo.column, self._resizeInfo.column.width);
 			if (ds.isset(self._resizeInfo.nextColumn)) {
+				self._resizeInfo.nextColumn.maxWidth = null;
+				self._resizeInfo.nextColumn.minWidth = null;
 				self._resizeInfo.nextColumn.width = (self._resizeInfo.nextColumnWidth - offset.x);
 				self._resizeInfo.nextColumnCells.forEach(cell => {
 					cell.style.setProperty('flex', null);
