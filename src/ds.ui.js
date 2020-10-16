@@ -5871,8 +5871,12 @@ ds.ui.DataGrid = ds.ui.View.extend({
             if (ds.isPrototypeOf(column, ds.ui.DataGridCheckColumn)) {
                 const headerElement = column._dataGrid._gridHeader.element.querySelector(`div[data-column-index="${column.index}"]`);
 
-                if(Boolean(column.cells) && Boolean(headerElement)){
-                    headerElement.firstChild.classList.toggle('__checked', column.cells.every(i => i.row.item[column.dataKey]));
+                if(Boolean(headerElement)){
+                    if(Boolean(column.cells && column.cells.length === 0)){
+                        headerElement.firstChild.classList.remove('__checked');
+                    } else if (Boolean(column.cells && column.cells.length > 0)){
+                        headerElement.firstChild.classList.toggle('__checked', column.cells.every(i => i.row.item[column.dataKey]));
+                    }
                 }
             }
         });
