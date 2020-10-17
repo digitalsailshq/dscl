@@ -5901,22 +5901,33 @@ ds.ui.DataGrid = ds.ui.View.extend({
 }, ds.Events('data:single', 'link_click', 'action_options:single', 'action_click', 'header_click', 'row_click', 'row_dblclick', 'row_unselect', 'row_options:single', 'cell_options:single', 'cell', 'row', 'check', 'check_all', 'group_options:single', 'check_group', 'link_group_click', 'edit', 'update', 'sort', 'column_resize', 'column_did_resize'));
 ds.ui.__DataGridHeader = ds.ui.View.extend({
 	styles: `.__xgrd_hdr { overflow-x: hidden; }
-			 .__xgrd_hdr_cell_grip { cursor: ew-resize; width: 10px; background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMnB4IiBoZWlnaHQ9IjEycHgiIHZpZXdCb3g9IjAgMCAyIDEyIiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPgogICAgPGcgaWQ9InNwbGl0dGVyX2hhbmRsZV92IiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlLTYxIiBmaWxsPSIjQ0JDQkNCIiB4PSIwIiB5PSIxIiB3aWR0aD0iMiIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5IiBmaWxsPSIjRThFOEU4IiB4PSIwIiB5PSIwIiB3aWR0aD0iMiIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTMiIGZpbGw9IiNDQkNCQ0IiIHg9IjAiIHk9IjYiIHdpZHRoPSIyIiBoZWlnaHQ9IjEiPjwvcmVjdD4KICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlLTYxLUNvcHktMiIgZmlsbD0iI0U4RThFOCIgeD0iMCIgeT0iNSIgd2lkdGg9IjIiIGhlaWdodD0iMSI+PC9yZWN0PgogICAgICAgIDxyZWN0IGlkPSJSZWN0YW5nbGUtNjEtQ29weS01IiBmaWxsPSIjQ0JDQkNCIiB4PSIwIiB5PSIxMSIgd2lkdGg9IjIiIGhlaWdodD0iMSI+PC9yZWN0PgogICAgICAgIDxyZWN0IGlkPSJSZWN0YW5nbGUtNjEtQ29weS00IiBmaWxsPSIjRThFOEU4IiB4PSIwIiB5PSIxMCIgd2lkdGg9IjIiIGhlaWdodD0iMSI+PC9yZWN0PgogICAgPC9nPgo8L3N2Zz4='); background-repeat: no-repeat; background-position: center; }
+			 .__xgrd_hdr_cell_size_grip { cursor: ew-resize; width: 14px; background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMnB4IiBoZWlnaHQ9IjEycHgiIHZpZXdCb3g9IjAgMCAyIDEyIiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPgogICAgPGcgaWQ9InNwbGl0dGVyX2hhbmRsZV92IiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlLTYxIiBmaWxsPSIjQ0JDQkNCIiB4PSIwIiB5PSIxIiB3aWR0aD0iMiIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5IiBmaWxsPSIjRThFOEU4IiB4PSIwIiB5PSIwIiB3aWR0aD0iMiIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTMiIGZpbGw9IiNDQkNCQ0IiIHg9IjAiIHk9IjYiIHdpZHRoPSIyIiBoZWlnaHQ9IjEiPjwvcmVjdD4KICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlLTYxLUNvcHktMiIgZmlsbD0iI0U4RThFOCIgeD0iMCIgeT0iNSIgd2lkdGg9IjIiIGhlaWdodD0iMSI+PC9yZWN0PgogICAgICAgIDxyZWN0IGlkPSJSZWN0YW5nbGUtNjEtQ29weS01IiBmaWxsPSIjQ0JDQkNCIiB4PSIwIiB5PSIxMSIgd2lkdGg9IjIiIGhlaWdodD0iMSI+PC9yZWN0PgogICAgICAgIDxyZWN0IGlkPSJSZWN0YW5nbGUtNjEtQ29weS00IiBmaWxsPSIjRThFOEU4IiB4PSIwIiB5PSIxMCIgd2lkdGg9IjIiIGhlaWdodD0iMSI+PC9yZWN0PgogICAgPC9nPgo8L3N2Zz4='); background-repeat: no-repeat; background-position: center; }
+			 .__xgrd_hdr_cell_drag_grip { cursor: move; width: 10px; margin-right: 10px; background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMTBweCIgaGVpZ2h0PSIxMXB4IiB2aWV3Qm94PSIwIDAgMTAgMTEiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8ZyBpZD0iZHJhZ19ncmlwIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlLTYxLUNvcHktNSIgZmlsbD0iI0NCQ0JDQiIgeD0iMCIgeT0iMTAiIHdpZHRoPSIxIiBoZWlnaHQ9IjEiPjwvcmVjdD4KICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlLTYxLUNvcHktNCIgZmlsbD0iI0U4RThFOCIgeD0iMCIgeT0iOSIgd2lkdGg9IjEiIGhlaWdodD0iMSI+PC9yZWN0PgogICAgICAgIDxyZWN0IGlkPSJSZWN0YW5nbGUtNjEtQ29weS03IiBmaWxsPSIjQ0JDQkNCIiB4PSIzIiB5PSIxMCIgd2lkdGg9IjEiIGhlaWdodD0iMSI+PC9yZWN0PgogICAgICAgIDxyZWN0IGlkPSJSZWN0YW5nbGUtNjEtQ29weS02IiBmaWxsPSIjRThFOEU4IiB4PSIzIiB5PSI5IiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTkiIGZpbGw9IiNDQkNCQ0IiIHg9IjYiIHk9IjEwIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTgiIGZpbGw9IiNFOEU4RTgiIHg9IjYiIHk9IjkiIHdpZHRoPSIxIiBoZWlnaHQ9IjEiPjwvcmVjdD4KICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlLTYxLUNvcHktMTEiIGZpbGw9IiNDQkNCQ0IiIHg9IjkiIHk9IjEwIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTEwIiBmaWxsPSIjRThFOEU4IiB4PSI5IiB5PSI5IiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTE5IiBmaWxsPSIjQ0JDQkNCIiB4PSIwIiB5PSI3IiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTE4IiBmaWxsPSIjRThFOEU4IiB4PSIwIiB5PSI2IiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTE3IiBmaWxsPSIjQ0JDQkNCIiB4PSIzIiB5PSI3IiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTE2IiBmaWxsPSIjRThFOEU4IiB4PSIzIiB5PSI2IiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTE1IiBmaWxsPSIjQ0JDQkNCIiB4PSI2IiB5PSI3IiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTE0IiBmaWxsPSIjRThFOEU4IiB4PSI2IiB5PSI2IiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTEzIiBmaWxsPSIjQ0JDQkNCIiB4PSI5IiB5PSI3IiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTEyIiBmaWxsPSIjRThFOEU4IiB4PSI5IiB5PSI2IiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTI3IiBmaWxsPSIjQ0JDQkNCIiB4PSIwIiB5PSI0IiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTI2IiBmaWxsPSIjRThFOEU4IiB4PSIwIiB5PSIzIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTI1IiBmaWxsPSIjQ0JDQkNCIiB4PSIzIiB5PSI0IiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTI0IiBmaWxsPSIjRThFOEU4IiB4PSIzIiB5PSIzIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTIzIiBmaWxsPSIjQ0JDQkNCIiB4PSI2IiB5PSI0IiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTIyIiBmaWxsPSIjRThFOEU4IiB4PSI2IiB5PSIzIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTIxIiBmaWxsPSIjQ0JDQkNCIiB4PSI5IiB5PSI0IiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTIwIiBmaWxsPSIjRThFOEU4IiB4PSI5IiB5PSIzIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTM1IiBmaWxsPSIjQ0JDQkNCIiB4PSIwIiB5PSIxIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTM0IiBmaWxsPSIjRThFOEU4IiB4PSIwIiB5PSIwIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTMzIiBmaWxsPSIjQ0JDQkNCIiB4PSIzIiB5PSIxIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTMyIiBmaWxsPSIjRThFOEU4IiB4PSIzIiB5PSIwIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTMxIiBmaWxsPSIjQ0JDQkNCIiB4PSI2IiB5PSIxIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTMwIiBmaWxsPSIjRThFOEU4IiB4PSI2IiB5PSIwIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTI5IiBmaWxsPSIjQ0JDQkNCIiB4PSI5IiB5PSIxIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTI4IiBmaWxsPSIjRThFOEU4IiB4PSI5IiB5PSIwIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICA8L2c+Cjwvc3ZnPg=='); background-repeat: no-repeat; background-position: center; }
 			 .__xgrd_hdr_cell_img_asc { transform: translateY(1px) rotate(180deg); opacity: 0.25 }
 			 .__xgrd_hdr_cell_img_desc { transform: translateY(1px); opacity: 0.25 }
 			 .__xgrd_hdr_cell { position: relative; overflow-x: hidden; }
-			 .__xgrd_hdr_cell:not(:first-child)::after { content: ''; position: absolute; left: 0px; top: 0px; bottom: 0px; width: 1px; background: linear-gradient(transparent, #cccccc67, transparent); }`,
+			 .__xgrd_hdr_cell:not(:first-child)::after { content: ''; position: absolute; left: 0px; top: 0px; bottom: 0px; width: 1px; background: linear-gradient(transparent, #cccccc67, transparent); }
+			 .__xgrd_hdr_cell_placeholder { position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; border-color: var(--border-color); border-width: 2px; border-style: dotted; background-color: white; }`,
 	template: `<div class="__xgrd_hdr __sbpad row bb">
 					<div x-for="column of this._columnList | store_item: __column" data-column-index="{{ column.index }}" class="__xgrd_hdr_cell row{{ column.hover ? ' hvr hnd' : '' }}" style="{{ column.getOuterStyle() }}">
 						{{ column.createHeaderCell() }}
-						<div x-if="this._columnIsGripVisible(column)" class="__xgrd_hdr_cell_grip"></div>
+						<div x-if="this._columnIsDragGripVisible(column)" class="__xgrd_hdr_cell_drag_grip"></div>
+						<div x-if="this._columnIsSizeGripVisible(column)" class="__xgrd_hdr_cell_size_grip"></div>
 					</div>
 				</div>`,
 	_dataGrid: null,
 	_dragHelper: null,
+	_dragType: null, // 'size' | 'drag'
 	_resizeInfo: null,
+	_dragInfo: null,
 	_columnList: null,
-	_columnIsGripVisible(column) {
+	_columnIsDragGripVisible(column) {
+		const self = this;
+		if (ds.isPrototypeOf(column, ds.ui.DataGridActionColumn))
+			return false;
+		return true;
+	},
+	_columnIsSizeGripVisible(column) {
 		const self = this;
 		const index = self._columnList.indexOf(column);
 		if (index > -1) {
@@ -5975,24 +5986,35 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 			}
 			return true;
 		});
-		ds.ui.element_on(self.element, 'mousedown', '.__xgrd_hdr_cell_grip', function(e) {
+		ds.ui.element_on(self.element, 'mousedown', '.__xgrd_hdr_cell_size_grip', function(e) {
 			if (self.__freed) return false;
-
 			const hcell = this.parentElement;
 			const hcell_next = ds.ui.element_next(hcell, '.__xgrd_hdr_cell');
-
 			self._resizeInfo = {};
 			self._resizeInfo.column = hcell.__column;
 			self._resizeInfo.columnWidth = ds.ui.element_rects(hcell).border.width;
 			self._resizeInfo.columnCells = [hcell, ...self._dataGrid.element.querySelectorAll(`div.__xgrd_bdy_cell[data-cell-index="${hcell.__column.index}"]`)];
-
 			if (ds.isset(hcell_next)
 			&& !ds.isPrototypeOf(hcell_next.__column, ds.ui.DataGridActionColumn)) {
 				self._resizeInfo.nextColumn = hcell_next.__column;
 				self._resizeInfo.nextColumnWidth = ds.ui.element_rects(hcell_next).border.width;
 				self._resizeInfo.nextColumnCells = [hcell_next, ...self._dataGrid.element.querySelectorAll(`div.__xgrd_bdy_cell[data-cell-index="${hcell_next.__column.index}"]`)];
 			}
-
+			self._dragType = 'size';
+			self._dragHelper.begin();
+			return true;
+		});
+		ds.ui.element_on(self.element, 'mousedown', '.__xgrd_hdr_cell_drag_grip', function(e) {
+			if (self.__freed) return false;
+			const hcell = this.parentElement;
+			const rect = ds.ui.element_rects(hcell).border;
+			self._dragInfo = {};
+			self._dragInfo.element = ds.ui.element(`<div class="pl pt pr pb bl bt br bb bkw strong sm" style="position: absolute; box-sizing: border-box; width: ${rect.width}px;">${hcell.__column.text}</div>`);;
+			self._dragInfo.placeholder = ds.ui.element(`<div class="__xgrd_hdr_cell_placeholder"></div>`);
+			self._dragInfo.position = { left: rect.left, top: rect.top };
+			hcell.appendChild(self._dragInfo.placeholder);
+			document.body.appendChild(self._dragInfo.element);
+			self._dragType = 'drag';
 			self._dragHelper.begin();
 			return true;
 		});
@@ -6001,40 +6023,53 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 
 		});
 		self._dragHelper.on('drag', offset => {
-			if (offset.x < 0) {
-				offset.x = Math.max(offset.x, -(self._resizeInfo.columnWidth - 40));
-			} else if (offset.x > 0) {
-				if (ds.isset(self._resizeInfo.nextColumn))
-					offset.x = Math.min(offset.x, (self._resizeInfo.nextColumnWidth - 40));
-			}
+			if (self._dragType == 'size') {
+				if (offset.x < 0) {
+					offset.x = Math.max(offset.x, -(self._resizeInfo.columnWidth - 40));
+				} else if (offset.x > 0) {
+					if (ds.isset(self._resizeInfo.nextColumn))
+						offset.x = Math.min(offset.x, (self._resizeInfo.nextColumnWidth - 40));
+				}
 
-			self._resizeInfo.column.maxWidth = null;
-			self._resizeInfo.column.minWidth = null;
-			self._resizeInfo.column.width = (self._resizeInfo.columnWidth + offset.x);
-			self._resizeInfo.columnCells.forEach(cell => {
-				cell.style.setProperty('flex', null);
-				cell.style.setProperty('max-width', null);
-				cell.style.setProperty('min-width', null);
-				cell.style.setProperty('width', `${self._resizeInfo.column.width}px`);
-			});
-			self._dataGrid._trigger('column_resize', self._resizeInfo.column, self._resizeInfo.column.width);
-			if (ds.isset(self._resizeInfo.nextColumn)) {
-				self._resizeInfo.nextColumn.maxWidth = null;
-				self._resizeInfo.nextColumn.minWidth = null;
-				self._resizeInfo.nextColumn.width = (self._resizeInfo.nextColumnWidth - offset.x);
-				self._resizeInfo.nextColumnCells.forEach(cell => {
+				self._resizeInfo.column.maxWidth = null;
+				self._resizeInfo.column.minWidth = null;
+				self._resizeInfo.column.width = (self._resizeInfo.columnWidth + offset.x);
+				self._resizeInfo.columnCells.forEach(cell => {
 					cell.style.setProperty('flex', null);
 					cell.style.setProperty('max-width', null);
 					cell.style.setProperty('min-width', null);
-					cell.style.setProperty('width', `${self._resizeInfo.nextColumn.width}px`);
+					cell.style.setProperty('width', `${self._resizeInfo.column.width}px`);
 				});
-				self._dataGrid._trigger('column_resize', self._resizeInfo.nextColumn, self._resizeInfo.nextColumn.width);
+				self._dataGrid._trigger('column_resize', self._resizeInfo.column, self._resizeInfo.column.width);
+				if (ds.isset(self._resizeInfo.nextColumn)) {
+					self._resizeInfo.nextColumn.maxWidth = null;
+					self._resizeInfo.nextColumn.minWidth = null;
+					self._resizeInfo.nextColumn.width = (self._resizeInfo.nextColumnWidth - offset.x);
+					self._resizeInfo.nextColumnCells.forEach(cell => {
+						cell.style.setProperty('flex', null);
+						cell.style.setProperty('max-width', null);
+						cell.style.setProperty('min-width', null);
+						cell.style.setProperty('width', `${self._resizeInfo.nextColumn.width}px`);
+					});
+					self._dataGrid._trigger('column_resize', self._resizeInfo.nextColumn, self._resizeInfo.nextColumn.width);
+				}
+			} else if (self._dragType == 'drag') {
+				self._dragInfo.element.style.setProperty('left', `${(self._dragInfo.position.left + offset.x)}px`);
+				self._dragInfo.element.style.setProperty('top', `${(self._dragInfo.position.top + offset.y)}px`);
+
+				////
 			}
 		});
 		self._dragHelper.on('end', () => {
-			self._dataGrid._trigger('column_did_resize', self._resizeInfo.column, self._resizeInfo.column.width);
-			if (ds.isset(self._resizeInfo.nextColumn))
-				self._dataGrid._trigger('column_did_resize', self._resizeInfo.nextColumn, self._resizeInfo.nextColumn.width);
+			if (self._dragType == 'size') {
+				self._dataGrid._trigger('column_did_resize', self._resizeInfo.column, self._resizeInfo.column.width);
+				if (ds.isset(self._resizeInfo.nextColumn))
+					self._dataGrid._trigger('column_did_resize', self._resizeInfo.nextColumn, self._resizeInfo.nextColumn.width);
+			} else if (self._dragType == 'drag') {
+				self._dragInfo.element.remove();
+				self._dragInfo.placeholder.remove();
+				self._dragInfo = {};
+			}
 		});
 	}
 });
