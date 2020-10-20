@@ -5710,9 +5710,9 @@ ds.ui.DataGridEditColumn = ds.ui.DataGridColumn.extend({
 });
 ds.ui.DataGrid = ds.ui.View.extend({
 	template: `<div class="__xgrd col">
-					{{ this._gridHeader = this._gridHeader || ds.ui.__DataGridHeader.new({ _dataGrid: this }) }}
-					{{ this._gridBody = this._gridBody || ds.ui.__DataGridBody.new({ _dataGrid: this }) }}
-					{{ this._gridAppend = this._gridAppend || ds.ui.__DataGridAppend.new({ _dataGrid: this }) }}
+					{{ this._gridHeader }}
+					{{ this._gridBody }}
+					{{ this._gridAppend }}
 				</div>`,
 	_gridHeader: null,
 	_gridBody: null,
@@ -5850,8 +5850,8 @@ ds.ui.DataGrid = ds.ui.View.extend({
 		this._dataSet.on('load', () => this.needsUpdate());
 		if (this._dataSet.isLoaded()) this.needsUpdate();
 	},
-	get selectedId() { return this._selectedId; },
-	set selectedId(value) { this._selectedId = value; this.needsUpdate(); },
+	get selectedId() { return this._gridBody._selectedId; },
+	set selectedId(value) { this._gridBody._selectedId = value; this.needsUpdate(); },
 	get compact() { return this._compact; },
 	set compact(value) { this._compact = value; this.needsUpdate(); },
 	get lastColumnResizable() { return this._lastColumnResizable; },
@@ -5924,6 +5924,9 @@ ds.ui.DataGrid = ds.ui.View.extend({
 	init() {
 		const self = this;
 		if (!self.columns) self.columns = [];
+		self._gridHeader = ds.ui.__DataGridHeader.new({ _dataGrid: self });
+		self._gridBody = ds.ui.__DataGridBody.new({ _dataGrid: self });
+		self._gridAppend = ds.ui.__DataGridAppend.new({ _dataGrid: self });
 		self.on('data', () => self._dataSet ? self._dataSet.data : (self.data || []));
 		self.spoilers = [];
 		ds.ui.View.init.call(self);
