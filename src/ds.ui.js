@@ -5718,6 +5718,7 @@ ds.ui.DataGrid = ds.ui.View.extend({
 	_gridBody: null,
 	_gridAppend: null,
 	_dataSet: null,
+	_selectedId: null,
 	_sortColumn: null,
 	_sortDirection: null,
 	_search: null,
@@ -5849,6 +5850,8 @@ ds.ui.DataGrid = ds.ui.View.extend({
 		this._dataSet.on('load', () => this.needsUpdate());
 		if (this._dataSet.isLoaded()) this.needsUpdate();
 	},
+	get selectedId() { return this._selectedId; },
+	set selectedId(value) { this._selectedId = value; this.needsUpdate(); },
 	get compact() { return this._compact; },
 	set compact(value) { this._compact = value; this.needsUpdate(); },
 	get lastColumnResizable() { return this._lastColumnResizable; },
