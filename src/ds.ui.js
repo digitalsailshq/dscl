@@ -6622,7 +6622,7 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 				if (selected_row_element) selected_row_element.classList.remove('__selected');
 				this.classList.add('__selected');
 				if (self._dataGrid.idKey) self._selectedId = ds.get(row.item, self._dataGrid.idKey);
-				else console.warn('ds.ui.__DataGridBody: Specify idKey if you want to keep selection after grid gets reloaded.');
+				else self._selectedId = null;
 			}
 			self._dataGrid._trigger('row_click', row, e);
 			return true;
