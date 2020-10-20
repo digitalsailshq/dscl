@@ -6068,7 +6068,7 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 				const hcell = (() => {
 					const center = ((self._dragInfo.rect.left + offset.x) + (self._dragInfo.rect.width / 2));
 					const prev = self._dragInfo.hcell.previousElementSibling;
-					const next = self._dragInfo.hcell.nextElementSibling;
+					const next = ds.ui.element_next(self._dragInfo.hcell, '.__xgrd_hdr_cell');
 
 					if (ds.isset(prev)) {
 						const rect = ds.ui.element_rects(prev).border;
