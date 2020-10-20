@@ -6615,7 +6615,7 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 		});
 		ds.ui.element_on(self.rows_element, 'click', '.__xgrd_bdy_row', function(e) {
 			if (self.__freed) return false;
-			var row = self._rows[parseInt(this.getAttribute('data-row-index'), 10)];
+			const row = self._rows[parseInt(this.getAttribute('data-row-index'), 10)];
 			if (!row) return true;
 			if (self._dataGrid.selectRows) {
 				var selected_row_element = self.rows_element.querySelector('.__xgrd_bdy_row.__selected');
@@ -6629,7 +6629,9 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 		});
 		ds.ui.element_on(self.rows_element, 'dblclick', '.__xgrd_bdy_row', function(e) {
 			if (self.__freed) return false;
-			self._dataGrid._trigger('row_dblclick');
+			const row = self._rows[parseInt(this.getAttribute('data-row-index'), 10)];
+			if (!row) return true;
+			self._dataGrid._trigger('row_dblclick', row, e);
 			return true;
 		});
 		ds.ui.element_on(self.rows_element, 'click', '.__xgrd_bdy_grp_hdr_exp', function(e) {
