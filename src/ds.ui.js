@@ -4388,7 +4388,15 @@ ds.ui.DropDownEdit = ds.ui.TextEdit.extend({
 	}
 }, ds.Events('before_open'));
 ds.ui.LookupEdit = ds.ui.DropDownEdit.extend({
-	styles: `.__xedt_frm_chk_itm { border-style: solid; border-width: 1px; border-radius: 3px; padding: 0px 6px; margin: 2px 0px 2px 2px; background-color: #d2e7fb; border-color: #d2e7fb; color: #333; }`,
+	styles: `.__xedt_frm_chk_itm {
+				border-style: solid;
+				border-width: 1px;
+				border-radius: 3px;
+				padding: 0px 0px 0px 6px;
+				margin: 2px 0px 2px 2px;
+				background-color: #d2e7fb;
+				border-color: #d2e7fb;
+				color: #333; }`,
 	template: `@extend ds.ui.DropDownEdit.template
 					@slot frame
 						{{ this._getCheckedLabels() }}
@@ -4561,11 +4569,31 @@ ds.ui.LookupEdit = ds.ui.DropDownEdit.extend({
 	},
 	_getCheckedLabels() {
 		const self = this;
+		const label = (name, index) => {
+			return ds.ui.View.new({
+				template: `<div class="__xedt_frm_chk_itm row mid">
+								<div>{{ this.name }}</div>
+								<div class="row mid cen hnd dhvr" style="width: 18px; height: 18px;" x-on:click="self.removeItem()">
+									<img src="${ds.ui.TIMES_IMG}" class="x12 dhvrc" />
+								</div>
+							</div>`,
+				name: name,
+				index: index,
+				lookupEdit: self,
+				removeItem() {
+					const self = this;
+					self.lookupEdit._onCheckItem(self.index, false);
+				}
+			});
+		}
 		if (!self.multiple || self.isEmpty() || !self.dataSet || !self.nameKey || !self.valueKey) return [];
 		return (ds.isArray(self.value) ? self.value : [self.value])
 				.map(value => self.dataSet.data.find(item => ds.get(item, self.valueKey) == value))
-				.map(item => ds.get(item, self.nameKey))
-				.map(text => ({ element: ds.ui.element('<div class="__xedt_frm_chk_itm">' + text + '</div>') }));
+				.map(item => {
+					const index = self.dataSet.data.indexOf(item);
+					const name = ds.get(item, self.nameKey);
+					return label(name, index);
+				});
 	},
 	isEmpty() { return this.value === null || this.value === undefined || this.value === '' || (ds.isArray(this.value) && this.value.length == 0); },
 	update() {
