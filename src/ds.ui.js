@@ -6145,10 +6145,10 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 				if (ds.isset(self._resizeInfo.nextColumn))
 					self._dataGrid._trigger('column_did_resize', self._resizeInfo.nextColumn, self._resizeInfo.nextColumn.width);
 			} else if (self._dragType == 'drag') {
+				self._dataGrid._trigger('column_did_drag', self._dragInfo.hcell.__column);
 				self._dragInfo.element.remove();
 				self._dragInfo.placeholder.remove();
 				self._dragInfo = {};
-				self._dataGrid._trigger('column_did_drag', self._dragInfo.hcell.__column);
 			}
 		});
 	}
