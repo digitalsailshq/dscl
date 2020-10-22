@@ -6218,7 +6218,7 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 			 .__xgrd_cell_actn { visibility: hidden; }
 			 .__xgrd_cell_cbox { font-size: 0px; cursor: pointer; }
 			 .__xgrd_cell_cbox > div:first-child { position: relative; display: inline-block; transform: translateY(1px); width: 14px; height: 14px; border: rgb(204, 204, 204) 1px solid; background-color: white; box-shadow: rgba(0, 0, 0, 0.0588235) 0px 1px 1px 0px inset; }
-			 .__xgrd_cell_cbox:hover > div:first-child { border-color: rgb(170, 170, 170); z-index: 2 }
+			 .__xgrd_cell_cbox:hover > div:first-child { border-color: rgb(170, 170, 170); z-index: 2; }
 			 .__xgrd_cell_cbox.__checked > div:first-child::after { content: ""; position: absolute; width: 10px; height: 8px; left: 2px; top: 3px; background-size: 10px 8px; background-image: url(\data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAQCAYAAAAWGF8bAAAABGdBTUEAALGPC/xhBQAAAPtJREFUOBGtkrERwjAMRe2wRTxCCpqkZ4VUFAxDlqFgBhr6VBQpWCBbcOZ/ne0zhpgkoDvZsi09KVKU+lGapqlixCY+LLUB21trL2VZFuM4Xhm/GuhgJwDJ2BljNKGa1KWSwCRca/2AbosYlvYjfvN2Bnbo+34IwLquO5R/Y4APTvcvsDP9pYcOdsSZCVr0445+DHTwMgdGXw3HipW55kq86wc/QbLOhQmQSy6A70jmp8mjShPKpVvClKeg9MtVH8Noh/+QPWPvcNdC/bC4eztbGfxEApCnCag45j5THNzyAuTdJ+hcGOPfgCkUMAsNE+f7auGgqKsB/wh8AnTbtdDy2XnCAAAAAElFTkSuQmCC\) }
 			 .__xgrd_cell_cbox.__mixed > div:first-child::after { content: ""; position: absolute; width: 6px; height: 6px; left: 4px; top: 4px; background-color: black; border-radius: 2px; }
 			 .__xgrd_cell_cbox.__disabled > div:first-child { background-color: var(--background-color); cursor: default; }
@@ -6226,7 +6226,7 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 			 .__xgrd_bdy_grp_bdy .__xgrd_bdy_row:last-child { border-bottom-width: 0px; }
 			 .__xgrd_bdy.__nolastrowsep .__xgrd_bdy_row:last-child { border-bottom-width: 0px; }
 			 .__xgrd_bdy.__alternate .__xgrd_bdy_row:nth-child(odd):not(:hover) { background-color: rgba(0, 0, 0, 0.0275); }
-			 .__xgrd_bdy_row.__selected { position: relative; background-color: var(--background-color-highlighted) !important; }
+			 .__xgrd_bdy_row.__selected { background-image: linear-gradient(to right, rgba(3, 144, 252, 0.1), rgba(3, 144, 252, 0.1)); }
 			 .__xgrd_bdy_row.__spoilered { border-bottom-width: 0px; }
 			 .__xgrd_bdy.__nolastrowsep .__xgrd_bdy_grp:last-child { border-bottom-width: 0px; }
 			 .__xgrd_bdy_grp_hdr_exp { width: 36px; height: 28px; text-align: center; line-height: 30px; vertical-align: middle; }
