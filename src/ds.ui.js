@@ -4325,7 +4325,7 @@ ds.ui.CheckboxEdit = ds.ui.Edit.extend({
 			if (self.passive) return true;
 			if (self._disabled) return true;
 			self.value = self.isChecked() ? self.falseValue : self.trueValue;
-			self._trigger('user_change', self.value);
+			self._trigger('user_change', self.value, e);
 			return true;
 		});
 	}
