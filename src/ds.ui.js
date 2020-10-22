@@ -5951,7 +5951,7 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 			 .__xgrd_hdr_cell:not(:first-child)::after { content: ''; position: absolute; left: 0px; top: 0px; bottom: 0px; width: 1px; background: linear-gradient(transparent, #cccccc67, transparent); }
 			 .__xgrd_hdr_cell_placeholder { position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; border-color: var(--border-color); border-width: 2px; border-style: dotted; background-color: white; }`,
 	template: `<div class="__xgrd_hdr __sbpad row bb">
-					<div x-for="column of this._columnList | store_item: __column" data-column-index="{{ column.index }}" class="__xgrd_hdr_cell row{{ column.hover ? ' hvr hnd' : '' }}" style="{{ column.getOuterStyle() }}">
+					<div x-for="column of this._columnList() | store_item: __column" data-column-index="{{ column.index }}" class="__xgrd_hdr_cell row{{ column.hover ? ' hvr hnd' : '' }}" style="{{ column.getOuterStyle() }}">
 						{{ column.createHeaderCell() }}
 						<div x-if="this._columnIsResizeVisible(column)" class="__xgrd_hdr_cell_resize"></div>
 					</div>
@@ -5961,10 +5961,9 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 	_dragType: null, // 'size' | 'drag'
 	_resizeInfo: null,
 	_dragInfo: null,
-	_columnList: null,
 	_columnIsResizeVisible(column) {
 		const self = this;
-		const index = self._columnList.indexOf(column);
+		const index = self._columnList().indexOf(column);
 		if (index > -1) {
 			if (!column.resizable)
 				return false;
@@ -5972,7 +5971,7 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 				return false;
 			if (self._dataGrid._lastColumnResizable)
 				return true;
-			const nextColumn = self._columnList[index + 1];
+			const nextColumn = self._columnList()[index + 1];
 			if (ds.isset(nextColumn)) {
 				if (ds.isPrototypeOf(nextColumn, ds.ui.DataGridActionColumn))
 					return false;
@@ -5981,13 +5980,16 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 			return true;
 		} return false;
 	},
+	_columnList() {
+		const self = this;
+		return self._dataGrid.columns.filter(c => c.visible && !c._hiddenByGrouping);
+	},
 	update() {
 		const self = this;
 		self._dataGrid.columns.forEach(column => {
 			column._hiddenByGrouping = self._dataGrid._grouped && self._dataGrid._groupHideColumn && self._dataGrid._groupDataKey == column.dataKey;
 			column._dataGrid = self._dataGrid;
 		});
-		self._columnList = self._dataGrid.columns.filter(c => c.visible && !c._hiddenByGrouping);
 		ds.ui.View.update.call(self);
 	},
 	init() {
