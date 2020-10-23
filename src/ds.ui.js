@@ -6230,7 +6230,7 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 			 .__xgrd_bdy_grp_bdy .__xgrd_bdy_row:last-child { border-bottom-width: 0px; }
 			 .__xgrd_bdy.__nolastrowsep .__xgrd_bdy_row:last-child { border-bottom-width: 0px; }
 			 .__xgrd_bdy.__alternate .__xgrd_bdy_row:nth-child(odd):not(:hover) { background-color: rgba(0, 0, 0, 0.0275); }
-			 .__xgrd_bdy_row.__selected { background-image: linear-gradient(to right, rgba(3, 144, 252, 0.1), rgba(3, 144, 252, 0.1)); }
+			 .__xgrd_bdy_row.__selected { background-image: linear-gradient(to right, rgba(0, 0, 0, 0.065), rgba(0, 0, 0, 0.065)); }
 			 .__xgrd_bdy_row.__spoilered { border-bottom-width: 0px; }
 			 .__xgrd_bdy.__nolastrowsep .__xgrd_bdy_grp:last-child { border-bottom-width: 0px; }
 			 .__xgrd_bdy_grp_hdr_exp { width: 36px; height: 28px; text-align: center; line-height: 30px; vertical-align: middle; }
