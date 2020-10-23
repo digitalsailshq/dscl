@@ -4951,16 +4951,16 @@ ds.ui.DateTimeEdit = ds.ui.DropDownEdit.extend({
 		self.calendar._disableEvents = true;
 		self.calendar.value = new Date();
 		self.calendar._disableEvents = false;
-		ds.ui.element_on(self._getInputElement(), 'keydown', e => {
-			if (self.__freed) return false;
-			self._processInput(e);
-			return true;
-		});
-		ds.ui.element_on(self._getInputElement(), 'mouseup', e => {
-			if (self.__freed) return false;
-			self._processMouse(e);
-			return true;
-		});
+        ds.ui.element_on(self._getInputElement(), 'keydown', e => {
+            if (self.__freed || self._disabled) return false;
+            self._processInput(e);
+            return true;
+        });
+        ds.ui.element_on(self._getInputElement(), 'mouseup', e => {
+            if (self.__freed || self._disabled) return false;
+            self._processMouse(e);
+            return true;
+        });
 	}
 }, ds.Events('select'));
 ds.ui.ListView = ds.ui.View.extend({
