@@ -4310,6 +4310,10 @@ ds.ui.CheckboxEdit = ds.ui.Edit.extend({
 	_setValue(value) { this._value = value; this.needsUpdate(); },
 	isChecked() { return this._value == this.trueValue; },
 	isEmpty() { return this.value != this.trueValue && this.value != this.falseValue; },
+	toggle() {
+		const self = this;
+		self.value = self.isChecked() ? self.falseValue : self.trueValue;
+	},
 	update() {
 		const self = this;
 		ds.ui.Edit.update.call(self);
@@ -4324,7 +4328,7 @@ ds.ui.CheckboxEdit = ds.ui.Edit.extend({
 			if (self.__freed) return false;
 			if (self.passive) return true;
 			if (self._disabled) return true;
-			self.value = self.isChecked() ? self.falseValue : self.trueValue;
+			self.toggle();
 			self._trigger('user_change', self.value, e);
 			return true;
 		});
