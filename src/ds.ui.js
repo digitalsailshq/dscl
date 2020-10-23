@@ -2423,6 +2423,7 @@ ds.ui.__parsestyles(ds.ui.PopupHelper.styles);
 ds.ui.DragHelper = ds.Object.extend({
 	_dragging: false,
 	_draggingPastSmallOffset: false,
+	_draggingBeginTriggered: false,
 	_draggingOptions: null,
 	beginPosition: null,
 	position: null,
@@ -2431,12 +2432,14 @@ ds.ui.DragHelper = ds.Object.extend({
 		const self = this;
 		self._dragging = true;
 		self._draggingPastSmallOffset = false;
+		self._draggingBeginTriggered = false;
 		self._draggingOptions = options;
 	},
 	end() {
 		const self = this;
 		self._dragging = false;
 		self._draggingPastSmallOffset = false;
+		self._draggingBeginTriggered = false;
 		self._draggingOptions = null;
 	},
 	init() {
@@ -2445,36 +2448,41 @@ ds.ui.DragHelper = ds.Object.extend({
 		self.position = { x: 0, y: 0 };
 		ds.ui.element_on(document, 'mousedown', e => {
 			if (self.__freed) return false;
-			self.beginPosition = {x: e.pageX, y: e.pageY};
-			if (!self._dragging) return true;
-			self._trigger('begin', self.beginPosition, e);
-			if (self._draggingOptions && ds.isFunction(self._draggingOptions.begin)) self._draggingOptions.begin(self.beginPosition, e);
-			document.body.style.cursor = self.cursor;
+			self.beginPosition = { x: e.pageX, y: e.pageY };
 			return true;
 		});
 		ds.ui.element_on(document, 'mousemove', e => {
 			if (self.__freed) return false;
 			self.position.x = e.pageX;
 			self.position.y = e.pageY;
-			var offset = {	x: self.position.x - self.beginPosition.x,
-							y: self.position.y - self.beginPosition.y  };
+			const offset = {	x: self.position.x - self.beginPosition.x,
+								y: self.position.y - self.beginPosition.y  };
 			if (!self._dragging) return true;
 			if (Math.abs(offset.x) > 3 || Math.abs(offset.y) > 3 || self._draggingPastSmallOffset) {
 				self._draggingPastSmallOffset = true;
+				if (!self._draggingBeginTriggered) {
+					self._draggingBeginTriggered = true;
+					self._trigger('begin', self.beginPosition, e);
+					if (self._draggingOptions && ds.isFunction(self._draggingOptions.begin))
+						self._draggingOptions.begin(self.beginPosition, e);
+					document.body.style.cursor = self.cursor;
+				}
 				self._trigger('drag', offset, self.position, self.beginPosition, e);
-				if (self._draggingOptions && ds.isFunction(self._draggingOptions.drag)) self._draggingOptions.drag(offset, self.position, self.beginPosition, e);
+				if (self._draggingOptions && ds.isFunction(self._draggingOptions.drag))
+					self._draggingOptions.drag(offset, self.position, self.beginPosition, e);
 			}
 			return true;
 		});
 		ds.ui.element_on(document, 'mouseup', e => {
 			if (self.__freed) return false;
 			try {
-				var offset = {	x: e.pageX - self.beginPosition.x,
-								y: e.pageY - self.beginPosition.y  };
+				const offset = {	x: e.pageX - self.beginPosition.x,
+									y: e.pageY - self.beginPosition.y  };
 				if (!self._dragging) return true;
 				if (Math.abs(offset.x) > 3 || Math.abs(offset.y) > 3 || self._draggingPastSmallOffset) {
 					self._trigger('end', offset, self.position, self.beginPosition, e);
-					if (self._draggingOptions && ds.isFunction(self._draggingOptions.end)) self._draggingOptions.end(offset, self.position, self.beginPosition, e);
+					if (self._draggingOptions && ds.isFunction(self._draggingOptions.end))
+						self._draggingOptions.end(offset, self.position, self.beginPosition, e);
 				}
 				document.body.style.cursor = null;
 			} finally {
@@ -4317,7 +4325,7 @@ ds.ui.CheckboxEdit = ds.ui.Edit.extend({
 			if (self.passive) return true;
 			if (self._disabled) return true;
 			self.value = self.isChecked() ? self.falseValue : self.trueValue;
-			self._trigger('user_change', self.value);
+			self._trigger('user_change', self.value, e);
 			return true;
 		});
 	}
@@ -4380,7 +4388,15 @@ ds.ui.DropDownEdit = ds.ui.TextEdit.extend({
 	}
 }, ds.Events('before_open'));
 ds.ui.LookupEdit = ds.ui.DropDownEdit.extend({
-	styles: `.__xedt_frm_chk_itm { border-style: solid; border-width: 1px; border-radius: 3px; padding: 0px 6px; margin: 2px 0px 2px 2px; background-color: #d2e7fb; border-color: #d2e7fb; color: #333; }`,
+	styles: `.__xedt_frm_chk_itm {
+				border-style: solid;
+				border-width: 1px;
+				border-radius: 3px;
+				padding: 0px 0px 0px 6px;
+				margin: 2px 0px 2px 2px;
+				background-color: #d2e7fb;
+				border-color: #d2e7fb;
+				color: #333; }`,
 	template: `@extend ds.ui.DropDownEdit.template
 					@slot frame
 						{{ this._getCheckedLabels() }}
@@ -4553,11 +4569,31 @@ ds.ui.LookupEdit = ds.ui.DropDownEdit.extend({
 	},
 	_getCheckedLabels() {
 		const self = this;
+		const label = (name, index) => {
+			return ds.ui.View.new({
+				template: `<div class="__xedt_frm_chk_itm row mid">
+								<div>{{ this.name }}</div>
+								<div class="row mid cen hnd dhvr" style="width: 18px; height: 18px;" x-on:click="self.removeItem()">
+									<img src="${ds.ui.TIMES_IMG}" class="x12 dhvrc" />
+								</div>
+							</div>`,
+				name: name,
+				index: index,
+				lookupEdit: self,
+				removeItem() {
+					const self = this;
+					self.lookupEdit._onCheckItem(self.index, false);
+				}
+			});
+		}
 		if (!self.multiple || self.isEmpty() || !self.dataSet || !self.nameKey || !self.valueKey) return [];
 		return (ds.isArray(self.value) ? self.value : [self.value])
 				.map(value => self.dataSet.data.find(item => ds.get(item, self.valueKey) == value))
-				.map(item => ds.get(item, self.nameKey))
-				.map(text => ({ element: ds.ui.element('<div class="__xedt_frm_chk_itm">' + text + '</div>') }));
+				.map(item => {
+					const index = self.dataSet.data.indexOf(item);
+					const name = ds.get(item, self.nameKey);
+					return label(name, index);
+				});
 	},
 	isEmpty() { return this.value === null || this.value === undefined || this.value === '' || (ds.isArray(this.value) && this.value.length == 0); },
 	update() {
@@ -5674,14 +5710,15 @@ ds.ui.DataGridEditColumn = ds.ui.DataGridColumn.extend({
 });
 ds.ui.DataGrid = ds.ui.View.extend({
 	template: `<div class="__xgrd col">
-					{{ this._gridHeader = this._gridHeader || ds.ui.__DataGridHeader.new({ _dataGrid: this }) }}
-					{{ this._gridBody = this._gridBody || ds.ui.__DataGridBody.new({ _dataGrid: this }) }}
-					{{ this._gridAppend = this._gridAppend || ds.ui.__DataGridAppend.new({ _dataGrid: this }) }}
+					{{ this._gridHeader }}
+					{{ this._gridBody }}
+					{{ this._gridAppend }}
 				</div>`,
 	_gridHeader: null,
 	_gridBody: null,
 	_gridAppend: null,
 	_dataSet: null,
+	_selectedId: null,
 	_sortColumn: null,
 	_sortDirection: null,
 	_search: null,
@@ -5721,6 +5758,7 @@ ds.ui.DataGrid = ds.ui.View.extend({
 	_groupCellPrototype: ds.ui.Cell.extend({ className: 'flex ml mr mt05 mb05' }),
 	_groupCheckboxRect: true,
 	_showIconOnEmpty: true,
+	_dragableColumns: true,
 	_compact: false,
 	_lastColumnResizable: false,
 	columns: null,
@@ -5812,10 +5850,14 @@ ds.ui.DataGrid = ds.ui.View.extend({
 		this._dataSet.on('load', () => this.needsUpdate());
 		if (this._dataSet.isLoaded()) this.needsUpdate();
 	},
+	get selectedId() { return this._gridBody._selectedId; },
+	set selectedId(value) { this._gridBody._selectedId = value; this.needsUpdate(); },
 	get compact() { return this._compact; },
 	set compact(value) { this._compact = value; this.needsUpdate(); },
 	get lastColumnResizable() { return this._lastColumnResizable; },
 	set lastColumnResizable(value) { this._lastColumnResizable = value; this.needsUpdate(); },
+	get dragableColumns() { return this._dragableColumns; },
+	set dragableColumns(value) { this._dragableColumns = value; this.needsUpdate(); },
 	groupExpand(index, expand) {
 		const self = this;
 		let group = self._gridBody._groups[index];
@@ -5866,13 +5908,11 @@ ds.ui.DataGrid = ds.ui.View.extend({
 	},
     _updateHeadersCheckboxRects(){
         const self = this;
-
         self.columns.forEach(column => {
             if (ds.isPrototypeOf(column, ds.ui.DataGridCheckColumn)) {
                 const headerElement = column._dataGrid._gridHeader.element.querySelector(`div[data-column-index="${column.index}"]`);
-
-                if(Boolean(headerElement && column.cells)){
-                    if(column.cells.length === 0){
+                if (headerElement && column.cells) {
+                    if (column.cells.length === 0) {
                         headerElement.firstChild.classList.remove('__checked');
                     } else if (column.cells.length > 0){
                         headerElement.firstChild.classList.toggle('__checked', column.cells.every(i => i.row.item[column.dataKey]));
@@ -5884,6 +5924,9 @@ ds.ui.DataGrid = ds.ui.View.extend({
 	init() {
 		const self = this;
 		if (!self.columns) self.columns = [];
+		self._gridHeader = ds.ui.__DataGridHeader.new({ _dataGrid: self });
+		self._gridBody = ds.ui.__DataGridBody.new({ _dataGrid: self });
+		self._gridAppend = ds.ui.__DataGridAppend.new({ _dataGrid: self });
 		self.on('data', () => self._dataSet ? self._dataSet.data : (self.data || []));
 		self.spoilers = [];
 		ds.ui.View.init.call(self);
@@ -5898,27 +5941,29 @@ ds.ui.DataGrid = ds.ui.View.extend({
 		self._gridAppend = null;
 		ds.ui.View.free.call(self);
 	}
-}, ds.Events('data:single', 'link_click', 'action_options:single', 'action_click', 'header_click', 'row_click', 'row_dblclick', 'row_unselect', 'row_options:single', 'cell_options:single', 'cell', 'row', 'check', 'check_all', 'group_options:single', 'check_group', 'link_group_click', 'edit', 'update', 'sort', 'column_resize', 'column_did_resize'));
+}, ds.Events('data:single', 'link_click', 'action_options:single', 'action_click', 'header_click', 'row_click', 'row_dblclick', 'row_unselect', 'row_options:single', 'cell_options:single', 'cell', 'row', 'check', 'check_all', 'group_options:single', 'check_group', 'link_group_click', 'edit', 'update', 'sort', 'column_resize', 'column_did_resize', 'column_did_drag'));
 ds.ui.__DataGridHeader = ds.ui.View.extend({
 	styles: `.__xgrd_hdr { overflow-x: hidden; }
-			 .__xgrd_hdr_cell_grip { cursor: ew-resize; width: 10px; background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMnB4IiBoZWlnaHQ9IjEycHgiIHZpZXdCb3g9IjAgMCAyIDEyIiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPgogICAgPGcgaWQ9InNwbGl0dGVyX2hhbmRsZV92IiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlLTYxIiBmaWxsPSIjQ0JDQkNCIiB4PSIwIiB5PSIxIiB3aWR0aD0iMiIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5IiBmaWxsPSIjRThFOEU4IiB4PSIwIiB5PSIwIiB3aWR0aD0iMiIgaGVpZ2h0PSIxIj48L3JlY3Q+CiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS02MS1Db3B5LTMiIGZpbGw9IiNDQkNCQ0IiIHg9IjAiIHk9IjYiIHdpZHRoPSIyIiBoZWlnaHQ9IjEiPjwvcmVjdD4KICAgICAgICA8cmVjdCBpZD0iUmVjdGFuZ2xlLTYxLUNvcHktMiIgZmlsbD0iI0U4RThFOCIgeD0iMCIgeT0iNSIgd2lkdGg9IjIiIGhlaWdodD0iMSI+PC9yZWN0PgogICAgICAgIDxyZWN0IGlkPSJSZWN0YW5nbGUtNjEtQ29weS01IiBmaWxsPSIjQ0JDQkNCIiB4PSIwIiB5PSIxMSIgd2lkdGg9IjIiIGhlaWdodD0iMSI+PC9yZWN0PgogICAgICAgIDxyZWN0IGlkPSJSZWN0YW5nbGUtNjEtQ29weS00IiBmaWxsPSIjRThFOEU4IiB4PSIwIiB5PSIxMCIgd2lkdGg9IjIiIGhlaWdodD0iMSI+PC9yZWN0PgogICAgPC9nPgo8L3N2Zz4='); background-repeat: no-repeat; background-position: center; }
+			 .__xgrd_hdr_cell_resize { cursor: ew-resize; width: 10px; }
 			 .__xgrd_hdr_cell_img_asc { transform: translateY(1px) rotate(180deg); opacity: 0.25 }
 			 .__xgrd_hdr_cell_img_desc { transform: translateY(1px); opacity: 0.25 }
 			 .__xgrd_hdr_cell { position: relative; overflow-x: hidden; }
-			 .__xgrd_hdr_cell:not(:first-child)::after { content: ''; position: absolute; left: 0px; top: 0px; bottom: 0px; width: 1px; background: linear-gradient(transparent, #cccccc67, transparent); }`,
+			 .__xgrd_hdr_cell:not(:first-child)::after { content: ''; position: absolute; left: 0px; top: 0px; bottom: 0px; width: 1px; background: linear-gradient(transparent, #cccccc67, transparent); }
+			 .__xgrd_hdr_cell_placeholder { position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; border-color: var(--border-color); border-width: 2px; border-style: dotted; background-color: white; }`,
 	template: `<div class="__xgrd_hdr __sbpad row bb">
-					<div x-for="column of this._columnList | store_item: __column" data-column-index="{{ column.index }}" class="__xgrd_hdr_cell row{{ column.hover ? ' hvr hnd' : '' }}" style="{{ column.getOuterStyle() }}">
+					<div x-for="column of this._columnList() | store_item: __column" data-column-index="{{ column.index }}" class="__xgrd_hdr_cell row{{ column.hover ? ' hvr hnd' : '' }}" style="{{ column.getOuterStyle() }}">
 						{{ column.createHeaderCell() }}
-						<div x-if="this._columnIsGripVisible(column)" class="__xgrd_hdr_cell_grip"></div>
+						<div x-if="this._columnIsResizeVisible(column)" class="__xgrd_hdr_cell_resize"></div>
 					</div>
 				</div>`,
 	_dataGrid: null,
 	_dragHelper: null,
+	_dragType: null, // 'size' | 'drag'
 	_resizeInfo: null,
-	_columnList: null,
-	_columnIsGripVisible(column) {
+	_dragInfo: null,
+	_columnIsResizeVisible(column) {
 		const self = this;
-		const index = self._columnList.indexOf(column);
+		const index = self._columnList().indexOf(column);
 		if (index > -1) {
 			if (!column.resizable)
 				return false;
@@ -5926,7 +5971,7 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 				return false;
 			if (self._dataGrid._lastColumnResizable)
 				return true;
-			const nextColumn = self._columnList[index + 1];
+			const nextColumn = self._columnList()[index + 1];
 			if (ds.isset(nextColumn)) {
 				if (ds.isPrototypeOf(nextColumn, ds.ui.DataGridActionColumn))
 					return false;
@@ -5935,13 +5980,16 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 			return true;
 		} return false;
 	},
+	_columnList() {
+		const self = this;
+		return self._dataGrid.columns.filter(c => c.visible && !c._hiddenByGrouping);
+	},
 	update() {
 		const self = this;
 		self._dataGrid.columns.forEach(column => {
 			column._hiddenByGrouping = self._dataGrid._grouped && self._dataGrid._groupHideColumn && self._dataGrid._groupDataKey == column.dataKey;
 			column._dataGrid = self._dataGrid;
 		});
-		self._columnList = self._dataGrid.columns.filter(c => c.visible && !c._hiddenByGrouping);
 		ds.ui.View.update.call(self);
 	},
 	init() {
@@ -5975,62 +6023,169 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 			}
 			return true;
 		});
-		ds.ui.element_on(self.element, 'mousedown', '.__xgrd_hdr_cell_grip', function(e) {
+		ds.ui.element_on(self.element, 'mousedown', '.__xgrd_hdr_cell_resize', function(e) {
 			if (self.__freed) return false;
-
+			e.__captured_by_resize = true;
 			const hcell = this.parentElement;
 			const hcell_next = ds.ui.element_next(hcell, '.__xgrd_hdr_cell');
-
 			self._resizeInfo = {};
 			self._resizeInfo.column = hcell.__column;
 			self._resizeInfo.columnWidth = ds.ui.element_rects(hcell).border.width;
 			self._resizeInfo.columnCells = [hcell, ...self._dataGrid.element.querySelectorAll(`div.__xgrd_bdy_cell[data-cell-index="${hcell.__column.index}"]`)];
-
 			if (ds.isset(hcell_next)
 			&& !ds.isPrototypeOf(hcell_next.__column, ds.ui.DataGridActionColumn)) {
 				self._resizeInfo.nextColumn = hcell_next.__column;
 				self._resizeInfo.nextColumnWidth = ds.ui.element_rects(hcell_next).border.width;
 				self._resizeInfo.nextColumnCells = [hcell_next, ...self._dataGrid.element.querySelectorAll(`div.__xgrd_bdy_cell[data-cell-index="${hcell_next.__column.index}"]`)];
 			}
-
+			self._dragType = 'size';
+			self._dragHelper.begin();
+			return true;
+		});
+		ds.ui.element_on(self.element, 'mousedown', '.__xgrd_hdr_cell', function(e) {
+			if (self.__freed) return false;
+			if (e.__captured_by_resize)
+				return true;
+			if (!self._dataGrid._dragableColumns)
+				return true;
+			self._dragInfo = {};
+			self._dragInfo.hcell = this;
+			self._dragInfo.rect = ds.ui.element_rects(self._dragInfo.hcell).border;
+			self._dragInfo.element = ds.ui.element(`<div class="pl pt pr pb bl bt br bb bkw strong sm" style="position: absolute; box-sizing: border-box; width: ${self._dragInfo.rect.width}px;">${self._dragInfo.hcell.__column.text || '.'}</div>`);;
+			self._dragInfo.element.style.setProperty('left', `${self._dragInfo.rect.left}px`);
+			self._dragInfo.element.style.setProperty('top', `${self._dragInfo.rect.top}px`);
+			self._dragInfo.placeholder = ds.ui.element(`<div class="__xgrd_hdr_cell_placeholder"></div>`);
+			self._dragType = 'drag';
 			self._dragHelper.begin();
 			return true;
 		});
 		self._dragHelper = ds.ui.DragHelper.new();
 		self._dragHelper.on('begin', offset => {
+			if (self._dragType == 'size') {
 
+			} else if (self._dragType == 'drag') {
+				self._dragInfo.hcell.appendChild(self._dragInfo.placeholder);
+				document.body.appendChild(self._dragInfo.element);
+			}
 		});
 		self._dragHelper.on('drag', offset => {
-			if (offset.x < 0) {
-				offset.x = Math.max(offset.x, -(self._resizeInfo.columnWidth - 40));
-			} else if (offset.x > 0) {
-				if (ds.isset(self._resizeInfo.nextColumn))
-					offset.x = Math.min(offset.x, (self._resizeInfo.nextColumnWidth - 40));
-			}
-
-			self._resizeInfo.column.width = (self._resizeInfo.columnWidth + offset.x);
-			self._resizeInfo.columnCells.forEach(cell => {
-				cell.style.setProperty('flex', null);
-				cell.style.setProperty('max-width', null);
-				cell.style.setProperty('min-width', null);
-				cell.style.setProperty('width', `${self._resizeInfo.column.width}px`);
-			});
-			self._dataGrid._trigger('column_resize', self._resizeInfo.column, self._resizeInfo.column.width);
-			if (ds.isset(self._resizeInfo.nextColumn)) {
-				self._resizeInfo.nextColumn.width = (self._resizeInfo.nextColumnWidth - offset.x);
-				self._resizeInfo.nextColumnCells.forEach(cell => {
+			if (self._dragType == 'size') {
+				if (offset.x < 0) {
+					offset.x = Math.max(offset.x, -(self._resizeInfo.columnWidth - 40));
+				} else if (offset.x > 0) {
+					if (ds.isset(self._resizeInfo.nextColumn))
+						offset.x = Math.min(offset.x, (self._resizeInfo.nextColumnWidth - 40));
+				}
+				self._resizeInfo.column.maxWidth = null;
+				self._resizeInfo.column.minWidth = null;
+				self._resizeInfo.column.width = (self._resizeInfo.columnWidth + offset.x);
+				self._resizeInfo.columnCells.forEach(cell => {
 					cell.style.setProperty('flex', null);
 					cell.style.setProperty('max-width', null);
 					cell.style.setProperty('min-width', null);
-					cell.style.setProperty('width', `${self._resizeInfo.nextColumn.width}px`);
+					cell.style.setProperty('width', `${self._resizeInfo.column.width}px`);
 				});
-				self._dataGrid._trigger('column_resize', self._resizeInfo.nextColumn, self._resizeInfo.nextColumn.width);
+				self._dataGrid._trigger('column_resize', self._resizeInfo.column, self._resizeInfo.column.width);
+				if (ds.isset(self._resizeInfo.nextColumn)) {
+					self._resizeInfo.nextColumn.maxWidth = null;
+					self._resizeInfo.nextColumn.minWidth = null;
+					self._resizeInfo.nextColumn.width = (self._resizeInfo.nextColumnWidth - offset.x);
+					self._resizeInfo.nextColumnCells.forEach(cell => {
+						cell.style.setProperty('flex', null);
+						cell.style.setProperty('max-width', null);
+						cell.style.setProperty('min-width', null);
+						cell.style.setProperty('width', `${self._resizeInfo.nextColumn.width}px`);
+					});
+					self._dataGrid._trigger('column_resize', self._resizeInfo.nextColumn, self._resizeInfo.nextColumn.width);
+				}
+			} else if (self._dragType == 'drag') {
+				self._dragInfo.element.style.setProperty('left', `${(self._dragInfo.rect.left + offset.x)}px`);
+
+				const hcell = (() => {
+					const center = ((self._dragInfo.rect.left + offset.x) + (self._dragInfo.rect.width / 2));
+					const prev = self._dragInfo.hcell.previousElementSibling;
+					const next = ds.ui.element_next(self._dragInfo.hcell, '.__xgrd_hdr_cell');
+
+					if (ds.isset(prev)) {
+						const rect = ds.ui.element_rects(prev).border;
+						rect.width /= 2;
+						rect.right = (rect.left + rect.width);
+
+						if ((center >= rect.left)
+						&& (center <= rect.right))
+							return prev;
+					}
+
+					if (ds.isset(next)) {
+						const rect = ds.ui.element_rects(next).border;
+						rect.left += (rect.width / 2);
+						rect.width /= 2;
+
+						if ((center >= rect.left)
+						&& (center <= rect.right))
+							return next;
+					}
+				})();
+
+				if (ds.isset(hcell) && (hcell != self._dragInfo.hcell)) {
+
+					const swap_items = (array, item1, item2) => {
+						if (!array.includes(item1)) throw new Error('swap_items: array must include item1');
+						if (!array.includes(item2)) throw new Error('swap_items: array must include item2');
+						const index1 = array.indexOf(item1);
+						const index2 = array.indexOf(item2);
+						array[index1] = item2;
+						array[index2] = item1;
+					}
+
+					const swap_elements = (element1, element2) => {
+						if (element1.parentElement != element2.parentElement)
+							throw new Error('swap_elements: elements must have mutual parent');
+
+						const parent = element1.parentElement;
+						const dummy1 = document.createElement('div');
+						const dummy2 = document.createElement('div');
+
+						parent.replaceChild(dummy1, element1);
+						parent.replaceChild(dummy2, element2);
+						parent.replaceChild(element2, dummy1);
+						parent.replaceChild(element1, dummy2);
+					}
+
+					const index1 = parseInt(self._dragInfo.hcell.getAttribute('data-column-index'), 10);
+					const index2 = parseInt(hcell.getAttribute('data-column-index'), 10);
+					const column1 = self._dragInfo.hcell.__column;
+					const column2 = hcell.__column;
+					const hcell1 = self._dragInfo.hcell;
+					const hcell2 = hcell;
+					const cells1 = self._dataGrid._gridBody.rows_element.querySelectorAll(`.__xgrd_bdy_cell[data-cell-index="${index1}"]`);
+					const cells2 = self._dataGrid._gridBody.rows_element.querySelectorAll(`.__xgrd_bdy_cell[data-cell-index="${index2}"]`);
+
+					swap_items(self._dataGrid.columns, column1, column2);
+
+					swap_elements(hcell1, hcell2);
+					hcell1.setAttribute('data-column-index', index2);
+					hcell2.setAttribute('data-column-index', index1);
+
+					for (let i = 0; i < cells1.length; i++) {
+						swap_elements(cells1[i], cells2[i]);
+						cells1[i].setAttribute('data-cell-index', index2);
+						cells2[i].setAttribute('data-cell-index', index1);
+					}
+				}
 			}
 		});
 		self._dragHelper.on('end', () => {
-			self._dataGrid._trigger('column_did_resize', self._resizeInfo.column, self._resizeInfo.column.width);
-			if (ds.isset(self._resizeInfo.nextColumn))
-				self._dataGrid._trigger('column_did_resize', self._resizeInfo.nextColumn, self._resizeInfo.nextColumn.width);
+			if (self._dragType == 'size') {
+				self._dataGrid._trigger('column_did_resize', self._resizeInfo.column, self._resizeInfo.column.width);
+				if (ds.isset(self._resizeInfo.nextColumn))
+					self._dataGrid._trigger('column_did_resize', self._resizeInfo.nextColumn, self._resizeInfo.nextColumn.width);
+			} else if (self._dragType == 'drag') {
+				self._dataGrid._trigger('column_did_drag', self._dragInfo.hcell.__column);
+				self._dragInfo.element.remove();
+				self._dragInfo.placeholder.remove();
+				self._dragInfo = {};
+			}
 		});
 	}
 });
@@ -6063,7 +6218,7 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 			 .__xgrd_cell_actn { visibility: hidden; }
 			 .__xgrd_cell_cbox { font-size: 0px; cursor: pointer; }
 			 .__xgrd_cell_cbox > div:first-child { position: relative; display: inline-block; transform: translateY(1px); width: 14px; height: 14px; border: rgb(204, 204, 204) 1px solid; background-color: white; box-shadow: rgba(0, 0, 0, 0.0588235) 0px 1px 1px 0px inset; }
-			 .__xgrd_cell_cbox:hover > div:first-child { border-color: rgb(170, 170, 170); z-index: 2 }
+			 .__xgrd_cell_cbox:hover > div:first-child { border-color: rgb(170, 170, 170); z-index: 2; }
 			 .__xgrd_cell_cbox.__checked > div:first-child::after { content: ""; position: absolute; width: 10px; height: 8px; left: 2px; top: 3px; background-size: 10px 8px; background-image: url(\data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAQCAYAAAAWGF8bAAAABGdBTUEAALGPC/xhBQAAAPtJREFUOBGtkrERwjAMRe2wRTxCCpqkZ4VUFAxDlqFgBhr6VBQpWCBbcOZ/ne0zhpgkoDvZsi09KVKU+lGapqlixCY+LLUB21trL2VZFuM4Xhm/GuhgJwDJ2BljNKGa1KWSwCRca/2AbosYlvYjfvN2Bnbo+34IwLquO5R/Y4APTvcvsDP9pYcOdsSZCVr0445+DHTwMgdGXw3HipW55kq86wc/QbLOhQmQSy6A70jmp8mjShPKpVvClKeg9MtVH8Noh/+QPWPvcNdC/bC4eztbGfxEApCnCag45j5THNzyAuTdJ+hcGOPfgCkUMAsNE+f7auGgqKsB/wh8AnTbtdDy2XnCAAAAAElFTkSuQmCC\) }
 			 .__xgrd_cell_cbox.__mixed > div:first-child::after { content: ""; position: absolute; width: 6px; height: 6px; left: 4px; top: 4px; background-color: black; border-radius: 2px; }
 			 .__xgrd_cell_cbox.__disabled > div:first-child { background-color: var(--background-color); cursor: default; }
@@ -6071,7 +6226,7 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 			 .__xgrd_bdy_grp_bdy .__xgrd_bdy_row:last-child { border-bottom-width: 0px; }
 			 .__xgrd_bdy.__nolastrowsep .__xgrd_bdy_row:last-child { border-bottom-width: 0px; }
 			 .__xgrd_bdy.__alternate .__xgrd_bdy_row:nth-child(odd):not(:hover) { background-color: rgba(0, 0, 0, 0.0275); }
-			 .__xgrd_bdy_row.__selected { position: relative; background-color: var(--background-color-highlighted) !important; }
+			 .__xgrd_bdy_row.__selected { background-image: linear-gradient(to right, rgba(3, 144, 252, 0.1), rgba(3, 144, 252, 0.1)); }
 			 .__xgrd_bdy_row.__spoilered { border-bottom-width: 0px; }
 			 .__xgrd_bdy.__nolastrowsep .__xgrd_bdy_grp:last-child { border-bottom-width: 0px; }
 			 .__xgrd_bdy_grp_hdr_exp { width: 36px; height: 28px; text-align: center; line-height: 30px; vertical-align: middle; }
@@ -6468,21 +6623,23 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 		});
 		ds.ui.element_on(self.rows_element, 'click', '.__xgrd_bdy_row', function(e) {
 			if (self.__freed) return false;
-			var row = self._rows[parseInt(this.getAttribute('data-row-index'), 10)];
+			const row = self._rows[parseInt(this.getAttribute('data-row-index'), 10)];
 			if (!row) return true;
 			if (self._dataGrid.selectRows) {
 				var selected_row_element = self.rows_element.querySelector('.__xgrd_bdy_row.__selected');
 				if (selected_row_element) selected_row_element.classList.remove('__selected');
 				this.classList.add('__selected');
 				if (self._dataGrid.idKey) self._selectedId = ds.get(row.item, self._dataGrid.idKey);
-				else console.warn('ds.ui.__DataGridBody: Specify idKey if you want to keep selection after grid gets reloaded.');
+				else self._selectedId = null;
 			}
 			self._dataGrid._trigger('row_click', row, e);
 			return true;
 		});
 		ds.ui.element_on(self.rows_element, 'dblclick', '.__xgrd_bdy_row', function(e) {
 			if (self.__freed) return false;
-			self._dataGrid._trigger('row_dblclick');
+			const row = self._rows[parseInt(this.getAttribute('data-row-index'), 10)];
+			if (!row) return true;
+			self._dataGrid._trigger('row_dblclick', row, e);
 			return true;
 		});
 		ds.ui.element_on(self.rows_element, 'click', '.__xgrd_bdy_grp_hdr_exp', function(e) {
