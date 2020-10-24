@@ -5910,14 +5910,13 @@ ds.ui.DataGrid = ds.ui.View.extend({
 		}
 
 		let space = 0;
-		let reduce = 0;
 		let columns = [];
 
 		const hcells = self._gridHeader.element.querySelectorAll('.__xgrd_hdr_cell');
 		for (const hcell of hcells) {
 			const column = hcell.__column;
 			if (ds.isPrototypeOf(column, ds.ui.DataGridActionColumn)) {
-				reduce += ds.ui.element_rects(hcell).border.width;
+				// skip column ...
 			} else {
 				columns = [...columns, column];
 				space += ds.ui.element_rects(hcell).border.width;
