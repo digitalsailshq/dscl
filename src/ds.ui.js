@@ -5909,6 +5909,7 @@ ds.ui.DataGrid = ds.ui.View.extend({
 			); // MAGIC 🙀 ...
 		}
 
+		let count = 0;
 		let space = 0;
 		let reduce = 0;
 		let columns = [];
@@ -5933,6 +5934,11 @@ ds.ui.DataGrid = ds.ui.View.extend({
 					column.__content_max_length = 20;
 				}
 			}
+
+			count += 1;
+
+			if (count > 1000)
+				break;
 		}
 
 		const contents = columns.reduce((acc, val) => (acc + val.__content_max_length), 0);
