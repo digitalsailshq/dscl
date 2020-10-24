@@ -5896,6 +5896,85 @@ ds.ui.DataGrid = ds.ui.View.extend({
 		self.spoilers = [];
 		self.needsUpdate();
 	},
+	autoFitContents() {
+		const self = this;
+
+		const limit = (column, width) => {
+			return Math.max(
+				Math.min(
+					width,
+					(column.maxWidth || 9999)
+				),
+				(column.minWidth || 0)
+			); // MAGIC 🙀 ...
+		}
+
+		let space = 0;
+		let reduce = 0;
+		let columns = [];
+
+		const hcells = self._gridHeader.element.querySelectorAll('.__xgrd_hdr_cell');
+		for (const hcell of hcells) {
+			const column = hcell.__column;
+			if (ds.isPrototypeOf(column, ds.ui.DataGridActionColumn)) {
+				reduce += ds.ui.element_rects(hcell).border.width;
+			} else {
+				columns = [...columns, column];
+				space += ds.ui.element_rects(hcell).border.width;
+			}
+		}
+
+		for (const item of self.dataSet.data) {
+			for (const column of columns) {
+				if (ds.isset(column.dataKey)) {
+					const value = (ds.get(item, column.dataKey) || '').toString();
+					column.__content_max_length = Math.max((column.__content_max_length || 0), value.length, 20);
+				} else {
+					column.__content_max_length = 20;
+				}
+			}
+		}
+
+		const contents = columns.reduce((acc, val) => (acc + val.__content_max_length), 0);
+
+		let flexible = 0;
+		let remained = space;
+
+		for (const column of columns) {
+			const width1 = (space * (column.__content_max_length / contents));
+			const width2 = limit(column, width1);
+			if (width1 != width2) {
+				column.__content_hit_limit = true;
+			} else {
+				column.__content_hit_limit = false;
+				flexible += 1;
+			}
+			column.width = width2;
+			remained -= width2;
+		}
+
+		while (remained > 0) {
+			const before = remained;
+			const extra = (remained / flexible);
+			for (const column of columns) {
+				if (column.__content_hit_limit)
+					continue;
+
+				const width = limit(column, extra);
+				if (width != extra) {
+					column.__content_hit_limit = true;
+					flexible -= 1;
+				}
+
+				column.width += width;
+				remained -= width;
+			}
+			const after = remained;
+			if (after == before)
+				break;
+		}
+		self.needsUpdate();
+	},
 	onshow() {
 		const self = this;
 		self._gridBody._checkInnerShadows();
@@ -5955,7 +6034,7 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 			 .__xgrd_hdr_cell:not(:first-child)::after { content: ''; position: absolute; left: 0px; top: 0px; bottom: 0px; width: 1px; background: linear-gradient(transparent, #cccccc67, transparent); }
 			 .__xgrd_hdr_cell_placeholder { position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; border-color: var(--border-color); border-width: 2px; border-style: dotted; background-color: white; }`,
 	template: `<div class="__xgrd_hdr __sbpad row bb">
-					<div x-for="column of this._columnList() | store_item: __column" data-column-index="{{ column.index }}" class="__xgrd_hdr_cell row{{ column.hover ? ' hvr hnd' : '' }}" style="{{ column.getOuterStyle() }}">
+					<div x-for="column of this._visibleColumnList() | store_item: __column" data-column-index="{{ column.index }}" class="__xgrd_hdr_cell row{{ column.hover ? ' hvr hnd' : '' }}" style="{{ column.getOuterStyle() }}">
 						{{ column.createHeaderCell() }}
 						<div x-if="this._columnIsResizeVisible(column)" class="__xgrd_hdr_cell_resize"></div>
 					</div>
@@ -5967,7 +6046,7 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 	_dragInfo: null,
 	_columnIsResizeVisible(column) {
 		const self = this;
-		const index = self._columnList().indexOf(column);
+		const index = self._visibleColumnList().indexOf(column);
 		if (index > -1) {
 			if (!column.resizable)
 				return false;
@@ -5975,7 +6054,7 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 				return false;
 			if (self._dataGrid._lastColumnResizable)
 				return true;
-			const nextColumn = self._columnList()[index + 1];
+			const nextColumn = self._visibleColumnList()[index + 1];
 			if (ds.isset(nextColumn)) {
 				if (ds.isPrototypeOf(nextColumn, ds.ui.DataGridActionColumn))
 					return false;
@@ -5984,7 +6063,7 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 			return true;
 		} return false;
 	},
-	_columnList() {
+	_visibleColumnList() {
 		const self = this;
 		return self._dataGrid.columns.filter(c => c.visible && !c._hiddenByGrouping);
 	},
