@@ -5631,7 +5631,6 @@ ds.ui.DataGridColumn = ds.Object.extend({
 		return ds.ui.Cell.new({
 			_text: self.text + sort_button,
 			_textAlign: self.textAlign,
-			_nowrap: true,
 			textClassName: 'sm bvl strong ' + (self._dataGrid.headerGrayText ? 'gray' : ''),
 			className: 'flex ' + self.getCellClassName()
 		});
@@ -6213,28 +6212,44 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 				self._dragInfo.element.style.setProperty('left', `${(self._dragInfo.rect.left + offset.x)}px`);
 
 				const hcell = (() => {
-					const center = ((self._dragInfo.rect.left + offset.x) + (self._dragInfo.rect.width / 2));
 					const prev = self._dragInfo.hcell.previousElementSibling;
 					const next = ds.ui.element_next(self._dragInfo.hcell, '.__xgrd_hdr_cell');
 
-					if (ds.isset(prev)) {
-						const rect = ds.ui.element_rects(prev).border;
-						rect.width /= 2;
-						rect.right = (rect.left + rect.width);
+					const ROMANS_WAY = false;
+					const JULIAS_WAY = true;
 
-						if ((center >= rect.left)
-						&& (center <= rect.right))
-							return prev;
-					}
+					if (ROMANS_WAY) {
+						const center = ((self._dragInfo.rect.left + offset.x) + (self._dragInfo.rect.width / 2));
 
-					if (ds.isset(next)) {
-						const rect = ds.ui.element_rects(next).border;
-						rect.left += (rect.width / 2);
-						rect.width /= 2;
+						if (ds.isset(prev)) {
+							const rect = ds.ui.element_rects(prev).border;
+							rect.width /= 2;
+							rect.right = (rect.left + rect.width);
 
-						if ((center >= rect.left)
-						&& (center <= rect.right))
-							return next;
+							if ((center >= rect.left)
+							&& (center <= rect.right))
+								return prev;
+						}
+
+						if (ds.isset(next)) {
+							const rect = ds.ui.element_rects(next).border;
+							rect.left += (rect.width / 2);
+							rect.width /= 2;
+
+							if ((center >= rect.left)
+							&& (center <= rect.right))
+								return next;
+						}
+					} else if (JULIAS_WAY) {
+						if (ds.isset(prev)) {
+							if ((self._dragInfo.rect.left + offset.x) < ds.ui.element_rects(prev).border.left)
+								return prev;
+						}
+
+						if (ds.isset(next)) {
+							if ((self._dragInfo.rect.right + offset.x) > ds.ui.element_rects(next).border.right)
+								return next;
+						}
 					}
 				})();
 
