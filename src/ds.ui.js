@@ -4595,16 +4595,17 @@ ds.ui.LookupEdit = ds.ui.DropDownEdit.extend({
 	},
 	_getCheckedLabels() {
 		const self = this;
-		const label = (name, index) => {
+		const label = (name, index, enabled) => {
 			return ds.ui.View.new({
 				template: `<div class="__xedt_frm_chk_itm row mid">
 								<div>{{ this.name }}</div>
-								<div class="row mid cen hnd dhvr" style="width: 18px; height: 18px;" x-on:click="self.removeItem()">
+								<div x-if="this.enabled" class="row mid cen hnd dhvr" style="width: 18px; height: 18px;" x-on:click="self.removeItem()">
 									<img src="${ds.ui.TIMES_IMG}" class="x12 dhvrc" />
 								</div>
 							</div>`,
 				name: name,
 				index: index,
+				enabled: enabled,
 				lookupEdit: self,
 				removeItem() {
 					const self = this;
@@ -4618,7 +4619,7 @@ ds.ui.LookupEdit = ds.ui.DropDownEdit.extend({
 				.map(item => {
 					const index = self.dataSet.data.indexOf(item);
 					const name = ds.get(item, self.nameKey);
-					return label(name, index);
+					return label(name, index, (!self.disabled && !self.readOnly));
 				});
 	},
 	isEmpty() { return this.value === null || this.value === undefined || this.value === '' || (ds.isArray(this.value) && this.value.length == 0); },
@@ -4755,7 +4756,6 @@ ds.ui.DateTimeEdit = ds.ui.DropDownEdit.extend({
 								this.value = ds.Date.newFromDate(value).toISODate();
 								this._trigger('user_change', this.value);
 								this.close();
-								//this.calendar.needsUpdate().then(() => this._popupHelper.adjust());
 							}) }}
 					@end
 				@end`,
@@ -4891,6 +4891,9 @@ ds.ui.DateTimeEdit = ds.ui.DropDownEdit.extend({
 	_processInput(e) {
 		const self = this;
 
+		if (self.disabled) return;
+		if (self.readOnly) return;
+
 		/* 	date: 	0   3   .   0   1   .   2   0   2   0     1  2  :  5  1
 			----------------------------------------------------------------
 			caret: 	0   1   2   3   4   5   6   7   8   9  10 11 12 13 14 15   */
@@ -4978,12 +4981,12 @@ ds.ui.DateTimeEdit = ds.ui.DropDownEdit.extend({
 		self.calendar.value = new Date();
 		self.calendar._disableEvents = false;
         ds.ui.element_on(self._getInputElement(), 'keydown', e => {
-            if (self.__freed || self._disabled) return false;
+            if (self.__freed) return false;
             self._processInput(e);
             return true;
         });
         ds.ui.element_on(self._getInputElement(), 'mouseup', e => {
-            if (self.__freed || self._disabled) return false;
+            if (self.__freed) return false;
             self._processMouse(e);
             return true;
         });
