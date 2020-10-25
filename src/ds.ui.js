@@ -2429,17 +2429,32 @@ ds.ui.DragHelper = ds.Object.extend({
 	position: null,
 	cursor: null,
 	threshold: 3,
+	_triggerBegin(beginPosition, e) {
+		const self = this;
+		self._trigger('begin', beginPosition, e);
+		if (self._draggingOptions && ds.isFunction(self._draggingOptions.begin))
+			self._draggingOptions.begin(beginPosition, e);
+		document.body.style.cursor = self.cursor;
+	},
+	_triggerDrag(offset, position, beginPosition, e) {
+		const self = this;
+		self._trigger('drag', offset, position, beginPosition, e);
+		if (self._draggingOptions && ds.isFunction(self._draggingOptions.drag))
+			self._draggingOptions.drag(offset, position, beginPosition, e);
+	},
+	_triggerEnd(offset, position, beginPosition, e) {
+		const self = this;
+		self._trigger('end', offset, position, beginPosition, e);
+		if (self._draggingOptions && ds.isFunction(self._draggingOptions.end))
+			self._draggingOptions.end(offset, position, beginPosition, e);
+		document.body.style.cursor = null;
+	},
 	begin(options) {
 		const self = this;
 		self._dragging = true;
 		self._draggingPastTreshold = false;
 		self._draggingBeginTriggered = false;
 		self._draggingOptions = options;
-
-		if (ds.isnull(self.threshold)
-		|| (self.threshold === 0)) {
-			self._draggingPastTreshold = true;
-		}
 	},
 	end() {
 		const self = this;
@@ -2455,6 +2470,11 @@ ds.ui.DragHelper = ds.Object.extend({
 		ds.ui.element_on(document, 'mousedown', e => {
 			if (self.__freed) return false;
 			self.beginPosition = { x: e.pageX, y: e.pageY };
+			if (ds.ifnull(self.threshold, 0) === 0) {
+				self._draggingPastTreshold = true;
+				self._draggingBeginTriggered = true;
+				self._triggerBegin(self.beginPosition, e);
+			}
 			return true;
 		});
 		ds.ui.element_on(document, 'mousemove', e => {
@@ -2464,18 +2484,15 @@ ds.ui.DragHelper = ds.Object.extend({
 			const offset = {	x: self.position.x - self.beginPosition.x,
 								y: self.position.y - self.beginPosition.y  };
 			if (!self._dragging) return true;
-			if (Math.abs(offset.x) > 3 || Math.abs(offset.y) > 3 || self._draggingPastTreshold) {
+			if ((Math.abs(offset.x) > ds.ifnull(self.threshold, 0))
+			|| (Math.abs(offset.y) > ds.ifnull(self.threshold, 0))
+			|| self._draggingPastTreshold) {
 				self._draggingPastTreshold = true;
 				if (!self._draggingBeginTriggered) {
 					self._draggingBeginTriggered = true;
-					self._trigger('begin', self.beginPosition, e);
-					if (self._draggingOptions && ds.isFunction(self._draggingOptions.begin))
-						self._draggingOptions.begin(self.beginPosition, e);
-					document.body.style.cursor = self.cursor;
+					self._triggerBegin(self.beginPosition, e);
 				}
-				self._trigger('drag', offset, self.position, self.beginPosition, e);
-				if (self._draggingOptions && ds.isFunction(self._draggingOptions.drag))
-					self._draggingOptions.drag(offset, self.position, self.beginPosition, e);
+				self._triggerDrag(offset, self.position, self.beginPosition, e);
 			}
 			return true;
 		});
@@ -2485,12 +2502,11 @@ ds.ui.DragHelper = ds.Object.extend({
 				const offset = {	x: e.pageX - self.beginPosition.x,
 									y: e.pageY - self.beginPosition.y  };
 				if (!self._dragging) return true;
-				if (Math.abs(offset.x) > 3 || Math.abs(offset.y) > 3 || self._draggingPastTreshold) {
-					self._trigger('end', offset, self.position, self.beginPosition, e);
-					if (self._draggingOptions && ds.isFunction(self._draggingOptions.end))
-						self._draggingOptions.end(offset, self.position, self.beginPosition, e);
+				if ((Math.abs(offset.x) > ds.ifnull(self.threshold, 0))
+				|| (Math.abs(offset.y) > ds.ifnull(self.threshold, 0))
+				|| self._draggingPastTreshold) {
+					self._triggerEnd(offset, self.position, self.beginPosition, e);
 				}
-				document.body.style.cursor = null;
 			} finally {
 				self.end();
 			}
