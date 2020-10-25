@@ -2422,23 +2422,29 @@ ds.ui.PopupHelper = ds.Object.extend({
 ds.ui.__parsestyles(ds.ui.PopupHelper.styles);
 ds.ui.DragHelper = ds.Object.extend({
 	_dragging: false,
-	_draggingPastSmallOffset: false,
+	_draggingPastTreshold: false,
 	_draggingBeginTriggered: false,
 	_draggingOptions: null,
 	beginPosition: null,
 	position: null,
 	cursor: null,
+	threshold: 3,
 	begin(options) {
 		const self = this;
 		self._dragging = true;
-		self._draggingPastSmallOffset = false;
+		self._draggingPastTreshold = false;
 		self._draggingBeginTriggered = false;
 		self._draggingOptions = options;
+
+		if (ds.isnull(self.threshold)
+		|| (self.threshold === 0)) {
+			self._draggingPastTreshold = true;
+		}
 	},
 	end() {
 		const self = this;
 		self._dragging = false;
-		self._draggingPastSmallOffset = false;
+		self._draggingPastTreshold = false;
 		self._draggingBeginTriggered = false;
 		self._draggingOptions = null;
 	},
@@ -2458,8 +2464,8 @@ ds.ui.DragHelper = ds.Object.extend({
 			const offset = {	x: self.position.x - self.beginPosition.x,
 								y: self.position.y - self.beginPosition.y  };
 			if (!self._dragging) return true;
-			if (Math.abs(offset.x) > 3 || Math.abs(offset.y) > 3 || self._draggingPastSmallOffset) {
-				self._draggingPastSmallOffset = true;
+			if (Math.abs(offset.x) > 3 || Math.abs(offset.y) > 3 || self._draggingPastTreshold) {
+				self._draggingPastTreshold = true;
 				if (!self._draggingBeginTriggered) {
 					self._draggingBeginTriggered = true;
 					self._trigger('begin', self.beginPosition, e);
@@ -2479,7 +2485,7 @@ ds.ui.DragHelper = ds.Object.extend({
 				const offset = {	x: e.pageX - self.beginPosition.x,
 									y: e.pageY - self.beginPosition.y  };
 				if (!self._dragging) return true;
-				if (Math.abs(offset.x) > 3 || Math.abs(offset.y) > 3 || self._draggingPastSmallOffset) {
+				if (Math.abs(offset.x) > 3 || Math.abs(offset.y) > 3 || self._draggingPastTreshold) {
 					self._trigger('end', offset, self.position, self.beginPosition, e);
 					if (self._draggingOptions && ds.isFunction(self._draggingOptions.end))
 						self._draggingOptions.end(offset, self.position, self.beginPosition, e);
