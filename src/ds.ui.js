@@ -5921,6 +5921,10 @@ ds.ui.DataGrid = ds.ui.View.extend({
 	autoFitContents() {
 		const self = this;
 
+		if (ds.ui.element_rects(self.element).border.width == 0) {
+			return;
+		}
+
 		const limit = (column, width) => {
 			return Math.max(
 				Math.min(
@@ -6289,6 +6293,7 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 				self._dragInfo.element.remove();
 				self._dragInfo.placeholder.remove();
 				self._dragInfo = {};
+				self.needsUpdate();
 			}
 		});
 	}
