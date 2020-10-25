@@ -4593,35 +4593,35 @@ ds.ui.LookupEdit = ds.ui.DropDownEdit.extend({
 		self._getInputElement().value = '';
 		self.needsUpdate().then(() => self._popupHelper.adjust());
 	},
-    _getCheckedLabels() {
-        const self = this;
-        const removeItemVisible = !self.disabled;
-        const label = (name, index) => {
-            return ds.ui.View.new({
-                template: `<div class="__xedt_frm_chk_itm row mid">
+	_getCheckedLabels() {
+		const self = this;
+		const label = (name, index, enabled) => {
+			return ds.ui.View.new({
+				template: `<div class="__xedt_frm_chk_itm row mid">
 								<div>{{ this.name }}</div>
-								<div class="row mid cen hnd dhvr" style="width: ${removeItemVisible ? '18px' : '6px'}; height: 18px;" x-on:click="self.removeItem()">
-									<img src="${ds.ui.TIMES_IMG}" class="x12 dhvrc" style="display: ${removeItemVisible ? null : 'none'}"/>
+								<div x-if="this.enabled" class="row mid cen hnd dhvr" style="width: ${self.disabled ? '6px' : '18px'}; height: 18px;" x-on:click="self.removeItem()">
+									<img src="${ds.ui.TIMES_IMG}" class="x12 dhvrc" style="display: ${self.disabled ? 'none' : null}"/>
 								</div>
 							</div>`,
-                name: name,
-                index: index,
-                lookupEdit: self,
-                removeItem() {
-                    const self = this;
-                    self.lookupEdit._onCheckItem(self.index, false);
-                }
-            });
-        }
-        if (!self.multiple || self.isEmpty() || !self.dataSet || !self.nameKey || !self.valueKey) return [];
-        return (ds.isArray(self.value) ? self.value : [self.value])
-            .map(value => self.dataSet.data.find(item => ds.get(item, self.valueKey) == value))
-            .map(item => {
-                const index = self.dataSet.data.indexOf(item);
-                const name = ds.get(item, self.nameKey);
-                return label(name, index);
-            });
-    },
+				name: name,
+				index: index,
+				enabled: enabled,
+				lookupEdit: self,
+				removeItem() {
+					const self = this;
+					self.lookupEdit._onCheckItem(self.index, false);
+				}
+			});
+		}
+		if (!self.multiple || self.isEmpty() || !self.dataSet || !self.nameKey || !self.valueKey) return [];
+		return (ds.isArray(self.value) ? self.value : [self.value])
+				.map(value => self.dataSet.data.find(item => ds.get(item, self.valueKey) == value))
+				.map(item => {
+					const index = self.dataSet.data.indexOf(item);
+					const name = ds.get(item, self.nameKey);
+					return label(name, index, (!self.disabled && !self.readOnly));
+				});
+	},
 	isEmpty() { return this.value === null || this.value === undefined || this.value === '' || (ds.isArray(this.value) && this.value.length == 0); },
 	update() {
 		const self = this;
