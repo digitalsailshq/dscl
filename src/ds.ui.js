@@ -6003,6 +6003,10 @@ ds.ui.DataGrid = ds.ui.View.extend({
 		}
 		self.needsUpdate();
 	},
+	checkCell(cell, checked, triggerEvent) {
+		const self = this;
+		self._gridBody._checkCell(cell, checked, triggerEvent);
+	},
 	onshow() {
 		const self = this;
 		self._gridBody._checkInnerShadows();
