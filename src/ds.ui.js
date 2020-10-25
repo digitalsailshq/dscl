@@ -4602,6 +4602,7 @@ ds.ui.LookupEdit = ds.ui.DropDownEdit.extend({
 								<div x-if="this.enabled" class="row mid cen hnd dhvr" style="width: 18px; height: 18px;" x-on:click="self.removeItem()">
 									<img src="${ds.ui.TIMES_IMG}" class="x12 dhvrc" />
 								</div>
+								<div x-if="!this.enabled" style="width: 6px;"></div>
 							</div>`,
 				name: name,
 				index: index,
