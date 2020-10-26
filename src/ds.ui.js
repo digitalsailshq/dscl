@@ -1926,7 +1926,7 @@ ds.ui.ModalController = ds.ui.Controller.extend({
 	template: `<div class="col bk {{ this.className }}">
 					<div class="row mid bb pl pt pr pb" x-on:mousedown="self._modalDragHelper.begin()">
 						<div x-ref="title_element" class="flex strong bvl">{{ this.text }}</div>
-						<div class="col mid cen x24 thvr hnd sm" x-on:click="self.closeModal('cancel')">
+						<div x-ref="close_element" class="col mid cen x24 thvr hnd sm" x-on:click="self.closeModal('cancel')">
 							<i class="fa fa-times"></i>
 						</div>
 					</div>
