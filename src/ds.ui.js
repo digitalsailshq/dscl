@@ -1926,7 +1926,7 @@ ds.ui.ModalController = ds.ui.Controller.extend({
 	template: `<div class="col bk {{ this.className }}">
 					<div class="row mid bb pl pt pr pb" x-on:mousedown="self._modalDragHelper.begin()">
 						<div x-ref="title_element" class="flex strong bvl">{{ this.text }}</div>
-						<div class="col mid cen x24 thvr hnd sm" x-on:click="self.closeModal('cancel')">
+						<div x-ref="close_element" class="col mid cen x24 thvr hnd sm" x-on:click="self.closeModal('cancel')">
 							<i class="fa fa-times"></i>
 						</div>
 					</div>
@@ -4602,6 +4602,7 @@ ds.ui.LookupEdit = ds.ui.DropDownEdit.extend({
 								<div x-if="this.enabled" class="row mid cen hnd dhvr" style="width: ${self.disabled ? '6px' : '18px'}; height: 18px;" x-on:click="self.removeItem()">
 									<img src="${ds.ui.TIMES_IMG}" class="x12 dhvrc" style="display: ${self.disabled ? 'none' : null}"/>
 								</div>
+								<div x-if="!this.enabled" style="width: 6px;"></div>
 							</div>`,
 				name: name,
 				index: index,
@@ -6001,6 +6002,10 @@ ds.ui.DataGrid = ds.ui.View.extend({
 				break;
 		}
 		self.needsUpdate();
+	},
+	checkCell(cell, checked, triggerEvent) {
+		const self = this;
+		self._gridBody._checkCell(cell, checked, triggerEvent);
 	},
 	onshow() {
 		const self = this;
