@@ -4607,8 +4607,8 @@ ds.ui.LookupEdit = ds.ui.DropDownEdit.extend({
 			return ds.ui.View.new({
 				template: `<div class="__xedt_frm_chk_itm row mid">
 								<div>{{ this.name }}</div>
-								<div x-if="this.enabled" class="row mid cen hnd dhvr" style="width: ${self.disabled ? '6px' : '18px'}; height: 18px;" x-on:click="self.removeItem()">
-									<img src="${ds.ui.TIMES_IMG}" class="x12 dhvrc" style="display: ${self.disabled ? 'none' : null}"/>
+								<div x-if="this.enabled" class="row mid cen hnd dhvr" style="width: 18px; height: 18px;" x-on:click="self.removeItem()">
+									<img src="${ds.ui.TIMES_IMG}" class="x12 dhvrc" />
 								</div>
 								<div x-if="!this.enabled" style="width: 6px;"></div>
 							</div>`,
