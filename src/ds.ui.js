@@ -1822,6 +1822,7 @@ ds.ui.Modal = function(target) {
 		self._modalDragInfo = { start: { left: 0, top: 0 } };
 		self._modalDragHelper = ds.ui.DragHelper.new();
 		self._modalDragHelper.on('begin', () => {
+            if(self.title_element) self.title_element.click();
 			self._modalDragInfo.start.left = element.offsetLeft;
 			self._modalDragInfo.start.top = element.offsetTop;
 		});
@@ -2119,6 +2120,7 @@ ds.ui.PopupHelper = ds.Object.extend({
 	related: null,
 	target: null,
 	offset: null,
+    corrections: null,
 	triangle: false,
 	triangleBkColor: 'white',
 	triangleBrdColor: '#d7d7d7',
@@ -2168,15 +2170,16 @@ ds.ui.PopupHelper = ds.Object.extend({
 	adjust() {
 		const self = this;
 		self.offset = Object.assign({ left: 0, top: 0 }, self.offset);
+        self.corrections = Object.assign({ width: 0, height: 0 }, self.corrections);
 		const set_limits = (mw, mh) => {
 			if (self._target_rect.width > mw) {
 				self.target.classList.add('__pptrgt_mw');
-				self.target.style.setProperty('--pptrgt-max-width', mw.toString() + 'px' );
+				self.target.style.setProperty('--pptrgt-max-width', mw - self.corrections.width + 'px' );
 				self._target_rect = ds.ui.element_rects(self.target).inner;
 			}
 			if (self._target_rect.height > mh) {
 				self.target.classList.add('__pptrgt_mh');
-				self.target.style.setProperty('--pptrgt-max-height', mh.toString() + 'px' );
+				self.target.style.setProperty('--pptrgt-max-height', mh - self.corrections.height + 'px' );
 				self._target_rect = ds.ui.element_rects(self.target).inner;
 			}
 		}
@@ -4398,7 +4401,12 @@ ds.ui.DropDownEdit = ds.ui.TextEdit.extend({
 			target: self.dropdown_element,
 			align: 'left',
 			direction: 'down',
-			offset: { top: -1 }
+			offset: {
+			    top: -1,
+			},
+            corrections: {
+                height: 10
+            }
 		});
 		self._popupHelper.on('open', () => {
 			self.element.classList.add('__droppeddown');
