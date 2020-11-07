@@ -5646,8 +5646,8 @@ ds.ui.DataGridDateColumn = ds.ui.DataGridColumn.extend({
 	time: true,
 	ontext(item) {
 		const self = this;
-		let text = self.dataKey ? ds.get(item, self.dataKey) : null;
-		return text ? (self.time ? ds.Date.newFromISO(text).DDMMYYYY_HHMM() : ds.Date.newFromISO(text).DDMMYYYY()) : null;
+		const text = self.dataKey ? ds.get(item, self.dataKey) : null;
+		return (ds.isset(text) && text.length > 0) ? (self.time ? ds.Date.newFromISO(text).DDMMYYYY_HHMM() : ds.Date.newFromISO(text).DDMMYYYY()) : null;
 	}
 });
 ds.ui.DataGridUserColumn = ds.ui.DataGridColumn.extend({
