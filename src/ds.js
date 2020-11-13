@@ -60,7 +60,7 @@ ds.destruct = obj => {
 	proc(obj, []);
 	return ret;
 }
-ds.constr = sets => {
+ds.construct = sets => {
 	const ret = {};
 	ds.patch(ret, sets);
 	return ret;
