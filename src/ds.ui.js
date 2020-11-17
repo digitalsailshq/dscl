@@ -1872,6 +1872,9 @@ ds.ui.Modal = function(target) {
 		element.style.setProperty('left', left.toString() + 'px');
 		element.style.setProperty('top', top.toString() + 'px');
 		self._trigger('open');
+        if (document.activeElement) {
+            document.activeElement.blur();
+        }
 	}
 }
 ds.ui.Popup = function(target) {
@@ -1961,8 +1964,8 @@ ds.ui.MessageBox = ds.ui.View.extend({
 				border-radius: 0px !important; }`,
 	template: `<div class="__xmsgbox">
 					<div style="height:3px; background-color: {{ this._getTopLineBGColor() }}"></div>
-					<div class="pl2 pr2 mt2 xlg"><i class="fa {{ this._getIconClassName() }} fa-lg mr"></i>{{ this.text }}</div>
-					<div class="mt2 pl2 pr2">{{ this._getBody() }}</div>
+					<div class="pl pr mt2 xlg"><i class="fa {{ this._getIconClassName() }} fa-lg mr"></i>{{ this.text }}</div>
+					<div class="mt2 pl pr">{{ this._getBody() }}</div>
 					<div class="mt2 mb row">
 						<div class="row mid pl">
 							{{ this._left_buttons }}
