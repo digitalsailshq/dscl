@@ -5654,8 +5654,8 @@ ds.ui.DataGridDateColumn = ds.ui.DataGridColumn.extend({
 	time: true,
 	ontext(item) {
 		const self = this;
-		let text = self.dataKey ? ds.get(item, self.dataKey) : null;
-		return text ? (self.time ? ds.Date.newFromISO(text).DDMMYYYY_HHMM() : ds.Date.newFromISO(text).DDMMYYYY()) : null;
+		const text = self.dataKey ? ds.get(item, self.dataKey) : null;
+		return (ds.isset(text) && text.length > 0) ? (self.time ? ds.Date.newFromISO(text).DDMMYYYY_HHMM() : ds.Date.newFromISO(text).DDMMYYYY()) : null;
 	}
 });
 ds.ui.DataGridUserColumn = ds.ui.DataGridColumn.extend({
@@ -6897,6 +6897,7 @@ ds.ui.Tabs = ds.ui.View.extend({
 			if (i == self.selectedIndex) item_element.classList.add('__selected');
 			if (self._trigger('canclose', i)) ds.ui.element('<span class="__xtbc_itm_cb"><i class="fa fa-times sm"></i></span>', item_element);
 			items.push(item_element);
+			self._trigger('tab', { index: i, element: item_element });
 		}
 		return items;
 	},
@@ -6939,7 +6940,7 @@ ds.ui.Tabs = ds.ui.View.extend({
 			return true;
 		});
 	}
-}, ds.Events('count:single', 'text:single', 'select', 'close', 'canclose:single'));
+}, ds.Events('count:single', 'text:single', 'tab', 'select', 'close', 'canclose:single'));
 ds.ui.Alert = ds.ui.View.extend({
 	styles: `.__xalrt { padding: 0px 0px 8px 12px; overflow: hidden; /*font-size: 13px*/ }
 			.__xalrt.__error { background-color: var(--background-color-error); border-left: var(--border-color-error) solid 3px; color: var(--text-color-error); }

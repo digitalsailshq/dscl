@@ -48,6 +48,52 @@ ds.set = (obj, path, value) => {
     	obj = obj[path_arr[i]];
     }
 }
+ds.destruct = obj => {
+	const ret = [];
+	const proc = (obj, path) => {
+		Object.keys(obj).forEach(key => {
+			const value = obj[key];
+			if (toString.call(value) == '[object Object]') proc(value, [...path, key]);
+			else ret.push({ path: [...path, key], value });
+		});
+	}
+	proc(obj, []);
+	return ret;
+}
+ds.construct = sets => {
+	const ret = {};
+	ds.patch(ret, sets);
+	return ret;
+}
+ds.patch = (obj, sets) => {
+	for (const set of sets) {
+		let dst = obj;
+		for (let i = 0; i < (set.path.length - 1); i++) {
+			const key = set.path[i];
+			if (!dst.hasOwnProperty(key))
+				dst[key] = {};
+			dst = dst[key];
+		}
+		const key = set.path[set.path.length - 1];
+		dst[key] = set.value;
+	}
+	return obj;
+}
+ds.diff = (obj1, obj2) => {
+	const sets1 = ds.destruct(obj1);
+	const sets2 = ds.destruct(obj2);
+	const diff = [];
+	for (const set of sets2) {
+		const path = set.path.join('/');
+		const found = sets1.find(s => s.path.join('/') == path);
+		if (found) {
+			const equals = (JSON.stringify(found.value) === JSON.stringify(set.value));
+			if (equals) {}
+			else diff.push(JSON.parse(JSON.stringify(set)));
+		} else diff.push(JSON.parse(JSON.stringify(set)));
+	}
+	return diff;
+}
 ds.ensurePath = (obj, path, defaultValue) => {
 	if (ds.isnull(obj)) throw new Error('ds.ensurePath: obj argument is required.');
 	if (ds.isnull(path)) throw new Error('ds.ensurePath: path argument is required.');
