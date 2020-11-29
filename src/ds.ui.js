@@ -6879,7 +6879,7 @@ ds.ui.Tabs = ds.ui.View.extend({
 			.__xtbc > .__xtbc_itm { position: relative; flex-shrink: 1; white-space: nowrap; overflow-x: hidden; background-color: var(--background-color); border-color: var(--border-color); border-style: solid; border-width: 1px; padding: 5px 12px 6px 12px; margin-right: -1px; max-width: 250px; min-width: 32px; cursor: pointer; }
 			.__xtbc > .__xtbc_itm:first-child { border-top-left-radius: 3px; }
 			.__xtbc > .__xtbc_itm:last-child { margin-right: 0px; border-top-right-radius: 3px; }
-			.__xtbc > .__xtbc_itm:hover:not(.__selected) { background-color: var(--background-color-light); }
+			.__xtbc > .__xtbc_itm:not(.__selected):hover { background-color: #eceaea; }
 			.__xtbc > .__xtbc_itm.__selected { border-bottom-width: 0px; background-color: white; }
 			.__xtbc > .__xtbc_itm > span { vertical-align: middle; }
 			.__xtbc > .__xtbc_itm > .__xtbc_itm_cb { display: none; position: absolute; top: 50%; right: 0px; padding-right: 4px; transform: translateY(calc(-50% + 1px)); background-color: inherit; width: 28px; height: 24px; margin-left: 10px; border-radius: 50%; line-height: 24px; text-align: center; }
