@@ -487,7 +487,7 @@ ds.srvkit.Server = ds.srvkit.RequestHandler.extend({
 				this.writeHead(404);
 				this.end();
 			} else {
-				if (self.catch)
+				if (self.cache)
 					this.setHeader('Cache-Control', 'public, max-age=3600');
 				const MIMETypes = {
 					'css': 	'text/css',
@@ -509,7 +509,7 @@ ds.srvkit.Server = ds.srvkit.RequestHandler.extend({
 		};
 		res.endBuffer = function(buf, options) {
 			this.statusCode = 200;
-			if (self.catch)
+			if (self.cache)
 				this.setHeader('Cache-Control', 'public, max-age=3600');
 			if (options.contentType) this.setHeader('Content-Type', options.contentType);
 			if (compress) {
