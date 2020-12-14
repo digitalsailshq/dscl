@@ -5739,6 +5739,7 @@ ds.ui.DataGridEditColumn = ds.ui.DataGridColumn.extend({
 	createCell(item, cell) {
 		const self = this;
 		cell.edit = self.editPrototype.new({ readOnly: self.readOnly, inline: true, className: 'flex ml05 mt05 mr05 mb05', dataGrid: self._dataGrid, dataGridCell: cell });
+		self._dataGrid._trigger('create_edit', cell, edit);
 		cell.edit.value = ds.get(item, self.dataKey);
 		cell.edit.on('change', value => self._dataGrid._trigger('edit', cell, value));
 		if (self.ondisabled(item, cell)) {
@@ -6067,7 +6068,7 @@ ds.ui.DataGrid = ds.ui.View.extend({
 		self._gridAppend = null;
 		ds.ui.View.free.call(self);
 	}
-}, ds.Events('data:single', 'link_click', 'action_options:single', 'action_click', 'header_click', 'row_click', 'row_dblclick', 'row_unselect', 'row_options:single', 'cell_options:single', 'cell', 'row', 'check', 'check_all', 'group_options:single', 'check_group', 'link_group_click', 'edit', 'update', 'sort', 'column_resize', 'column_did_resize', 'column_did_drag'));
+}, ds.Events('data:single', 'link_click', 'action_options:single', 'action_click', 'header_click', 'row_click', 'row_dblclick', 'row_unselect', 'row_options:single', 'cell_options:single', 'cell', 'row', 'check', 'check_all', 'group_options:single', 'check_group', 'link_group_click', 'edit', 'update', 'sort', 'column_resize', 'column_did_resize', 'column_did_drag', 'create_edit'));
 ds.ui.__DataGridHeader = ds.ui.View.extend({
 	styles: `.__xgrd_hdr { overflow-x: hidden; }
 			 .__xgrd_hdr_cell_resize { cursor: ew-resize; width: 10px; }
