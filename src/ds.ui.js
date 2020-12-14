@@ -5739,7 +5739,7 @@ ds.ui.DataGridEditColumn = ds.ui.DataGridColumn.extend({
 	createCell(item, cell) {
 		const self = this;
 		cell.edit = self.editPrototype.new({ readOnly: self.readOnly, inline: true, className: 'flex ml05 mt05 mr05 mb05', dataGrid: self._dataGrid, dataGridCell: cell });
-		self._dataGrid._trigger('create_edit', cell, edit);
+		self._dataGrid._trigger('create_edit', cell, cell.edit);
 		cell.edit.value = ds.get(item, self.dataKey);
 		cell.edit.on('change', value => self._dataGrid._trigger('edit', cell, value));
 		if (self.ondisabled(item, cell)) {
