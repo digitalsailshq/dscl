@@ -5755,7 +5755,7 @@ ds.ui.DataGrid = ds.ui.View.extend({
 					{{ this._gridHeader }}
 					{{ this._gridBody }}
 					{{ this._gridAppend }}
-					<div x-if="this._disabled == true" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; background-color: rgba(0, 0, 0, 0.025);"></div>
+					<div x-if="this._disabled == true" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; background-color: rgba(0, 0, 0, 0.05);"></div>
 				</div>`,
 	_gridHeader: null,
 	_gridBody: null,
