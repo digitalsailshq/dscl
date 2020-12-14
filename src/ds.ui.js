@@ -5752,10 +5752,10 @@ ds.ui.DataGridEditColumn = ds.ui.DataGridColumn.extend({
 ds.ui.DataGrid = ds.ui.View.extend({
 	styles: `.__xgrd { position: relative; }`,
 	template: `<div class="__xgrd col">
-					<div x-if="this._disabled == true" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; background-color: rgba(0, 0, 0, 0.1);"></div>
 					{{ this._gridHeader }}
 					{{ this._gridBody }}
 					{{ this._gridAppend }}
+					<div x-if="this._disabled == true" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; background-color: rgba(0, 0, 0, 0.025);"></div>
 				</div>`,
 	_gridHeader: null,
 	_gridBody: null,
