@@ -6085,6 +6085,7 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 	_dataGrid: null,
 	_dragHelper: null,
 	_dragType: null, // 'size' | 'drag'
+	_preventClick: null,
 	_resizeInfo: null,
 	_dragInfo: null,
 	_columnIsResizeVisible(column) {
@@ -6123,32 +6124,6 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 		if (!self._dataGrid) throw 'ds.ui.__DataGridHeader: _dataGrid property must be specified.';
 		self._dataGrid.columns.forEach(column => column._dataGrid = self._dataGrid);
 		ds.ui.View.init.call(self);
-		ds.ui.element_on(self.element, 'click', '.__xgrd_hdr_cell > .__xcell', function(e) {
-			if (self.__freed) return false;
-			const hcell = this.parentElement;
-			const column = self._dataGrid.columns[hcell.getAttribute('data-column-index')];
-			self._dataGrid._trigger('header_click', column);
-			if (!column.sortable || !column.dataKey) return true;
-			if (ds.isPrototypeOf(column, ds.ui.DataGridCheckColumn)) {
-				if (!self._dataGrid._headerCheckbox) return true;
-				const dup = [];
-				column.cells
-					.filter(cell => dup.includes(cell.row.item) ? false : (dup.push(cell.row.item), true))
-					.filter(cell => !cell.options.disabled)
-					.forEach(cell => self._dataGrid._gridBody._toggleCheckCell(cell, false));
-				self._dataGrid._trigger('check_all');
-				(self._dataGrid._gridBody._groups || []).forEach(group => self._dataGrid._gridBody._updateGroupCheck(group));
-			} else {
-				if (self._dataGrid._sortColumn == column) self._dataGrid._sortDirection = (self._dataGrid._sortDirection == 'asc' ? 'desc' : 'asc');
-				else {
-					self._dataGrid._sortColumn = column;
-					self._dataGrid._sortDirection = 'asc';
-				}
-				self._dataGrid._trigger('sort', self._dataGrid._sortColumn, self._dataGrid._sortDirection);
-				self._dataGrid.needsUpdate();
-			}
-			return true;
-		});
 		ds.ui.element_on(self.element, 'mousedown', '.__xgrd_hdr_cell_resize', function(e) {
 			if (self.__freed) return false;
 			e.__captured_by_resize = true;
@@ -6182,11 +6157,40 @@ ds.ui.__DataGridHeader = ds.ui.View.extend({
 			self._dragInfo.element.style.setProperty('top', `${self._dragInfo.rect.top}px`);
 			self._dragInfo.placeholder = ds.ui.element(`<div class="__xgrd_hdr_cell_placeholder"></div>`);
 			self._dragType = 'drag';
+			self._preventClick = false;
 			self._dragHelper.begin();
+			return true;
+		});
+		ds.ui.element_on(self.element, 'mouseup', '.__xgrd_hdr_cell', function(e) {
+			if (self.__freed) return false;
+			if (self._preventClick) return true;
+			const hcell = this;
+			const column = self._dataGrid.columns[hcell.getAttribute('data-column-index')];
+			self._dataGrid._trigger('header_click', column);
+			if (!column.sortable || !column.dataKey) return true;
+			if (ds.isPrototypeOf(column, ds.ui.DataGridCheckColumn)) {
+				if (!self._dataGrid._headerCheckbox) return true;
+				const dup = [];
+				column.cells
+					.filter(cell => dup.includes(cell.row.item) ? false : (dup.push(cell.row.item), true))
+					.filter(cell => !cell.options.disabled)
+					.forEach(cell => self._dataGrid._gridBody._toggleCheckCell(cell, false));
+				self._dataGrid._trigger('check_all');
+				(self._dataGrid._gridBody._groups || []).forEach(group => self._dataGrid._gridBody._updateGroupCheck(group));
+			} else {
+				if (self._dataGrid._sortColumn == column) self._dataGrid._sortDirection = (self._dataGrid._sortDirection == 'asc' ? 'desc' : 'asc');
+				else {
+					self._dataGrid._sortColumn = column;
+					self._dataGrid._sortDirection = 'asc';
+				}
+				self._dataGrid._trigger('sort', self._dataGrid._sortColumn, self._dataGrid._sortDirection);
+				self._dataGrid.needsUpdate();
+			}
 			return true;
 		});
 		self._dragHelper = ds.ui.DragHelper.new();
 		self._dragHelper.on('begin', offset => {
+			self._preventClick = true;
 			if (self._dragType == 'size') {
 
 			} else if (self._dragType == 'drag') {
@@ -6439,9 +6443,11 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 		let value = cell.row.item[cell.column.dataKey] == 1 ? 0 : 1;
 		cell.row.item[cell.column.dataKey] = value;
 		cell.column.cells.forEach(c => {
-			if (c.row.item == cell.row.item) ds.ui.element_classif(c.cell.element, '__checked', value == 1);
+			if (c.row.item == cell.row.item)
+				ds.ui.element_classif(c.cell.element, '__checked', value == 1);
 		});
-        if (self._dataGrid.headerCheckboxRect) self._dataGrid._updateHeadersCheckboxRects();
+        if (self._dataGrid.headerCheckboxRect)
+        	self._dataGrid._updateHeadersCheckboxRects();
 		if (triggerEvent) self._dataGrid._trigger('check', cell, value == 1);
 	},
 	_checkCell(cell, checked = true, triggerEvent = true) {
@@ -6451,7 +6457,8 @@ ds.ui.__DataGridBody = ds.ui.View.extend({
 		if (!ds.isPrototypeOf(cell.column, ds.ui.DataGridCheckColumn)) return;
 		cell.row.item[cell.column.dataKey] = checked ? 1 : 0;
 		cell.cell.element.classList.add('__checked');
-        if (self._dataGrid.headerCheckboxRect) self._dataGrid._updateHeadersCheckboxRects();
+        if (self._dataGrid.headerCheckboxRect)
+        	self._dataGrid._updateHeadersCheckboxRects();
 		if (triggerEvent) self._dataGrid._trigger('check', cell, checked);
 	},
 	_createGroupCell(group) {
