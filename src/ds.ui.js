@@ -5750,7 +5750,9 @@ ds.ui.DataGridEditColumn = ds.ui.DataGridColumn.extend({
 	}
 });
 ds.ui.DataGrid = ds.ui.View.extend({
+	styles: `.__xgrd { position: relative; }`,
 	template: `<div class="__xgrd col">
+					<div x-if="this._disabled == true" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; background-color: rgba(0, 0, 0, 0.1);"></div>
 					{{ this._gridHeader }}
 					{{ this._gridBody }}
 					{{ this._gridAppend }}
@@ -5802,6 +5804,7 @@ ds.ui.DataGrid = ds.ui.View.extend({
 	_dragableColumns: true,
 	_compact: false,
 	_lastColumnResizable: false,
+	_disabled: false,
 	columns: null,
 	data: null,
 	spoilers: null,
@@ -5899,6 +5902,8 @@ ds.ui.DataGrid = ds.ui.View.extend({
 	set lastColumnResizable(value) { this._lastColumnResizable = value; this.needsUpdate(); },
 	get dragableColumns() { return this._dragableColumns; },
 	set dragableColumns(value) { this._dragableColumns = value; this.needsUpdate(); },
+	get disabled() { return this._disabled; },
+	set disabled(value) { this._disabled = value; this.needsUpdate(); },
 	groupExpand(index, expand) {
 		const self = this;
 		let group = self._gridBody._groups[index];
@@ -6030,7 +6035,7 @@ ds.ui.DataGrid = ds.ui.View.extend({
 		if (self._gridHeader) self._gridHeader.update();
 		if (self._gridBody) self._gridBody.update();
 		if (self._gridAppend) self._gridAppend.update();
-		if (self.headerCheckboxRect) self._updateHeadersCheckboxRects();
+		if (self._headerCheckboxRect) self._updateHeadersCheckboxRects();
 		self._trigger('update');
 	},
     _updateHeadersCheckboxRects(){
