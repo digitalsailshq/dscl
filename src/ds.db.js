@@ -453,3 +453,11 @@ ds.db.drop_field = (conn, table_name, field_name) => {
 		else throw new Error(`ds.db.drop_field: Connection type "${conn.__type}" not supported.`);
 	}
 }
+ds.db.create_table_as = (conn, table_name, query) => {
+	const exists = ds.db.table_exists(conn, table_name);
+	if (!exists) {
+		if (conn.__type == 'libpq') ds.db.exec(conn, `create table "${table_name}" as ${query}`);
+		else if (conn.__type == 'odbc') ds.db.exec(conn, `select * into [${table_name}] from (${query})`);
+		else throw new Error(`ds.db.create_table_as: Connection type "${conn.__type}" not supported.`);
+	} else throw new Error(`ds.db.create_table_as: Table "${table_name}" already exists.`);
+}
