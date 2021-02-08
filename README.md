@@ -25,7 +25,7 @@
 ```
 7. Fladaptive tweak
 ```
-"blue_my": "hsl(210, 15%, 12%)"
+"blue_my": "hsl(210, 15%, 10%)"
 "line_hl": "hsl(210, 15%, 17%)"
 "line_highlight": "var(line_hl)",
 ```
