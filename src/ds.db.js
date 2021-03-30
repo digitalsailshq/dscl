@@ -7,6 +7,8 @@ const fslib = require('fs');
 const pathlib = require('path');
 // consts...
 ds.db.datatypes = [
+	{ driver: 'libpq', id: 'bigint', decl: 'bigint', common: 'int' },
+	{ driver: 'libpq', id: 'int8', decl: 'bigint', common: 'int' },
 	{ driver: 'libpq', id: 'int4', decl: 'int', common: 'int' },
 	{ driver: 'libpq', id: 'int2', decl: 'smallint', common: 'int' },
 	{ driver: 'libpq', id: 'numeric', decl: 'numeric', common: 'float' },
@@ -17,6 +19,7 @@ ds.db.datatypes = [
 	{ driver: 'libpq', id: 'bool', decl: 'boolean', common: 'bool' },  // <-- 2 ordinal
 	{ driver: 'libpq', id: 'text', decl: 'text', common: 'text' },
 	{ driver: 'odbc', id: 'int', decl: 'int', common: 'int' },
+	{ driver: 'odbc', id: 'bigint', decl: 'intbig', common: 'int' },
 	{ driver: 'odbc', id: 'numeric', decl: 'numeric', common: 'float' },
 	{ driver: 'odbc', id: 'nvarchar', decl: 'nvarchar', common: 'string' },
 	{ driver: 'odbc', id: 'date', decl: 'date', common: 'date' },
