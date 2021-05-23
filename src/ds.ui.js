@@ -7835,7 +7835,7 @@ ds.ui.post = function(url, text, options) {
 	});
 }
 ds.ui.postJSON = function(url, json, options) {
-	var options = Object.assign({ mode: 'cors', credentials: 'include' }, options);
+	var options = Object.assign({ mode: 'cors', credentials: 'include', headers: { 'Content-Type': 'application/json' } }, options);
 	return new Promise(function(resolve, reject) {
 		ds.ui.post(url, JSON.stringify(json), options).then((text) => {
 			resolve(JSON.parse(text));
@@ -7855,7 +7855,7 @@ ds.ui.patch = function(url, text, options) {
 	});
 }
 ds.ui.patchJSON = function(url, json, options) {
-	var options = Object.assign({ mode: 'cors', credentials: 'include' }, options);
+	var options = Object.assign({ mode: 'cors', credentials: 'include', headers: { 'Content-Type': 'application/json' } }, options);
 	return new Promise((resolve, reject) => {
 		ds.ui.patch(url, JSON.stringify(json), options).then((text) => {
 			resolve(JSON.parse(text));
